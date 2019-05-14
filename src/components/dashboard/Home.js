@@ -1,53 +1,55 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
 
-
-const Home = () => (
-  <div>
-    <Title />
-    <Sets />
-    <button>
-      <Link to="/create">add new set</Link>
-    </button>
-
-  </div>
-)
-
-const Title = () => <h1>FLASHCARDS</h1>
-
-class Sets extends React.Component {
-  sets = [
-    {
-      name: 'verbs',
-      amount: 100,
-      author: 'Anna'
-    },
-    {
-      name: 'adjective',
-      amount: 60,
-      author: 'Alina'
-    }
-  ];
-
-  setsList = () => {
-    return this.sets.map((set, index) =>
-      <li key={ index }>
-        <Link to={`/sets/${set.name}`}>
-          <h2>{ set.name }</h2>
-          <p>{ set.amount } terms</p>
-          <p>created by { set.author }</p>
-        </Link>
-      </li>
-    )
-  };
-
+class Home extends Component {
   render() {
     return (
-      <ul>
-        { this.setsList() }
-      </ul>
+      <Main>
+        <Title>flashcards</Title>
+        {this.props.sets && <Sets sets={this.props.sets} />}
+        <Button>
+          <Link to="/create">
+            <div>add new set</div>
+          </Link>
+        </Button>
+      </Main>
+    );
+  }
+}
+
+
+class Sets extends Component {
+  render() {
+    return (
+      <List>
+        { this.props.sets.map(set =>
+          <ListItem key={ set.id }>
+            <Link to={`/sets/${set.id}`}>
+              <SetWrapper>
+                <Topic>{ set.name }</Topic>
+                <Amount>{ set.terms.length } terms</Amount>
+                <Author>by { set.author }</Author>
+              </SetWrapper>
+            </Link>
+          </ListItem>
+        )}
+      </List>
     )
   }
 };
 
-export default Home;
+const mapStateToProps = state => {
+  console.log(state);
+  return({
+  sets: state.firestore.ordered.sets
+})}
+
+export default compose(
+  connect(mapStateToProps),
+  firestoreConnect([
+    { collection: 'sets' }
+  ])
+)(Home);
