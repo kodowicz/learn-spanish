@@ -3,6 +3,67 @@ import { connect } from 'react-redux';
 import { signUp, signIn } from '../../store/actions/authActions';
 import { Redirect } from 'react-router-dom';
 
+import { Main, Button, colors } from '../../styled/GlobalStyles';
+import styled from 'styled-components';
+
+
+const SwitchWrapper = styled.div`
+  height: 60px;
+  display: flex;
+  position: relative;
+`;
+
+const Switch = styled.button`
+  background: none;
+  border: none;
+  font-family: 'Open Sans', sans-serif;
+  color: ${colors.black};
+  font-size: 16px;
+  width: 50%
+`;
+
+const Border = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: ${colors.blue};
+  transform: ${props => props.toggle ? 'translateX(0)' : 'translateX(100%)'};
+  transition: transform 0.4s ease-out
+`;
+
+const Form = styled.form`
+  margin: 60px 0;
+`;
+
+const Wrapper = styled.div`
+  position: relative;
+  border-radius: 5px;
+  box-shadow: 0 7px 15px -5px rgba(7, 22, 124, 0.2);
+  margin: 40px 0;
+`;
+
+const Label = styled.label`
+  position: absolute;
+  top: -1.2rem;
+  left: 0;
+  font-size: 12px;
+  color: ${colors.gray}
+`;
+
+const Input = styled.input`
+  border-radius: 5px;
+  border: none;
+  padding: 1rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  color: ${colors.black}
+`;
+
+
 class Login extends Component {
   state = { toggle: true }
 
@@ -72,7 +133,7 @@ class SignUpForm extends Component {
   state = {
     email: "",
     username: "",
-    password: ""
+    password: "",
     confirm: ""
   }
 

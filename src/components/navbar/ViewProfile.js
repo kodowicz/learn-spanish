@@ -5,6 +5,58 @@ import { firestoreConnect } from 'react-redux-firebase';
 import { logOut } from '../../store/actions/authActions';
 import { Link, Redirect } from 'react-router-dom';
 
+import { Main, Title, Button, colors, BlockShadow } from '../../styled/GlobalStyles';
+import styled from 'styled-components';
+
+
+const List = styled.div`
+  margin: 35px 0 40px 0;
+`;
+
+const ListItem = styled.div`
+  display: flex;
+  margin: 5px 0;
+  justify-content: space-between;
+`;
+
+const Span = styled.span`
+  
+`
+
+const Subtitle = styled.h2`
+  font-size: 22px;
+  color: ${colors.black};
+  text-align: center;
+  margin: 60px 0 30px 0;
+`
+const SetWrapper = styled(BlockShadow)`
+  display: flex;
+  height: 40px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+
+  a {
+    text-decoration: none
+  }
+`;
+
+const Topic = styled.p`
+  color: #303030;
+  font-weight: 700;
+  font-size: 18px;
+  width: 100%;
+  margin: 0;
+`
+
+const Info = styled.p`
+  color: #849197;
+  font-weight: 600;
+  font-size: 12px;
+  margin: 0
+`
+
 
 class ViewProfile extends Component {
 
@@ -49,15 +101,15 @@ class ViewProfile extends Component {
 const UserDetails = ({ user }) => (
   <List>
     <ListItem>
-      <span>email</span>
-      <span>{ user.email }</span>
+      <Span>email</Span>
+      <Span>{ user.email }</Span>
     </ListItem>
     <ListItem>
-      <span>username</span>
-      <span>{ user.username }</span>
+      <Span>username</Span>
+      <Span>{ user.username }</Span>
     </ListItem>
     <ListItem>
-      <span>change password</span>
+      <Span>change password</Span>
     </ListItem>
   </List>
 )
