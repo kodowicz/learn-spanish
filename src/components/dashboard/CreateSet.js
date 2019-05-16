@@ -1,23 +1,34 @@
-import React from 'react';
-import addButton from '../../images/add.png';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 
-const CreateSet = () => {
-  return (
-    <div>
-      <h1>create set</h1>
-      <p>Name:</p>
+// import styled from 'styled-components';
 
-      <ul>
-        <Term />
-        <Term />
-      </ul>
 
-      <button>
-        <img src={addButton} />
-      </button>
-    </div>
-  )
-};
+
+class CreateSet extends Component {
+  componentDidMount() {
+    this.props.changeLocation('create');
+    this.props.changeLastLocation("/");
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>create set</h1>
+        <p>Name:</p>
+
+        <ul>
+          <Term />
+          <Term />
+        </ul>
+
+        <button>
+        </button>
+      </div>
+    )
+  }
+}
 
 const Term = () => (
   <div>
@@ -26,4 +37,13 @@ const Term = () => (
   </div>
 )
 
-export default CreateSet;
+const mapStateToProps = state => ({
+  location: state.location,
+  lastLocation: state.lastLocation
+})
+
+
+export default connect(
+  mapStateToProps,
+  { changeLocation, changeLastLocation }
+)(CreateSet);

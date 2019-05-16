@@ -3,6 +3,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { logOut } from '../../store/actions/authActions';
+import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { Link, Redirect } from 'react-router-dom';
 
 import { Main, Title, Button, colors, BlockShadow } from '../../styled/GlobalStyles';
@@ -10,24 +11,18 @@ import styled from 'styled-components';
 
 
 const List = styled.div`
-  margin: 35px 0 40px 0;
+  margin: 60px 0 40px 0;
 `;
 
 const ListItem = styled.div`
   display: flex;
-  margin: 5px 0;
   justify-content: space-between;
 `;
 
-const Span = styled.span`
-  
-`
-
 const Subtitle = styled.h2`
-  font-size: 22px;
-  color: ${colors.black};
-  text-align: center;
-  margin: 60px 0 30px 0;
+  text-transform: uppercase;
+  color: ${colors.gray};
+  font-size: 14px
 `
 const SetWrapper = styled(BlockShadow)`
   display: flex;
@@ -36,7 +31,7 @@ const SetWrapper = styled(BlockShadow)`
   justify-content: space-between;
   align-items: center;
   padding: 20px 25px;
-
+  margin-bottom: 25px;
   a {
     text-decoration: none
   }
@@ -57,40 +52,39 @@ const Info = styled.p`
   margin: 0
 `
 
+const Svg = styled.svg`
+  width: 15px;
+  margin-top: 30%;
+  height: 70%;
+  fill: none;
+  stroke: ${colors.black};
+  stroke-width: 10;
+  stroke-linecap: round
+`
+
 
 class ViewProfile extends Component {
+  componentDidMount() {
+    this.props.changeLocation('profile');
+    this.props.changeLastLocation("/");
+  }
 
   handleClick = () => {
     this.props.logOut()
   }
 
-  listOfSets = (sets) => {
-    return sets.map((set, index) =>
-      <SetWrapper key={ index }>
-        <Link to={`/sets/${set.name}`}>
-          <Topic>{ set.name }</Topic>
-          <Info>{ set.terms.length } terms</Info>
-        </Link>
-      </SetWrapper>
-    )
-  }
-
   render() {
     const { userSets, user, auth } = this.props;
-
     if (!auth.uid) return <Redirect to="/signup" />;
 
     return (
       <Main>
-        <Title>hello { user.username }</Title>
-
-        <UserDetails user={ user }/>
-
+        <Title>hello {user.username}</Title>
+        <UserDetails user={user} />
         <Button onClick={this.handleClick}>log out</Button>
-
         <List>
           <Subtitle>your sets</Subtitle>
-          { this.listOfSets(userSets) }
+          <UserSets userSets={userSets} />
         </List>
       </Main>
 
@@ -98,18 +92,35 @@ class ViewProfile extends Component {
   }
 }
 
+const UserSets = ({ userSets }) => {
+  return userSets.map(set =>
+    <SetWrapper key={ set.id }>
+      <Link to={`/sets/${set.id}`}>
+        <Topic>{ set.name }</Topic>
+        <Info>{ set.terms.length } terms</Info>
+      </Link>
+    </SetWrapper>
+  )
+};
+
+
 const UserDetails = ({ user }) => (
   <List>
     <ListItem>
-      <Span>email</Span>
-      <Span>{ user.email }</Span>
+      <span>email</span>
+      <span>{ user.email }</span>
     </ListItem>
     <ListItem>
-      <Span>username</Span>
-      <Span>{ user.username }</Span>
+      <span>username</span>
+      <span>{ user.username }</span>
     </ListItem>
     <ListItem>
-      <Span>change password</Span>
+      <span>change password</span>
+      <span>
+        <Svg viewBox="0 0 100 100">
+          <path d="M20,7 L75,50 M20,93 L75,50" />
+        </Svg>
+      </span>
     </ListItem>
   </List>
 )
@@ -129,7 +140,7 @@ const mapStateToProps = state => {
 }
 
 export default compose(
-  connect(mapStateToProps, { logOut }),
+  connect(mapStateToProps, { logOut, changeLocation, changeLastLocation }),
   firestoreConnect([
     { collection: 'sets' }
   ])

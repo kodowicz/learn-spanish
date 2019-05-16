@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
+import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 
 import styled from 'styled-components';
 import { LinkButton, Main, BlockShadow, Title, colors } from '../../styled/GlobalStyles';
@@ -28,13 +28,14 @@ const Border = styled.div`
 `;
 
 const ButtonsWrapper = styled.div`
-  margin: 40px 0 60px 0;
-  display: flex;
-  justify-content: space-evenly;
+  margin: ${props => props.iseditable ? '40px 0 60px 0' : '30px 0 60px 0' };
+  display: ${props => props.iseditable ? 'flex' : 'block' };
+  ${props => props.iseditable ? 'justify-content: space-evenly' : false };
 `;
 
 const ButtonLink = styled(LinkButton)`
   padding: 0.5rem 2rem;
+  display: ${props => props.iseditable ? 'block' : 'inline' };
 `;
 
 const SubTitle = styled.h2`
@@ -44,12 +45,12 @@ const SubTitle = styled.h2`
 `
 
 const List = styled.ul`
-  margin: 35px 0 40px 0;
+  margin: 0 0 40px 0;
   padding: 0
 `;
 
 const ListItem = styled.li`
-  margin: 25px 0;
+  margin-bottom: 25px;
   list-style: none
   position: relative;
 `;
@@ -76,13 +77,20 @@ const Term = styled.p`
 
 
 class ViewSet extends Component {
+  componentDidMount() {
+    this.props.changeLocation('set');
+    this.props.changeLastLocation("/");
+  }
+
   render() {
-    const { match, set } = this.props;
+    const { match, set, author, signedUser } = this.props;
+    const iseditable = author === signedUser ? true : false;
+
     if (set) {
       return (
         <Main>
           <Description set={set} />
-          <Buttons setId={match.params.id} />
+          <Buttons setId={match.params.id} iseditable={iseditable} />
           <TermsList terms={set.terms} />
         </Main>
       )
@@ -105,10 +113,16 @@ const Description = ({ set }) => (
   </>
 );
 
-const Buttons = ({ setId }) => (
-  <ButtonsWrapper>
-    <ButtonLink to={ `/edit/${setId}` }>edit set</ButtonLink>
-    <ButtonLink to={ `/learn/${setId}` }>learn set</ButtonLink>
+const Buttons = ({ setId, iseditable }) => (
+  <ButtonsWrapper iseditable={iseditable.toString()}>
+    { iseditable &&
+      <ButtonLink to={ `/edit/${setId}` }>edit set</ButtonLink>
+    }
+    <ButtonLink
+      iseditable={iseditable.toString()}
+      to={ `/learn/${setId}` }>
+      learn set
+    </ButtonLink>
   </ButtonsWrapper>
 );
 
@@ -134,14 +148,19 @@ const TermsList = ({ terms }) => (
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
   const sets = state.firestore.data.sets;
-  const set = sets ? sets[id] : null;
+  const singleSet = sets ? sets[id] : null;
+  const author = sets ? singleSet.authorId : null;
+
   return ({
-    set: set
+    set: singleSet,
+    signedUser: state.firebase.auth.uid,
+    author: author,
+    lastLocation: state.lastLocation
   })
 }
 
 export default compose(
-  connect(mapStateToProps),
+  connect(mapStateToProps, { changeLocation, changeLastLocation }),
   firestoreConnect([
     { collection: 'sets' }
   ])

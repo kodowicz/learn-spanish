@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
-import styled from 'styled-components';
+import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 
+import styled from 'styled-components';
 import { LinkButton, Main, BlockShadow, Title } from '../../styled/GlobalStyles';
 
 
@@ -50,6 +51,11 @@ const Info = styled.p`
 
 
 class Home extends Component {
+  componentDidMount() {
+    this.props.changeLocation('home');
+    this.props.changeLastLocation("/");
+  }
+
   render() {
     return (
       <Main>
@@ -82,14 +88,12 @@ class Sets extends Component {
   }
 };
 
-const mapStateToProps = state => {
-  console.log(state);
-  return({
+const mapStateToProps = state => ({
   sets: state.firestore.ordered.sets
-})}
+})
 
 export default compose(
-  connect(mapStateToProps),
+  connect(mapStateToProps, { changeLocation, changeLastLocation }),
   firestoreConnect([
     { collection: 'sets' }
   ])

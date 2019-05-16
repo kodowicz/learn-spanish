@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { signUp, signIn } from '../../store/actions/authActions';
+import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { Redirect } from 'react-router-dom';
 
 import { Main, Button, colors } from '../../styled/GlobalStyles';
@@ -66,6 +67,11 @@ const Input = styled.input`
 
 class Login extends Component {
   state = { toggle: true }
+
+  componentDidMount() {
+    this.props.changeLocation('log in');
+    this.props.changeLastLocation("/");
+  }
 
   handleClick = (toggle) => {
     this.setState({
@@ -180,4 +186,7 @@ const mapStateToProps = state => ({
   authError: state.auth.authError
 });
 
-export default connect(mapStateToProps, { signIn, signUp })(Login);
+export default connect(
+  mapStateToProps,
+  { signIn, signUp, changeLocation, changeLastLocation }
+)(Login);
