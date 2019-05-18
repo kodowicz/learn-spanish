@@ -29,7 +29,44 @@ const Wrapper = styled.div`
   -webkit-user-select: none;
   transition: transform .2s;
   z-index: ${ props => props.layerIndex };
+  visibility: hidden;
 
+  ${ props => props.layerIndex == 0 && css`
+    visibility: visible;
+
+  `};
+
+  ${ props => props.layerIndex == -1 && css`
+    visibility: visible;
+    opacity: 0.5;
+    transform: translate(-2px, -5px) rotate(5deg);
+    box-shadow: 0 0 20px #d8d8d8;
+
+    &::before, &::after {
+      content: "";
+      position: absolute;
+      background: #f7f7f7;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      box-shadow: 0 0 5px #d8d8d8;
+    }
+
+    &::before {
+      transform: translate(-2px, 0px) rotate(-7deg)
+    }
+
+    &::after {
+      transform: translate(-5px, 5px) rotate(-2deg);
+      z-index: -1
+    }
+
+    ${Front}, ${Back} {
+      background: #fbfbfb
+    }
+  `};
+}
 
   /*flipping a card */
   ${props => props.flip && css`
