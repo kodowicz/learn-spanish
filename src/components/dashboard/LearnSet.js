@@ -31,12 +31,12 @@ const Wrapper = styled.div`
   z-index: ${ props => props.layerIndex };
   visibility: hidden;
 
-  ${ props => props.layerIndex == 0 && css`
+  ${ props => props.layerIndex === 0 && css`
     visibility: visible;
 
   `};
 
-  ${ props => props.layerIndex == -1 && css`
+  ${ props => props.layerIndex === -1 && css`
     visibility: visible;
     opacity: 0.5;
     transform: translate(-2px, -5px) rotate(5deg);
@@ -66,10 +66,10 @@ const Wrapper = styled.div`
       background: #fbfbfb
     }
   `};
-}
+
 
   /*flipping a card */
-  ${props => props.flip && css`
+  ${ props => props.flip && css`
     ${Front} {
       transition: transform .6s, opacity 0s .5s;
       opacity: 0;
@@ -79,7 +79,16 @@ const Wrapper = styled.div`
       transition: transform .6s, opacity 0s .15s;
       opacity: 1
     }
-  `}
+  `};
+
+  /* move card */
+  ${ ({ transform }) => transform.rotate !== 0 && css`
+    transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
+  `};
+
+  ${'' /* ${ ({ transform }) => transform.rotate == 0 && css`
+    transform: translate(0px, 0px) rotate(0deg)
+  `}; */}
 `;
 
 const Front = styled.div`
@@ -156,7 +165,6 @@ class LearnSet extends Component {
       <Cards>
         { terms && terms.map(term => {
           layerIndex += 1;
-          console.log(layerIndex);
           return (
             <Card
               layerIndex={layerIndex}
@@ -171,15 +179,33 @@ class LearnSet extends Component {
 }
 
 class Card extends Component {
-  state = {
-    isFlipped: true,
-    isMoved: true,
-    toggle: false,
-    rotateFront: 0,
-    rotateBack: -180,
-    backAmplitude: 120,
-    horizontalAmp: 100,
-    verticalAmp: 50
+  constructor(props) {
+    super(props);
+
+    this.cardRef = React.createRef();
+
+    this.state = {
+      isFlipped: true,
+      isMoved: true,
+      toggle: false,
+      cardCenter: 0,
+      point: { x: 0, y: 0 },
+      position: { x: 0, y: 0 },
+      rotateFront: 0,
+      rotateBack: -180,
+      transformCard: { x: 0, y: 0, rotate: 0 },
+      backAmplitude: 120,
+      horizontalAmp: 100,
+      verticalAmp: 50
+    }
+  }
+
+  componentDidMount () {
+    if (this.cardRef.current) {
+      this.setState({
+        cardCenter: this.cardRef.current.offsetParent.offsetLeft
+      })
+    }
   }
 
   flipCard = () => {
@@ -206,21 +232,95 @@ class Card extends Component {
     this.setState({ isFlipped: true });
   }
 
-  moveCard = (event) => {
-    // console.log(event.targetTouches);
+  startTouch = event => {
+    this.setState({
+      point: {
+        x: event.targetTouches[0].pageX,
+        y: event.targetTouches[0].pageY
+      }
+    })
+  }
+
+  moveCard = event => {
+    const position = {
+      x: event.targetTouches[0].pageX,
+      y: event.targetTouches[0].pageY
+    };
+
+    this.setState({ position: position }, () => {
+      const { point, position, horizontalAmp, verticalAmp } = this.state;
+      let delta = {
+        x: ((position.x - point.x) > horizontalAmp) ?
+        horizontalAmp :
+        ((position.x - point.x) < -horizontalAmp) ?
+        -horizontalAmp :
+        position.x - point.x,
+
+        y: ((position.y - point.y) > verticalAmp) ?
+        verticalAmp :
+        ((position.y - point.y) < -verticalAmp) ?
+        -verticalAmp :
+        position.y - point.y
+      };
+
+      let rotate = delta.x * 0.1;
+
+      this.setState({
+        transformCard: {
+          x: delta.x,
+          y: delta.y,
+          rotate: rotate
+        },
+        isMoved: false
+      })
+    })
+
+
+
+  }
+
+  stopTouch = event => {
+    const position = event.changedTouches[0].pageX;
+    const { cardCenter, backAmplitude } = this.state;
+
+    if (position < (cardCenter - backAmplitude)) {
+      this.moveLeft();
+    } else if (position > (cardCenter + backAmplitude)) {
+      this.moveRight();
+    } else {
+      this.setState({ transformCard: {
+        x: 0,
+        y: 0,
+        rotate: 0
+      }})
+    }
+  }
+
+  moveLeft = () => {
+    console.log("move left");
+  }
+
+  moveRight = () => {
+    console.log("move right");
   }
 
   render() {
     return (
       <Wrapper
+        ref={this.props.layerIndex === 0 ? this.cardRef : null}
+
         flip={this.state.toggle}
         layerIndex={this.props.layerIndex}
+        transform={this.state.transformCard}
+
         onClick={this.flipCard}
         onTransitionEnd={this.animateCard}
+        onTouchMove={this.moveCard}
+        onTouchStart={this.startTouch}
+        onTouchEnd={this.stopTouch}
         >
         <Front
-          rotate={this.state.rotateFront}
-          onTouchMove={this.moveCard}>
+          rotate={this.state.rotateFront}>
 
           <Top>
             <Term>{ this.props.term.english }</Term>
