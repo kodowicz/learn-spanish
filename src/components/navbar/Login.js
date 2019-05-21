@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { signUp, signIn, cleanError } from '../../store/actions/authActions';
+import { signUp, signIn, cleanError, signUpError } from '../../store/actions/authActions';
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { Redirect } from 'react-router-dom';
 
 import { Main, Button, colors } from '../../styled/GlobalStyles';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 
 const SwitchWrapper = styled.div`
@@ -91,7 +91,9 @@ class Login extends Component {
   }
 
   render() {
-    const { auth, authError, signIn, signUp } = this.props;
+    const { auth, authError, signIn, signUp, signUpError } = this.props;
+    const { toggle } = this.state;
+
     if (auth.uid) return <Redirect to={`/profile/${auth.uid}`} />;
 
     return (
@@ -99,12 +101,12 @@ class Login extends Component {
         <SwitchWrapper>
           <Switch onClick={() => this.handleClick(true)}>sign in</Switch>
           <Switch onClick={() => this.handleClick(false)}>sign up</Switch>
-          <Border toggle={this.state.toggle} />
+          <Border toggle={toggle} />
         </SwitchWrapper>
 
-          { this.state.toggle ?
+          { toggle ?
             <SignInForm auth={ auth } error={ authError } signIn={ signIn } /> :
-            <SignUpForm auth={ auth } error={ authError } signUp={ signUp } />
+            <SignUpForm auth={ auth } error={ authError } signUp={ signUp } signUpError={ signUpError }/>
           }
       </Main>
     );
@@ -116,21 +118,6 @@ class SignInForm extends Component {
     email: "",
     password: ""
   }
-
-  errors = [
-    {
-      code: "auth/invalid-email",
-      message: "The email address is badly formatted."
-    },
-    {
-      code: "auth/user-not-found",
-      message: "There is no user record corresponding to this identifier. The user may have been deleted."
-    },
-    {
-      code: "auth/wrong-password",
-      message: "The password is invalid or the user does not have a password."
-    }
-  ]
 
   handleChange = event => {
     this.setState({
@@ -144,7 +131,6 @@ class SignInForm extends Component {
   }
 
   render() {
-    console.log(this.props.error);
     return (
       <Form onSubmit={this.handleSubmit}>
         <ErrorMessage>{ this.props.error }</ErrorMessage>
@@ -167,27 +153,9 @@ class SignUpForm extends Component {
   state = {
     email: "",
     username: "",
-    password: ""
+    password: "",
+    confirm: ""
   }
-
-  errors = [
-    {
-      code: "auth/invalid-email",
-      message: "The email address is badly formatted."
-    },
-    {
-      code: "auth/weak-password",
-      message: "Password should be at least 6 characters."
-    },
-    {
-      code: "auth/email-already-in-use",
-      message: "The email address is already in use by another account."
-    },
-    {
-      code: "",
-      message: "The name should be at least 4 characters."
-    }
-  ]
 
   handleChange = event => {
     this.setState({
@@ -197,7 +165,13 @@ class SignUpForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props.signUp(this.state)
+    if (this.state.username.length <= 4) {
+      this.props.signUpError("Username should be at least 4 characters.")
+    } else if (this.state.password !== this.state.confirm) {
+      this.props.signUpError("The password hasn't been confirmed properly.")
+    } else {
+      this.props.signUp(this.state)
+    }
   }
 
   render() {
@@ -216,7 +190,10 @@ class SignUpForm extends Component {
           <Label htmlFor="password">password</Label>
           <Input id="password" name="password" type="password" onChange={this.handleChange} required/>
         </Wrapper>
-
+        <Wrapper>
+          <Label htmlFor="confirm">confirm</Label>
+          <Input id="confirm" name="confirm" type="password" onChange={this.handleChange} required/>
+        </Wrapper>
         <Button>sign up</Button>
       </Form>
     )
@@ -231,5 +208,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { signIn, signUp, cleanError, changeLocation, changeLastLocation }
+  { signIn, signUp, cleanError, signUpError, changeLocation, changeLastLocation }
 )(Login);

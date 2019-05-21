@@ -40,11 +40,17 @@ const authReducer = (state = initState, action) => {
         authError: 'Logout failed'
       }
 
-      case 'CLEAN_UP':
-        return {
-          ...state,
-          authError: null
-        }
+    case 'CLEAN_UP':
+      return {
+        ...state,
+        authError: null
+      }
+
+    case 'INVALID_DATA':
+      return {
+        ...state,
+        authError: action.message
+      }
 
     default:
       return state;

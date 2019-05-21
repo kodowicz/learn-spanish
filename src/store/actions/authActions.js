@@ -48,3 +48,8 @@ export const logOut = () => (dispatch, getState, { getFirebase }) => {
 export const cleanError = () => ({
   type: 'CLEAN_UP'
 })
+
+export const signUpError = message => ({
+  type: 'INVALID_DATA',
+  message
+})
