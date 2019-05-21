@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { signUp, signIn } from '../../store/actions/authActions';
+import { signUp, signIn, cleanError } from '../../store/actions/authActions';
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { Redirect } from 'react-router-dom';
 
 import { Main, Button, colors } from '../../styled/GlobalStyles';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 
 const SwitchWrapper = styled.div`
@@ -20,7 +20,8 @@ const Switch = styled.button`
   font-family: 'Open Sans', sans-serif;
   color: ${colors.black};
   font-size: 16px;
-  width: 50%
+  width: 50%;
+  ${'' /* outline: none */}
 `;
 
 const Border = styled.div`
@@ -38,6 +39,12 @@ const Form = styled.form`
   margin: 60px 0;
 `;
 
+const ErrorMessage = styled.p`
+  color: #F65D5D;
+  font-size: 14px;
+  text-align: center;
+`;
+
 const Wrapper = styled.div`
   position: relative;
   border-radius: 5px;
@@ -51,6 +58,8 @@ const Label = styled.label`
   left: 0;
   font-size: 12px;
   color: ${colors.gray}
+
+  ${'' /* ${props => props.error === "auth/wrong-password"} */}
 `;
 
 const Input = styled.input`
@@ -61,7 +70,8 @@ const Input = styled.input`
   box-sizing: border-box;
   font-size: 16px;
   font-family: 'Open Sans', sans-serif;
-  color: ${colors.black}
+  color: ${colors.black};
+  outline-color: ${colors.blue};
 `;
 
 
@@ -74,13 +84,14 @@ class Login extends Component {
   }
 
   handleClick = (toggle) => {
+    this.props.cleanError();
     this.setState({
       toggle: toggle
     })
   }
 
   render() {
-    const { auth, signIn, signUp } = this.props;
+    const { auth, authError, signIn, signUp } = this.props;
     if (auth.uid) return <Redirect to={`/profile/${auth.uid}`} />;
 
     return (
@@ -92,8 +103,8 @@ class Login extends Component {
         </SwitchWrapper>
 
           { this.state.toggle ?
-            <SignInForm auth={ auth } signIn={ signIn } /> :
-            <SignUpForm auth={ auth } signUp={ signUp } />
+            <SignInForm auth={ auth } error={ authError } signIn={ signIn } /> :
+            <SignUpForm auth={ auth } error={ authError } signUp={ signUp } />
           }
       </Main>
     );
@@ -106,6 +117,21 @@ class SignInForm extends Component {
     password: ""
   }
 
+  errors = [
+    {
+      code: "auth/invalid-email",
+      message: "The email address is badly formatted."
+    },
+    {
+      code: "auth/user-not-found",
+      message: "There is no user record corresponding to this identifier. The user may have been deleted."
+    },
+    {
+      code: "auth/wrong-password",
+      message: "The password is invalid or the user does not have a password."
+    }
+  ]
+
   handleChange = event => {
     this.setState({
       [event.target.id]: event.target.value
@@ -114,12 +140,14 @@ class SignInForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props.signIn(this.state)
+    this.props.signIn(this.state);
   }
 
   render() {
+    console.log(this.props.error);
     return (
       <Form onSubmit={this.handleSubmit}>
+        <ErrorMessage>{ this.props.error }</ErrorMessage>
       <Wrapper>
         <Label htmlFor="email">email</Label>
         <Input id="email" name="email" type="email" onChange={this.handleChange} required/>
@@ -139,9 +167,27 @@ class SignUpForm extends Component {
   state = {
     email: "",
     username: "",
-    password: "",
-    confirm: ""
+    password: ""
   }
+
+  errors = [
+    {
+      code: "auth/invalid-email",
+      message: "The email address is badly formatted."
+    },
+    {
+      code: "auth/weak-password",
+      message: "Password should be at least 6 characters."
+    },
+    {
+      code: "auth/email-already-in-use",
+      message: "The email address is already in use by another account."
+    },
+    {
+      code: "",
+      message: "The name should be at least 4 characters."
+    }
+  ]
 
   handleChange = event => {
     this.setState({
@@ -157,6 +203,7 @@ class SignUpForm extends Component {
   render() {
     return (
       <Form onSubmit={this.handleSubmit}>
+        <ErrorMessage>{ this.props.error }</ErrorMessage>
         <Wrapper>
           <Label htmlFor="email">email</Label>
           <Input id="email" name="email" type="email" onChange={this.handleChange} required/>
@@ -168,10 +215,6 @@ class SignUpForm extends Component {
         <Wrapper>
           <Label htmlFor="password">password</Label>
           <Input id="password" name="password" type="password" onChange={this.handleChange} required/>
-        </Wrapper>
-        <Wrapper>
-          <Label htmlFor="password">confirm</Label>
-          <Input id="confirm" name="password" type="password" onChange={this.handleChange} required/>
         </Wrapper>
 
         <Button>sign up</Button>
@@ -188,5 +231,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { signIn, signUp, changeLocation, changeLastLocation }
+  { signIn, signUp, cleanError, changeLocation, changeLastLocation }
 )(Login);

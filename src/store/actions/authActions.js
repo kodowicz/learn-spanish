@@ -29,11 +29,11 @@ export const signUp = newUser => (dispatch, getState, { getFirebase, getFirestor
     })
   })
   .then(() => dispatch({ type: 'SIGNUP_SUCCESS' }))
-  .catch(error =>{ console.log(error);
+  .catch(error =>
     dispatch({
       type: 'SIGNUP_ERROR',
       error
-    })}
+    })
   )
 }
 
@@ -44,3 +44,7 @@ export const logOut = () => (dispatch, getState, { getFirebase }) => {
   .then(() => dispatch({ type: 'SIGNOUT_SUCCESS'}))
 
 }
+
+export const cleanError = () => ({
+  type: 'CLEAN_UP'
+})
