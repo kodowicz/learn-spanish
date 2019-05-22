@@ -6,18 +6,31 @@ export const colors = {
   navy: "#07167C",
   blue: "#2561EA",
   black: "#303030",
-  gray: "#849197"
+  gray: "#849197",
+  background: "#E6E6E6"
 }
+
 export const GlobalStyle = createGlobalStyle`
+  html {
+    background: ${colors.white}
+  }
   body {
     font-family: 'Open Sans', sans-serif;
-    color: #303030;
+    color: ${colors.black};
     margin: 0;
     font-size: 16px;
+    height: 100vh;
+    overflow-x: hidden
+  }
+
+  #root {
+    height: 100%
   }
 `
+
+
 export const Main = styled.main`
-  margin: 50px 12vw 0 12vw;
+  margin: 80px 12vw 0 12vw;
 `;
 
 export const BlockShadow = styled.div`
@@ -77,4 +90,13 @@ export const LinkButton = styled(Link)`
     transform: translateY(2px);
     box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.15);
   }
+`
+
+export const BasicInput = styled.input`
+  background: none;
+  border: none;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  color: ${colors.black};
 `
