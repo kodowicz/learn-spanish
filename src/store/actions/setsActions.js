@@ -23,27 +23,40 @@ export const createProject = project => (dispatch, getState, { getFirebase, getF
   })
 }
 
-export const addUnsavedTerm = project => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const setUnsavedName = name => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
-  const subcollection = project.id;
+
+  const docRef = firestore.doc(`users/${authId}/`);
+
+  docRef.update({
+    unsavedSet: name
+  })
+}
+
+export const addUnsavedTerm = term => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firestore = getFirestore();
+  const authId = getState().firebase.auth.uid;
+  const subcollection = term.id;
 
   const docRef = firestore.doc(`users/${authId}/unsaved/${subcollection}`);
 
   docRef.get().then(thisDoc => {
     if (thisDoc.exists) {
-      if (thisDoc.data().term !== project.term || thisDoc.data().definition !== project.definition) {
-        docRef.update(project)
+      if (thisDoc.data().term !== term.term || thisDoc.data().definition !== term.definition) {
+        docRef.update(term)
       }
-
+      if (term.term === "" && term.definition === "") {
+        docRef.delete()
+      }
     } else {
       const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
       const keyId = newDocument.id;
 
       newDocument.set({
         id: keyId,
-        term: project.term,
-        definition: project.definition
+        term: term.term,
+        definition: term.definition
       })
     }
   })
@@ -60,9 +73,78 @@ export const addUnsavedTerm = project => (dispatch, getState, { getFirebase, get
   })
 }
 
-export const refreshSet = () => ({
-  type: 'REFRESHED_SET'
-})
+export const addNewUnsavedTerm = project => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firestore = getFirestore();
+  const authId = getState().firebase.auth.uid;
+  const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
+  const keyId = newDocument.id;
+
+  newDocument.set({
+    id: keyId,
+    term: "",
+    definition: ""
+  })
+  .then(() => {
+    dispatch({
+      type: 'ADD_UNSAVED_NEW_TERM'
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'ADD_UNSAVED_NEW_TERM_ERROR',
+      error
+    })
+  })
+}
+
+export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firestore = getFirestore();
+  const authorId = getState().firebase.auth.uid;
+  const author = getState().firebase.profile.username;
+  const name = getState().firebase.profile.unsavedSet;
+  let terms = [];
+
+  const unsavedRef = firestore.collection(`users/${authorId}/unsaved`);
+  const createdRef = firestore.collection("sets").doc();
+
+  unsavedRef.get().then(querySnapshot => {
+    if (querySnapshot.length >= 2 && name.length > 0) {
+      firestore.doc(`users/${authorId}`).update({ unsavedSet: "" });
+
+      querySnapshot.docs.map(doc => {
+        const documentId = doc.data().id;
+
+        if (doc.data().term && doc.data().definition) {
+          terms.push(doc.data());
+        }
+
+        unsavedRef.doc(documentId).delete();
+      })
+
+
+      firestore.collection("sets").doc(createdRef.id).set({
+        author,
+        authorId,
+        name,
+        terms
+      })
+    }
+  })
+  .then(() => {
+    dispatch({
+      type: 'CREATE_SET'
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'CREATE_SET_ERROR',
+      error
+    })
+  })
+}
+
+export const learnSet = () => (dispatch, getState, { getFirebase, getFirestore }) => {
+  // download set
+  // return shuffled elements with indexes
+}
 
 export const shuffleCard = () => ({
   type: 'SHUFFLE_CARD',

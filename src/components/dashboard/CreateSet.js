@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { addUnsavedTerm, refreshSet } from '../../store/actions/setsActions';
+import { setUnsavedName, addUnsavedTerm, addNewUnsavedTerm, submitSet } from '../../store/actions/setsActions';
 import { Redirect } from 'react-router-dom';
 
 import styled, { css } from 'styled-components';
-import { Button, Main, BlockShadow, BasicInput, colors } from '../../styled/GlobalStyles';
+import { Button, Main, BlockShadow, BasicInput, colors } from '../../assets/styles/GlobalStyles';
 
 
 const SetName = styled.div`
@@ -104,15 +104,12 @@ class CreateSet extends Component {
   }
 
   componentWillReceiveProps (newProps) {
-    const { unsavedSetName, unsavedSetTerms, refreshSet } = this.props;
+    const { unsavedSetName, unsavedSetTerms } = this.props;
 
     if (unsavedSetName !== newProps.unsavedSetName) {
       this.setState({
         setName: newProps.unsavedSetName
       })
-    }
-    if (unsavedSetTerms !== newProps.unsavedSetTerms && unsavedSetTerms.length !== 0) {
-      refreshSet();
     }
   }
 
@@ -122,49 +119,70 @@ class CreateSet extends Component {
     })
   }
 
+  addTerm = event => {
+    event.preventDefault();
+    this.props.addNewUnsavedTerm();
+  }
+
+  submitName = () => {
+    this.props.setUnsavedName(this.state.setName)
+  }
+
   submitSet = event => {
     event.preventDefault();
+    this.props.submitSet()
   }
 
   render() {
-    const { auth, unsavedSetTerms, isTermAdded, addUnsavedTerm, refreshSet } = this.props;
+    const { auth, unsavedSetTerms, newSetKey, addUnsavedTerm } = this.props;
     const isFilled = this.state.setName ? true : false;
-
+    console.log(unsavedSetTerms);
     if (!auth.uid) return <Redirect to="/signup" />;
+    if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
     return (
       <Main>
         <SetName>
-          <NameInput value={this.state.setName} onChange={this.setName} />
+          <NameInput value={this.state.setName} onChange={this.setName} onBlur={this.submitName} />
           <NameLabel isFilled={isFilled} htmlFor="name">Name your set</NameLabel>
           <Border isBig="true" />
         </SetName>
 
-        <Form onSubmit={this.submitSet}>
+        <Form>
           { unsavedSetTerms !== undefined ?
             unsavedSetTerms.length !== 0 ?
               <>
-                {unsavedSetTerms.map(term =>
-                  <Term termDetails={term} key={term.id} refreshSet={refreshSet} addUnsavedTerm={addUnsavedTerm} />
-                )}
-                {isTermAdded && <Term refreshSet={refreshSet} addUnsavedTerm={addUnsavedTerm} />}
+                <UnsavedTerms
+                  unsavedSetTerms={unsavedSetTerms}
+                  addUnsavedTerm={addUnsavedTerm} />
+
               </>
               :
-              <>
-                <Term refreshSet={refreshSet} addUnsavedTerm={addUnsavedTerm} />
-                <Term refreshSet={refreshSet} addUnsavedTerm={addUnsavedTerm} />
-              </>
+              <NewTerms addUnsavedTerm={addUnsavedTerm} />
             :
             <></>
           }
-          <AddButton>add term</AddButton>
-          <SubmitButton>done</SubmitButton>
+          <AddButton onClick={this.addTerm}>add term</AddButton>
+          <SubmitButton onClick={this.submitSet}>done</SubmitButton>
         </Form>
 
       </Main>
     )
   }
 }
+
+const UnsavedTerms = ({ unsavedSetTerms, addUnsavedTerm }) => {
+  return unsavedSetTerms.map(term =>
+    <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
+  )
+};
+
+const NewTerms = ({ addUnsavedTerm }) => (
+  <>
+    <Term addUnsavedTerm={addUnsavedTerm} />
+    <Term addUnsavedTerm={addUnsavedTerm} />
+  </>
+)
 
 class Term extends Component {
   state = {
@@ -187,12 +205,11 @@ class Term extends Component {
   handleChange = event => {
     this.setState({
       [event.target.id]: event.target.value
-    });
+    }, () => this.props.addUnsavedTerm(this.state));
   }
 
   handleFinish = () => {
-    this.props.addUnsavedTerm(this.state);
-    // this.props.refreshSet()
+    // this.props.addUnsavedTerm(this.state);
   }
 
   render() {
@@ -203,7 +220,7 @@ class Term extends Component {
             id="term"
             value={this.state.term}
             onChange={this.handleChange}
-            // onBlur={this.handleFinish}
+            onBlur={this.handleFinish}
           />
           <Label htmlFor="term">term</Label>
           <Border />
@@ -213,12 +230,11 @@ class Term extends Component {
             id="definition"
             value={this.state.definition}
             onChange={this.handleChange}
-            // onBlur={this.handleFinish}
+            onBlur={this.handleFinish}
           />
           <Label htmlFor="definition">definition</Label>
           <Border />
         </DefineTerm>
-        <Button onClick={this.handleFinish}>sub</Button>
       </TermWrapper>
     );
   }
@@ -228,21 +244,27 @@ class Term extends Component {
 
 const mapStateToProps = state => {
   const users = state.firestore.ordered.users;
-  const unsavedSetTerms = users ? users[0].unsaved : [];
+  let unsavedSetTerms = users ?               // why firebase doesn't connect with subcollection?
+    users[0].unsaved === undefined ?
+      users : users[0].unsaved
+      :
+      [];
 
   return ({
-  auth: state.firebase.auth,
-  location: state.location,
-  lastLocation: state.lastLocation,
-  unsavedSetName: state.firebase.profile.unsavedSet,
-  unsavedSetTerms: unsavedSetTerms,
-  isTermAdded: state.isTermAdded
-})}
+    auth: state.firebase.auth,
+    location: state.location,
+    lastLocation: state.lastLocation,
+    unsavedSetName: state.firebase.profile.unsavedSet,
+    unsavedSetTerms: unsavedSetTerms,
+    isTermAdded: state.isTermAdded,
+    newSetKey: state.newSetKey
+  })
+}
 
 export default compose(
   connect(
     mapStateToProps,
-    { addUnsavedTerm, refreshSet, changeLocation, changeLastLocation }
+    { setUnsavedName, addUnsavedTerm, addNewUnsavedTerm, submitSet, changeLocation, changeLastLocation }
   ),
   firestoreConnect(props => [
     {

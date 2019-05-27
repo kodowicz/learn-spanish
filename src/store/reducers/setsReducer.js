@@ -1,6 +1,7 @@
 export const unsavedSetReducer = (state = true, action) => {
   switch (action.type) {
     case 'CREATE_UNSAVED_SET':
+    console.log('new set');
       return false;
 
     case 'REFRESHED_SET':
@@ -11,7 +12,18 @@ export const unsavedSetReducer = (state = true, action) => {
     default:
       return state;
   }
-}
+};
+
+export const createdSetReducer = (state = null, action) => {
+  switch (action.type) {
+    case 'CREATE_SET':
+      return state;
+    case 'CREATE_SET_ERROR':
+      return action.error;
+    default:
+      return state;
+  }
+};
 
 export const shuffleReducer = (state = '', action) => {
   switch (action.type) {
@@ -22,6 +34,4 @@ export const shuffleReducer = (state = '', action) => {
     default:
       return state;
   }
-};
-
-// export default projectReducer;
+}
