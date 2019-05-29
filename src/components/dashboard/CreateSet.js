@@ -138,7 +138,7 @@ class CreateSet extends Component {
     const { setName } = this.state;
     const isFilled = this.state.setName ? true : false;
     console.log(isNewTerm);
-    if (!auth.uid) return <Redirect to="/signup" />;
+    // if (!auth.uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
     return (
@@ -256,6 +256,31 @@ const mapStateToProps = state => {
   //     users : users[0].unsaved
   //     :
   //     [];
+
+  // sometimes it looks different
+  console.log(state.firestore.ordered);
+  // properly:
+  // ordered: {
+  //   users: [
+  //     {
+  //       id: "QhrMlGCm8hcbyPfsr0D1U0jHVPN2" // user id
+  //       unsaved: [
+  //         {id: "0FcS1VpxtWlEpOZwINcg", definition: "", term: ""}
+  //         {id: "ff0f6SZP3RRQstWRM29I", definition: "", term: ""}
+  //       ]
+  //     }
+  //   ]
+  // }
+
+  // unwanted
+  // ordered: {
+  //   sets: [...],
+  //   users: [
+  //     {id: "0FcS1VpxtWlEpOZwINcg", definition: "", term: ""}
+  //     {id: "ff0f6SZP3RRQstWRM29I", definition: "", term: ""}
+  //   ]
+  // }
+
 
   return ({
     auth: state.firebase.auth,
