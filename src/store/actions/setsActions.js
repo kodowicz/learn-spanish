@@ -34,6 +34,36 @@ export const setUnsavedName = name => (dispatch, getState, { getFirebase, getFir
   })
 }
 
+// if there is no subcollection
+export const basicTwoTerms = number => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firestore = getFirestore();
+  const authId = getState().firebase.auth.uid;
+  let size;
+
+  const unsavedRef = firestore.collection("users").doc(authId).collection("unsaved");
+
+  unsavedRef.get().then(snap => {
+    size = snap.size;
+
+  }).then(() => {
+    if (size === 0) {
+      for (let i = 0; i < number; i++) {
+        let newDocument = unsavedRef.doc();
+        let keyId = newDocument.id;
+        console.log(keyId);
+
+        newDocument.set({
+          id: keyId,
+          term: "",
+          definition: ""
+        })
+      }
+    }
+  });
+
+}
+
+// on change input
 export const addUnsavedTerm = term => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
@@ -73,7 +103,8 @@ export const addUnsavedTerm = term => (dispatch, getState, { getFirebase, getFir
   })
 }
 
-export const addNewUnsavedTerm = project => (dispatch, getState, { getFirebase, getFirestore }) => {
+// add term button
+export const addNewUnsavedTerm = () => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
   const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
@@ -107,7 +138,7 @@ export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore 
   const createdRef = firestore.collection("sets").doc();
 
   unsavedRef.get().then(querySnapshot => {
-    if (querySnapshot.length >= 2 && name.length > 0) {
+    if (querySnapshot.docs.length >= 2 && name.length > 0) {
       firestore.doc(`users/${authorId}`).update({ unsavedSet: "" });
 
       querySnapshot.docs.map(doc => {
@@ -120,7 +151,6 @@ export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore 
         unsavedRef.doc(documentId).delete();
       })
 
-
       firestore.collection("sets").doc(createdRef.id).set({
         author,
         authorId,
@@ -131,7 +161,8 @@ export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore 
   })
   .then(() => {
     dispatch({
-      type: 'CREATE_SET'
+      type: 'CREATE_SET',
+      newSetKey: createdRef.id
     })
   }).catch(error => {
     dispatch({

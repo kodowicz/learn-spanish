@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { setUnsavedName, addUnsavedTerm, addNewUnsavedTerm, submitSet } from '../../store/actions/setsActions';
+import { setUnsavedName, basicTwoTerms, addUnsavedTerm, addNewUnsavedTerm, submitSet } from '../../store/actions/setsActions';
 import { Redirect } from 'react-router-dom';
 
 import styled, { css } from 'styled-components';
@@ -87,7 +87,6 @@ const Input = styled(BasicInput)`
   border: none;
   padding: 5px 0;
   outline-color: ${colors.blue}
-
 `;
 
 
@@ -121,6 +120,7 @@ class CreateSet extends Component {
 
   addTerm = event => {
     event.preventDefault();
+    console.log('add term');
     this.props.addNewUnsavedTerm();
   }
 
@@ -134,31 +134,35 @@ class CreateSet extends Component {
   }
 
   render() {
-    const { auth, unsavedSetTerms, newSetKey, addUnsavedTerm } = this.props;
+    const { auth, unsavedSetTerms, isNewTerm, newSetKey, addUnsavedTerm } = this.props;
+    const { setName } = this.state;
     const isFilled = this.state.setName ? true : false;
-    console.log(unsavedSetTerms);
+    console.log(isNewTerm);
     if (!auth.uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
     return (
       <Main>
         <SetName>
-          <NameInput value={this.state.setName} onChange={this.setName} onBlur={this.submitName} />
+          <NameInput value={setName} onChange={this.setName} onBlur={this.submitName} />
           <NameLabel isFilled={isFilled} htmlFor="name">Name your set</NameLabel>
           <Border isBig="true" />
         </SetName>
 
         <Form>
           { unsavedSetTerms !== undefined ?
-            unsavedSetTerms.length !== 0 ?
+            // unsavedSetTerms.length !== 0 ?
               <>
                 <UnsavedTerms
+                  basicTwoTerms={this.props.basicTwoTerms}
                   unsavedSetTerms={unsavedSetTerms}
-                  addUnsavedTerm={addUnsavedTerm} />
-
+                  addUnsavedTerm={addUnsavedTerm}
+                />
               </>
-              :
-              <NewTerms addUnsavedTerm={addUnsavedTerm} />
+              // :
+              // <NewTerms
+              //   addUnsavedTerm={addUnsavedTerm}
+              // />
             :
             <></>
           }
@@ -171,18 +175,25 @@ class CreateSet extends Component {
   }
 }
 
-const UnsavedTerms = ({ unsavedSetTerms, addUnsavedTerm }) => {
-  return unsavedSetTerms.map(term =>
-    <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
-  )
-};
-
-const NewTerms = ({ addUnsavedTerm }) => (
-  <>
-    <Term addUnsavedTerm={addUnsavedTerm} />
-    <Term addUnsavedTerm={addUnsavedTerm} />
-  </>
-)
+class UnsavedTerms extends Component {
+  componentDidMount () {
+    console.log(this.props.unsavedSetTerms);
+    if (this.props.unsavedSetTerms.length === 0) {
+      this.props.basicTwoTerms(2)
+    }
+  }
+  render() {
+    const { unsavedSetTerms, addUnsavedTerm } = this.props;
+    console.log(unsavedSetTerms);
+    return (
+      <>
+        {unsavedSetTerms.map(term =>
+          <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
+        )}
+      </>
+    );
+  }
+}
 
 class Term extends Component {
   state = {
@@ -208,10 +219,6 @@ class Term extends Component {
     }, () => this.props.addUnsavedTerm(this.state));
   }
 
-  handleFinish = () => {
-    // this.props.addUnsavedTerm(this.state);
-  }
-
   render() {
     return (
       <TermWrapper>
@@ -220,7 +227,6 @@ class Term extends Component {
             id="term"
             value={this.state.term}
             onChange={this.handleChange}
-            onBlur={this.handleFinish}
           />
           <Label htmlFor="term">term</Label>
           <Border />
@@ -230,7 +236,6 @@ class Term extends Component {
             id="definition"
             value={this.state.definition}
             onChange={this.handleChange}
-            onBlur={this.handleFinish}
           />
           <Label htmlFor="definition">definition</Label>
           <Border />
@@ -244,11 +249,13 @@ class Term extends Component {
 
 const mapStateToProps = state => {
   const users = state.firestore.ordered.users;
-  let unsavedSetTerms = users ?               // why firebase doesn't connect with subcollection?
-    users[0].unsaved === undefined ?
-      users : users[0].unsaved
-      :
-      [];
+  let unsavedSetTerms = users ? users[0].unsaved : [];
+  // why firebase doesn't connect with subcollection every time?
+  // let unsavedSetTerms = users ?
+  //   users[0].unsaved === undefined ?
+  //     users : users[0].unsaved
+  //     :
+  //     [];
 
   return ({
     auth: state.firebase.auth,
@@ -257,6 +264,7 @@ const mapStateToProps = state => {
     unsavedSetName: state.firebase.profile.unsavedSet,
     unsavedSetTerms: unsavedSetTerms,
     isTermAdded: state.isTermAdded,
+    isNewTerm: state.isNewTerm,
     newSetKey: state.newSetKey
   })
 }
@@ -264,7 +272,15 @@ const mapStateToProps = state => {
 export default compose(
   connect(
     mapStateToProps,
-    { setUnsavedName, addUnsavedTerm, addNewUnsavedTerm, submitSet, changeLocation, changeLastLocation }
+    {
+      setUnsavedName,
+      basicTwoTerms,
+      addUnsavedTerm,
+      addNewUnsavedTerm,
+      submitSet,
+      changeLocation,
+      changeLastLocation
+    }
   ),
   firestoreConnect(props => [
     {
