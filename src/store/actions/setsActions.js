@@ -1,4 +1,4 @@
-export const createProject = project => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createProject = project => (dispatch, getState, { getFirestore }) => {
   // make async call to database
   const firestore = getFirestore();
   const profile = getState().firebase.profile;
@@ -23,7 +23,7 @@ export const createProject = project => (dispatch, getState, { getFirebase, getF
   })
 }
 
-export const setUnsavedName = name => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const setUnsavedName = name => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
 
@@ -35,7 +35,7 @@ export const setUnsavedName = name => (dispatch, getState, { getFirebase, getFir
 }
 
 // if there is no subcollection
-export const basicTwoTerms = number => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
   let size;
@@ -50,21 +50,31 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirebase, getFi
       for (let i = 0; i < number; i++) {
         let newDocument = unsavedRef.doc();
         let keyId = newDocument.id;
-        console.log(keyId);
 
         newDocument.set({
           id: keyId,
           term: "",
-          definition: ""
+          definition: "",
+          time: new Date()
         })
       }
+    } else if (size === 1) {  // necessary if cloud function exists
+      let newDocument = unsavedRef.doc();
+      let keyId = newDocument.id;
+
+      newDocument.set({
+        id: keyId,
+        term: "",
+        definition: "",
+        time: new Date()
+      })
     }
   });
 
 }
 
 // on change input
-export const addUnsavedTerm = term => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const addUnsavedTerm = term => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
   const subcollection = term.id;
@@ -86,7 +96,8 @@ export const addUnsavedTerm = term => (dispatch, getState, { getFirebase, getFir
       newDocument.set({
         id: keyId,
         term: term.term,
-        definition: term.definition
+        definition: term.definition,
+        time: new Date()
       })
     }
   })
@@ -104,7 +115,7 @@ export const addUnsavedTerm = term => (dispatch, getState, { getFirebase, getFir
 }
 
 // add term button
-export const addNewUnsavedTerm = () => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
   const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
@@ -113,7 +124,8 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirebase, getFi
   newDocument.set({
     id: keyId,
     term: "",
-    definition: ""
+    definition: "",
+    time: new Date()
   })
   .then(() => {
     dispatch({
@@ -127,7 +139,7 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirebase, getFi
   })
 }
 
-export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const submitSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authorId = getState().firebase.auth.uid;
   const author = getState().firebase.profile.username;
@@ -139,6 +151,7 @@ export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore 
 
   unsavedRef.get().then(querySnapshot => {
     if (querySnapshot.docs.length >= 2 && name.length > 0) {
+      console.log('added');
       firestore.doc(`users/${authorId}`).update({ unsavedSet: "" });
 
       querySnapshot.docs.map(doc => {
@@ -171,6 +184,10 @@ export const submitSet = () => (dispatch, getState, { getFirebase, getFirestore 
     })
   })
 }
+
+export const removeNewKey = () => ({
+  type: 'REMOVE_KEY'
+})
 
 export const learnSet = () => (dispatch, getState, { getFirebase, getFirestore }) => {
   // download set

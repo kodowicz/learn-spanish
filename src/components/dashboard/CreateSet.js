@@ -29,7 +29,7 @@ const NameLabel = styled.label`
 `;
 
 const NameInput = styled(BasicInput)`
-  padding: 5px 0;
+  padding: 2px 0;
   width: 100%;
   font-size: 20px;
   outline-color: ${colors.blue};
@@ -49,7 +49,8 @@ const Border = styled.div`
 `;
 
 const Form = styled.form`
-  margin: 100px 0
+  margin: 100px 0;
+  padding-bottom: 100px
 `;
 
 const AddButton = styled(Button)`
@@ -85,7 +86,7 @@ const Label = styled.label`
 const Input = styled(BasicInput)`
   width: 100%;
   border: none;
-  padding: 5px 0;
+  padding: 0px 0;
   outline-color: ${colors.blue}
 `;
 
@@ -100,6 +101,10 @@ class CreateSet extends Component {
   componentDidMount() {
     this.props.changeLocation('create');
     this.props.changeLastLocation("/");
+  }
+
+  componentWillUnmount() {
+    console.log(this.props.newSetKey);
   }
 
   componentWillReceiveProps (newProps) {
@@ -137,7 +142,7 @@ class CreateSet extends Component {
     const { auth, unsavedSetTerms, isNewTerm, newSetKey, addUnsavedTerm } = this.props;
     const { setName } = this.state;
     const isFilled = this.state.setName ? true : false;
-    console.log(isNewTerm);
+    // console.log(isNewTerm);
     // if (!auth.uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
@@ -177,19 +182,29 @@ class CreateSet extends Component {
 
 class UnsavedTerms extends Component {
   componentDidMount () {
-    console.log(this.props.unsavedSetTerms);
-    if (this.props.unsavedSetTerms.length === 0) {
+    if (this.props.unsavedSetTerms.length < 2) {
       this.props.basicTwoTerms(2)
     }
   }
+
   render() {
     const { unsavedSetTerms, addUnsavedTerm } = this.props;
-    console.log(unsavedSetTerms);
+    const lastTerm = unsavedSetTerms.length - 1;
+
     return (
       <>
-        {unsavedSetTerms.map(term =>
-          <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
-        )}
+        {unsavedSetTerms.map((term, index) => {
+            if (index === lastTerm) {
+              return <Term
+                termDetails={term}
+                key={term.id}
+                addUnsavedTerm={addUnsavedTerm}
+                focused="true" />
+            } else {
+              return <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
+            }
+
+        })}
       </>
     );
   }
@@ -224,7 +239,9 @@ class Term extends Component {
       <TermWrapper>
         <DefineTerm>
           <Input
+            autoFocus={this.props.focused ? "true" : "false"}
             id="term"
+            tabIndex={this.props.index}
             value={this.state.term}
             onChange={this.handleChange}
           />
@@ -234,6 +251,7 @@ class Term extends Component {
         <DefineTerm>
           <Input
             id="definition"
+            tabIndex={this.props.index}
             value={this.state.definition}
             onChange={this.handleChange}
           />
@@ -247,52 +265,16 @@ class Term extends Component {
 
 
 
-const mapStateToProps = state => {
-  const users = state.firestore.ordered.users;
-  let unsavedSetTerms = users ? users[0].unsaved : [];
-  // why firebase doesn't connect with subcollection every time?
-  // let unsavedSetTerms = users ?
-  //   users[0].unsaved === undefined ?
-  //     users : users[0].unsaved
-  //     :
-  //     [];
-
-  // sometimes it looks different
-  console.log(state.firestore.ordered);
-  // properly:
-  // ordered: {
-  //   users: [
-  //     {
-  //       id: "QhrMlGCm8hcbyPfsr0D1U0jHVPN2" // user id
-  //       unsaved: [
-  //         {id: "0FcS1VpxtWlEpOZwINcg", definition: "", term: ""}
-  //         {id: "ff0f6SZP3RRQstWRM29I", definition: "", term: ""}
-  //       ]
-  //     }
-  //   ]
-  // }
-
-  // unwanted
-  // ordered: {
-  //   sets: [...],
-  //   users: [
-  //     {id: "0FcS1VpxtWlEpOZwINcg", definition: "", term: ""}
-  //     {id: "ff0f6SZP3RRQstWRM29I", definition: "", term: ""}
-  //   ]
-  // }
-
-
-  return ({
-    auth: state.firebase.auth,
-    location: state.location,
-    lastLocation: state.lastLocation,
-    unsavedSetName: state.firebase.profile.unsavedSet,
-    unsavedSetTerms: unsavedSetTerms,
-    isTermAdded: state.isTermAdded,
-    isNewTerm: state.isNewTerm,
-    newSetKey: state.newSetKey
-  })
-}
+const mapStateToProps = state => ({
+  auth: state.firebase.auth,
+  location: state.location,
+  lastLocation: state.lastLocation,
+  unsavedSetName: state.firebase.profile.unsavedSet,
+  unsavedSetTerms: state.firestore.ordered.unsaved,
+  isTermAdded: state.isTermAdded,
+  isNewTerm: state.isNewTerm,
+  newSetKey: state.newSetKey
+})
 
 export default compose(
   connect(
@@ -311,9 +293,9 @@ export default compose(
     {
       collection: 'users',
       doc: props.auth.uid,
-      subcollections: [
-        { collection: 'unsaved' }
-      ]
+      subcollections: [{ collection: 'unsaved' }],
+      storeAs: 'unsaved',
+      orderBy: ["time"]
     }
   ])
 )(CreateSet);

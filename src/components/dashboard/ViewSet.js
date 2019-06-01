@@ -3,9 +3,10 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
+import { removeNewKey } from '../../store/actions/setsActions';
 
 import styled from 'styled-components';
-import { LinkButton, Main, BlockShadow, Title, colors } from '../../styled/GlobalStyles';
+import { LinkButton, Main, BlockShadow, Title, colors } from '../../assets/styles/GlobalStyles';
 
 
 
@@ -34,7 +35,7 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ButtonLink = styled(LinkButton)`
-  padding: 0.5rem 2rem;
+  padding: 1rem 3.5rem;
   display: ${props => props.iseditable ? 'block' : 'inline' };
 `;
 
@@ -46,7 +47,7 @@ const SubTitle = styled.h2`
 
 const List = styled.ul`
   margin: 0 0 40px 0;
-  padding: 0
+  padding: 0;
 `;
 
 const ListItem = styled.li`
@@ -69,7 +70,7 @@ const Counter = styled.span`
 `
 
 const Term = styled.p`
-  font-weight: 700;
+  font-weight: ${({ weight }) => weight};
   font-size: 16px
   margin: 0.3rem 0
 `
@@ -80,6 +81,7 @@ class ViewSet extends Component {
   componentDidMount() {
     this.props.changeLocation('set');
     this.props.changeLastLocation("/");
+    this.props.removeNewKey();
   }
 
   render() {
@@ -130,12 +132,12 @@ const TermsList = ({ terms }) => (
   <>
     <SubTitle>terms</SubTitle>
     <List>
-      {terms.map(term =>
-        <ListItem key={ term.termId }>
-          <Counter>{ term.termId + 1 }</Counter>
+      {terms.map((term, index) =>
+        <ListItem key={ term.id }>
+          <Counter>{ index }</Counter>
           <SetWrapper>
-            <Term>{ term.english }</Term>
-            <Term>{ term.polish }</Term>
+            <Term weight={700}>{ term.term }</Term>
+            <Term weight={600}>{ term.definition }</Term>
           </SetWrapper>
         </ListItem>
       )}
@@ -149,18 +151,18 @@ const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
   const sets = state.firestore.data.sets;
   const singleSet = sets ? sets[id] : null;
-  const author = sets ? singleSet.authorId : null;
+  const authorId = sets && singleSet ? singleSet.authorId : null;
 
   return ({
     set: singleSet,
     signedUser: state.firebase.auth.uid,
-    author: author,
+    author: authorId,
     lastLocation: state.lastLocation
   })
 }
 
 export default compose(
-  connect(mapStateToProps, { changeLocation, changeLastLocation }),
+  connect(mapStateToProps, { removeNewKey, changeLocation, changeLastLocation }),
   firestoreConnect([
     { collection: 'sets' }
   ])
