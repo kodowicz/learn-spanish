@@ -6,8 +6,9 @@ import { logOut } from '../../store/actions/authActions';
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { Link, Redirect } from 'react-router-dom';
 
-import { Main, Title, Button, colors, BlockShadow } from '../../styled/GlobalStyles';
+import { Main, Title, Button, colors, BlockShadow } from '../../assets/styles/GlobalStyles';
 import styled from 'styled-components';
+import arrow from '../../assets/images/arrow.svg';
 
 
 const List = styled.div`
@@ -32,6 +33,7 @@ const SetWrapper = styled(BlockShadow)`
   align-items: center;
   padding: 20px 25px;
   margin-bottom: 25px;
+  box-sizing: content-box;
   a {
     text-decoration: none
   }
@@ -52,21 +54,11 @@ const Info = styled.p`
   margin: 0
 `
 
-const Svg = styled.svg`
-  width: 15px;
-  margin-top: 30%;
-  height: 70%;
-  fill: none;
-  stroke: ${colors.black};
-  stroke-width: 10;
-  stroke-linecap: round
-`
-
 
 class ViewProfile extends Component {
   componentDidMount() {
     this.props.changeLocation('profile');
-    this.props.changeLastLocation("/");
+    this.props.changeLastLocation("");
   }
 
   handleClick = () => {
@@ -75,6 +67,7 @@ class ViewProfile extends Component {
 
   render() {
     const { userSets, user, auth } = this.props;
+
     if (!auth.uid) return <Redirect to="/signup" />;
 
     return (
@@ -82,10 +75,12 @@ class ViewProfile extends Component {
         <Title>hello {user.username}</Title>
         <UserDetails user={user} />
         <Button onClick={this.handleClick}>log out</Button>
-        <List>
-          <Subtitle>your sets</Subtitle>
-          <UserSets userSets={userSets} />
-        </List>
+        { userSets.length > 0 &&
+          <List>
+            <Subtitle>your sets</Subtitle>
+            <UserSets userSets={userSets} />
+          </List>
+        }
       </Main>
 
     );
@@ -117,9 +112,7 @@ const UserDetails = ({ user }) => (
     <ListItem>
       <span>change password</span>
       <span>
-        <Svg viewBox="0 0 100 100">
-          <path d="M20,7 L75,50 M20,93 L75,50" />
-        </Svg>
+        <img src={arrow} alt="change password" />
       </span>
     </ListItem>
   </List>
@@ -130,7 +123,7 @@ const mapStateToProps = state => {
   const userId = state.firebase.auth.uid;
   const sets = state.firestore.ordered.sets;
   const userSets = sets ? sets.filter(set => set.authorId === userId) : [];
-
+  console.log(state);
   return ({
     userSets: userSets,
     user: state.firebase.profile,

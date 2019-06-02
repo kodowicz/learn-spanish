@@ -39,7 +39,7 @@ export const GlobalStyle = createGlobalStyle`
 
 
 export const Main = styled.main`
-  margin: 80px 12vw 0 12vw;
+  margin: 80px 12vw;
 `;
 
 export const BlockShadow = styled.div`
