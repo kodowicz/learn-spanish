@@ -3,7 +3,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { removeNewKey } from '../../store/actions/setsActions';
+import { removeNewKey } from '../../store/actions/createSetActions';
 
 import styled from 'styled-components';
 import { LinkButton, Main, BlockShadow, Title, colors } from '../../assets/styles/GlobalStyles';
@@ -84,21 +84,23 @@ class ViewSet extends Component {
     this.props.removeNewKey();
   }
 
-  render() {
-    const { match, set, author, signedUser } = this.props;
-    const iseditable = author === signedUser ? true : false;
 
-    if (set) {
+
+  render() {
+    const { match, set, author, terms, signedUser } = this.props;
+    const iseditable = author === signedUser ? true : false;
+    // console.log(this.props);
+    if (terms) {
       return (
         <Main>
           <Description set={set} />
           <Buttons setId={match.params.id} iseditable={iseditable} />
-          <TermsList terms={set.terms} />
+          <TermsList terms={terms} />
         </Main>
       )
     } else {
       return (
-        <div></div>
+        <Main></Main>
       )
     }
   }
@@ -106,11 +108,11 @@ class ViewSet extends Component {
 
 const Description = ({ set }) => (
   <>
-    <SetName>{ set.name }</SetName>
+    <SetName>{set.name}</SetName>
     <Details>
-      <span>{ set.terms.length } terms</span>
+      <span>{set.amount} terms</span>
       <Border />
-      <span>by { set.author } </span>
+      <span>by {set.author}</span>
     </Details>
   </>
 );
@@ -118,11 +120,11 @@ const Description = ({ set }) => (
 const Buttons = ({ setId, iseditable }) => (
   <ButtonsWrapper iseditable={iseditable.toString()}>
     { iseditable &&
-      <ButtonLink to={ `/edit/${setId}` }>edit set</ButtonLink>
+      <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
     }
     <ButtonLink
       iseditable={iseditable.toString()}
-      to={ `/learn/${setId}` }>
+      to={`/learn/${setId}`}>
       learn set
     </ButtonLink>
   </ButtonsWrapper>
@@ -149,21 +151,32 @@ const TermsList = ({ terms }) => (
 
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
-  const sets = state.firestore.data.sets;
-  const singleSet = sets ? sets[id] : null;
-  const authorId = sets && singleSet ? singleSet.authorId : null;
+  const set = state.firestore.data.set ? state.firestore.data.set[id] : null;
+  const authorId = set ? set.authorId : null;
+  const terms = state.firestore.ordered.terms;
 
   return ({
-    set: singleSet,
+    set: set,
     signedUser: state.firebase.auth.uid,
     author: authorId,
+    terms: terms,
     lastLocation: state.lastLocation
   })
 }
 
 export default compose(
   connect(mapStateToProps, { removeNewKey, changeLocation, changeLastLocation }),
-  firestoreConnect([
-    { collection: 'sets' }
+  firestoreConnect(props => [
+    {
+      collection: 'sets',
+      doc: props.match.params.id,
+      storeAs: 'set'
+    },
+    {
+      collection: 'sets',
+      doc: props.match.params.id,
+      subcollections: [{ collection: 'terms' }],
+      storeAs: 'terms'
+    }
   ])
 )(ViewSet);
