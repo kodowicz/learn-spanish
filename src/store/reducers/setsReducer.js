@@ -39,6 +39,16 @@ export const createdSetReducer = (state = null, action) => {
   }
 };
 
+export const isSubmitedEditReducer = (state = null, action) => {
+  switch (action.type) {
+    case 'SUBMIT_EDIT_SET':
+      return action.isSubmited;
+      
+    default:
+      return state;
+  }
+};
+
 export const shuffleReducer = (state = '', action) => {
   switch (action.type) {
     case 'SHUFFLE_CARD':

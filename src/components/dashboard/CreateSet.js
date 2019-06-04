@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { setUnsavedName, basicTwoTerms, addUnsavedTerm, addNewUnsavedTerm, submitSet } from '../../store/actions/setsActions';
+import { setUnsavedName, basicTwoTerms, addUnsavedTerm, addNewUnsavedTerm, submitSet } from '../../store/actions/createSetActions';
 import { Redirect } from 'react-router-dom';
 
 import styled, { css } from 'styled-components';
@@ -103,10 +103,6 @@ class CreateSet extends Component {
     this.props.changeLastLocation("/");
   }
 
-  componentWillUnmount() {
-    console.log(this.props.newSetKey);
-  }
-
   componentWillReceiveProps (newProps) {
     const { unsavedSetName, unsavedSetTerms } = this.props;
 
@@ -125,7 +121,6 @@ class CreateSet extends Component {
 
   addTerm = event => {
     event.preventDefault();
-    console.log('add term');
     this.props.addNewUnsavedTerm();
   }
 
@@ -141,9 +136,9 @@ class CreateSet extends Component {
   render() {
     const { auth, unsavedSetTerms, isNewTerm, newSetKey, addUnsavedTerm } = this.props;
     const { setName } = this.state;
-    const isFilled = this.state.setName ? true : false;
-    // console.log(isNewTerm);
-    // if (!auth.uid) return <Redirect to="/signup" />;
+    const isFilled = setName ? true : false;
+
+    if (!auth.uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
     return (
@@ -155,8 +150,7 @@ class CreateSet extends Component {
         </SetName>
 
         <Form>
-          { unsavedSetTerms !== undefined ?
-            // unsavedSetTerms.length !== 0 ?
+          { unsavedSetTerms ?
               <>
                 <UnsavedTerms
                   basicTwoTerms={this.props.basicTwoTerms}
@@ -164,10 +158,6 @@ class CreateSet extends Component {
                   addUnsavedTerm={addUnsavedTerm}
                 />
               </>
-              // :
-              // <NewTerms
-              //   addUnsavedTerm={addUnsavedTerm}
-              // />
             :
             <></>
           }
@@ -194,12 +184,13 @@ class UnsavedTerms extends Component {
     return (
       <>
         {unsavedSetTerms.map((term, index) => {
+          // is basic terms added /* */
             if (index === lastTerm) {
               return <Term
                 termDetails={term}
                 key={term.id}
                 addUnsavedTerm={addUnsavedTerm}
-                focused="true" />
+                focused={true} />
             } else {
               return <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
             }
@@ -239,7 +230,7 @@ class Term extends Component {
       <TermWrapper>
         <DefineTerm>
           <Input
-            autoFocus={this.props.focused ? "true" : "false"}
+            autoFocus={this.props.focused ? true : false}
             id="term"
             tabIndex={this.props.index}
             value={this.state.term}

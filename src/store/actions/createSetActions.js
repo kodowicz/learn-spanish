@@ -58,16 +58,10 @@ export const addUnsavedTerm = term => (dispatch, getState, { getFirestore }) => 
 
   docRef.get().then(thisDoc => {
     if (thisDoc.exists) {
-      if (thisDoc.data().term !== term.term || thisDoc.data().definition !== term.definition) {
-        docRef.update(term)
-      }
-      // if (term.term === "" && term.definition === "") {
-      //   docRef.delete()
-      // }
+      docRef.update(term)
     // } else {
     //   const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
     //   const keyId = newDocument.id;
-    //   console.log('else');
     //   newDocument.set({
     //     id: keyId,
     //     term: term.term,

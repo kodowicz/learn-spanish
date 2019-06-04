@@ -1,5 +1,5 @@
 import authReducer from './authReducer';
-import { unsavedSetReducer, newUnsavedTermReducer, createdSetReducer, shuffleReducer } from './setsReducer';
+import { createdSetReducer, shuffleReducer, isSubmitedEditReducer } from './setsReducer';
 import { locationReducer, lastLocationReducer } from './locationReducer';
 import { combineReducers } from 'redux';
 import { firestoreReducer } from 'redux-firestore';
@@ -8,9 +8,8 @@ import { firebaseReducer } from 'react-redux-firebase';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  // isTermAdded: unsavedSetReducer,
-  // isNewTerm: newUnsavedTermReducer,
   newSetKey: createdSetReducer,
+  isEditSubmited: isSubmitedEditReducer,
   shuffled: shuffleReducer,
   location: locationReducer,
   lastLocation: lastLocationReducer,

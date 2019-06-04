@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { removeNewKey } from '../../store/actions/createSetActions';
+import { submitEditedSet } from '../../store/actions/editSetActions';
 
 import styled from 'styled-components';
 import { LinkButton, Main, BlockShadow, Title, colors } from '../../assets/styles/GlobalStyles';
@@ -82,14 +84,15 @@ class ViewSet extends Component {
     this.props.changeLocation('set');
     this.props.changeLastLocation("/");
     this.props.removeNewKey();
+    this.props.submitEditedSet(false)
   }
-
-
 
   render() {
     const { match, set, author, terms, signedUser } = this.props;
     const iseditable = author === signedUser ? true : false;
-    // console.log(this.props);
+
+    if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
+
     if (terms) {
       return (
         <Main>
@@ -160,12 +163,21 @@ const mapStateToProps = (state, ownProps) => {
     signedUser: state.firebase.auth.uid,
     author: authorId,
     terms: terms,
-    lastLocation: state.lastLocation
+    lastLocation: state.lastLocation,
+    isEditSubmited: state.isEditSubmited
   })
 }
 
 export default compose(
-  connect(mapStateToProps, { removeNewKey, changeLocation, changeLastLocation }),
+  connect(
+    mapStateToProps,
+    {
+      removeNewKey,
+      submitEditedSet,
+      changeLocation,
+      changeLastLocation
+    }
+  ),
   firestoreConnect(props => [
     {
       collection: 'sets',
@@ -176,7 +188,8 @@ export default compose(
       collection: 'sets',
       doc: props.match.params.id,
       subcollections: [{ collection: 'terms' }],
-      storeAs: 'terms'
+      storeAs: 'terms',
+      orderBy: ["time"]
     }
   ])
 )(ViewSet);
