@@ -3,92 +3,117 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { editSetName, updateTerm, addNewTerm, submitEditedSet } from '../../store/actions/editSetActions';
+import { editSetName, updateTerm, addNewTerm, removeTerm, submitEditedSet } from '../../store/actions/editSetActions';
 import { Redirect } from 'react-router-dom';
 
 import styled, { css } from 'styled-components';
 import { Button, Main, BlockShadow, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import removeButton from '../../assets/images/remove.png';
 
 
 const SetName = styled.div`
   position: relative;
   margin: 100px 10px 60px;
-  `;
+`;
 
-  const NameLabel = styled.label`
-    position: absolute;
-    bottom: 5px;
-    left: 0;
-    font-size: 20px;
-    color: ${colors.gray};
-    transition: opacity 0.1s;
+const NameLabel = styled.label`
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  font-size: 20px;
+  color: ${colors.gray};
+  transition: opacity 0.1s;
 
-    ${props => props.isFilled && css `
-      opacity: 0;
-    `}
-  `;
+  ${props => props.isFilled && css `
+    opacity: 0;
+  `}
+`;
 
-  const NameInput = styled(BasicInput)`
-    padding: 2px 0;
-    width: 100%;
-    font-size: 20px;
-    outline-color: ${colors.blue};
+const NameInput = styled(BasicInput)`
+  padding: 2px 0;
+  width: 100%;
+  font-size: 20px;
+  outline-color: ${colors.blue};
 
-    &:focus + ${NameLabel} {
-      opacity: 0;
-    }
-  `;
+  &:focus + ${NameLabel} {
+    opacity: 0;
+  }
+`;
 
-  const Border = styled.div`
-    width: 100%;
-    height: 1px;
-    background: ${colors.gray};
-    position: absolute;
-    bottom: ${props => props.isBig ? '0' : '10px'};
-    left: 0;
-  `;
+const Border = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${colors.gray};
+  position: absolute;
+  bottom: ${props => props.isBig ? '0' : '10px'};
+  left: 0;
+`;
 
-  const Form = styled.form`
-    margin: 100px 0;
-    padding-bottom: 100px
-  `;
+const Form = styled.form`
+  margin: 100px 0;
+  padding-bottom: 100px
+`;
 
-  const AddButton = styled(Button)`
-    margin: 50px auto
-  `;
+const AddButton = styled(Button)`
+  margin: 50px auto
+`;
 
-  const SubmitButton = styled(Button)`
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%
-  `;
+const SubmitButton = styled(Button)`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%
+`;
 
-  const TermWrapper = styled(BlockShadow)`
-    padding: 5px 20px 25px 20px;
-    margin: 25px 0;
-  `;
+const Wrapper = styled.div`
+  display: grid;
+  grid-template: 1fr / 1fr 80px
+  margin: 25px 0;
+`
 
-  const DefineTerm = styled.div`
-    position: relative;
-    padding: 5px 0 10px 0;
-  `;
+const TermWrapper = styled(BlockShadow)`
+  grid-column: 1 / 3;
+  grid-row: 1 / 2;
+  padding: 5px 20px 25px 20px;
+  transition: transform 0.1s ease-out;
+  transform: ${props => `translateX(${props.isMoved}px)`};
+  background: white
+`;
 
-  const Label = styled.label`
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    color: ${colors.gray};
-    font-size: 10px;
-    text-transform: uppercase;
-  `;
+const DefineTerm = styled.div`
+  position: relative;
+  padding: 5px 0 10px 0;
+`;
 
-  const Input = styled(BasicInput)`
-    width: 100%;
-    border: none;
-    padding: 0px 0;
-    outline-color: ${colors.blue}
-  `;
+const Label = styled.label`
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  color: ${colors.gray};
+  font-size: 10px;
+  text-transform: uppercase;
+`;
+
+const Input = styled(BasicInput)`
+  width: 100%;
+  border: none;
+  padding: 0px 0;
+  outline-color: ${colors.blue}
+`;
+
+const DeleteButton = styled.button`
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  background: none;
+  border: none;
+  padding: 0;
+  display: ${ props => props.isMoved ? 'block' : 'none' }
+`
+
+const RemoveImg = styled.img`
+  width: 25px;
+  height: 25px
+`
 
 
 class EditSet extends Component {
@@ -131,11 +156,13 @@ class EditSet extends Component {
   }
 
   render() {
-    const { author, signedUser, setId, terms, isNewTerm, updateTerm } = this.props;
+    const { author, signedUser, setId, terms, isNewTerm, updateTerm, removeTerm } = this.props;
     const { setName, redirect } = this.state;
     const isFilled = setName ? true : false;
 
     // if (signedUser !== author) return <Redirect to={`/sets/${setId}`} />;
+
+    // TODO: fix firestoreConnect update
     if (this.props.isEditSubmited) return <Redirect to={`/sets/${setId}`} />
 
     return (
@@ -152,6 +179,7 @@ class EditSet extends Component {
                 <TermList
                   terms={terms}
                   updateTerm={updateTerm}
+                  removeTerm={removeTerm}
                 />
               </>
             :
@@ -169,7 +197,7 @@ class EditSet extends Component {
 class TermList extends Component {
 
   render() {
-    const { terms, updateTerm } = this.props;
+    const { terms, updateTerm, removeTerm } = this.props;
     const lastTerm = terms.length - 1;
 
     return (
@@ -177,12 +205,19 @@ class TermList extends Component {
         {terms.map((term, index) => {
           if (index === lastTerm) {
             return <Term
-              termDetails={term}
-              key={term.id}
-              updateTerm={updateTerm}
-              focused={true} />
+                      key={term.id}
+                      termDetails={term}
+                      updateTerm={updateTerm}
+                      focused={true}
+                      removeTerm={removeTerm}
+                    />
           } else {
-            return <Term termDetails={term} key={term.id} updateTerm={updateTerm} />
+            return <Term
+                      key={term.id}
+                      termDetails={term}
+                      updateTerm={updateTerm}
+                      removeTerm={removeTerm}
+                    />
           }
 
         })}
@@ -195,8 +230,13 @@ class Term extends Component {
   state = {
     term: "",
     definition: "",
-    id: null
-  }
+    id: null,
+    firstTouch: null,
+    lastTouch: null,
+    currentTouch: null,
+    isDeleted: false,
+    isMoved: 0
+  };
 
   componentDidMount () {
     if (this.props.termDetails) {
@@ -215,31 +255,110 @@ class Term extends Component {
     }, () => this.props.updateTerm(this.state));
   }
 
+  handleTouchStart = event => {
+    this.setState({
+      lastTouch: event.targetTouches[0].clientX,
+      firstTouch: event.targetTouches[0].clientX
+    })
+  }
+
+  handleTouchMove = event => {
+    const currentTouch = event.targetTouches[0].clientX;
+
+    this.setState(() => ({
+      currentTouch
+    }), () => {
+      let isDeleted = null;
+      let isMoved = 0;
+
+      isMoved = -(this.state.firstTouch - this.state.currentTouch);
+
+      if (this.state.lastTouch > this.state.currentTouch) {
+        isDeleted = true;
+        if (isMoved <= -80) {
+          isMoved = -80
+        } else if (isMoved > 0) {
+          isMoved = 0
+        }
+
+      } else if (this.state.lastTouch < this.state.currentTouch) {
+        isDeleted = false;
+        if (isMoved >= 0) {
+          isMoved = 0
+          // TODO: fix moving back too fast
+        } else if (isMoved < -80) {
+          isMoved = -80
+        }
+      }
+
+      this.setState({
+        isDeleted,
+        isMoved,
+        lastTouch: currentTouch
+      })
+    })
+  }
+
+  handleTouchEnd = event => {
+    if (this.state.isMoved < -40) {
+      this.setState({
+        isMoved: -80
+      })
+    } else {
+      this.setState({
+        isMoved: 0
+      })
+    }
+
+    if (this.state.isDeleted) {
+      console.log('remove');
+    }
+  }
+
+  removeElement = event => {
+    event.preventDefault();
+    this.props.removeTerm(this.state.id);
+  }
+
   render() {
+    const { isMoved } = this.state;
     return (
-      <TermWrapper>
-        <DefineTerm>
-          <Input
-            autoFocus={this.props.focused ? true : false}
-            id="term"
-            tabIndex={this.props.index}
-            value={this.state.term}
-            onChange={this.handleChange}
-          />
-          <Label htmlFor="term">term</Label>
-          <Border />
-        </DefineTerm>
-        <DefineTerm>
-          <Input
-            id="definition"
-            tabIndex={this.props.index}
-            value={this.state.definition}
-            onChange={this.handleChange}
-          />
-          <Label htmlFor="definition">definition</Label>
-          <Border />
-        </DefineTerm>
-      </TermWrapper>
+      <Wrapper>
+        <TermWrapper
+          isMoved={isMoved}
+          onTouchStart={this.handleTouchStart}
+          onTouchMove={this.handleTouchMove}
+          onTouchEnd={this.handleTouchEnd}
+        >
+          <DefineTerm>
+            <Input
+              autoFocus={this.props.focused ? true : false}
+              id="term"
+              tabIndex={this.props.index}
+              value={this.state.term}
+              onChange={this.handleChange}
+            />
+            <Label htmlFor="term">term</Label>
+            <Border />
+          </DefineTerm>
+          <DefineTerm>
+            <Input
+              id="definition"
+              tabIndex={this.props.index}
+              value={this.state.definition}
+              onChange={this.handleChange}
+            />
+            <Label htmlFor="definition">definition</Label>
+            <Border />
+          </DefineTerm>
+        </TermWrapper>
+        <DeleteButton
+          isMoved={isMoved}
+          onClick={this.removeElement}
+        >
+          <img src={removeButton} />
+        </DeleteButton>
+      </Wrapper>
     );
   }
 }
@@ -261,6 +380,7 @@ const mapStateToProps = (state, ownProps) => {
     terms: terms,
     setName: name,
     isNewTerm: state.isNewTerm,
+    isTermDeleted: state.isTermDeleted,
     isEditSubmited: state.isEditSubmited
   })
 }
@@ -272,6 +392,7 @@ export default compose(
       editSetName,
       updateTerm,
       addNewTerm,
+      removeTerm,
       submitEditedSet,
       changeLocation,
       changeLastLocation

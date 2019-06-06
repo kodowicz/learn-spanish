@@ -45,14 +45,14 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
   const newDocRef = firestore.collection(`sets/${setId}/terms`).doc();
   const keyId = newDocRef.id;
 
-  setRef.get().then(thisDoc => {
-    let amount = thisDoc.data().amount;
-    amount += 1;
-
-    setRef.update({
-      amount
-    })
-  })
+  // setRef.get().then(thisDoc => {
+  //   let amount = thisDoc.data().amount;
+  //   amount += 1;
+  //
+  //   // setRef.update({
+  //   //   amount
+  //   // })
+  // })
 
   newDocRef.set({
     id: keyId,
@@ -67,6 +67,24 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
   }).catch(error => {
     dispatch({
       type: 'ADD_NEW_TERM_ERROR',
+      error
+    })
+  })
+}
+
+export const removeTerm = termId => (dispatch, getState, { getFirestore })  => {
+  const firestore = getFirestore();
+  const setId = getState().firestore.ordered.set[0].id;
+
+  const termRef = firestore.doc(`sets/${setId}/terms/${termId}`)
+
+  termRef.delete().then(() => {
+    dispatch({
+      type: 'DELETE_TERM'
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'DELETE_TERM_ERROR',
       error
     })
   })
