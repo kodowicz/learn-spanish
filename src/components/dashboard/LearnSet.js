@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
-import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
+import { changeLocation, changeLastLocation, currentSetId } from '../../store/actions/locationActions';
+import { shuffleCard, throwoutCard } from '../../store/actions/learnSetActions';
 
-import styled, { css } from 'styled-components';
-// import { colors } from '../../styled/GlobalStyles';
-
-
+import styled, { css, keyframes } from 'styled-components';
 
 const Cards = styled.div`
   position: relative;
@@ -86,10 +84,55 @@ const Wrapper = styled.div`
     transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
   `};
 
-  ${'' /* ${ ({ transform }) => transform.rotate == 0 && css`
-    transform: translate(0px, 0px) rotate(0deg)
-  `}; */}
+  ${ ({ moveLeft, layerIndex }) => moveLeft && layerIndex === 0 && css` /* front*/
+    animation: ${shuffle} 0.8s ease-out forwards
+  `};
+
+  ${ ({ moveRight, layerIndex }) => moveRight && layerIndex === -1 && css`  /* back */
+    animation: ${throwOut} 0.5s ease-out forwards
+  `};
 `;
+
+
+const shuffle = keyframes`
+  0% {
+    /*transform: rotate(0deg)*/
+  }
+
+  50% {
+    transform: translateX(-200px) rotate(-15deg);
+  }
+
+  55% {
+    z-index: -10
+  }
+
+  100% {
+    transform: rotate(0deg);
+    z-index: -10
+  }
+`
+
+const throwOut = keyframes`
+  0% {
+    /*transform: rotate(0deg);
+    opacity: 1 */
+  }
+
+  30% {
+    /*opacity: 1*/
+  }
+
+  50% {
+    transform: translateX(300px) rotate(15deg);
+    opacity: 0.5
+  }
+
+  100% {
+    transform: translateX(300px) rotate(15deg);
+    opacity: 0
+  }
+`
 
 const Front = styled.div`
   position: absolute;
@@ -129,8 +172,8 @@ const Top = styled.div`
 `;
 
 const Bottom = styled.div`
-  height: 2.5rem;
-  margin: 0 0.5rem;
+  height: 3.5rem;
+  margin: 0 0.7rem;
   border-top: 0.5px solid #C6C6C6;
   display: flex;
   justify-content: center;
@@ -138,7 +181,7 @@ const Bottom = styled.div`
 `;
 
 const Term = styled.div`
-  font-size: 1.3rem;
+  font-size: 1.8rem;
 `;
 
 const Tap = styled.button`
@@ -150,33 +193,65 @@ const Tap = styled.button`
 `;
 
 
-
 class LearnSet extends Component {
+  state = {
+    terms: []
+  }
+
   componentDidMount() {
-    this.props.changeLocation('learn');
     const setId = this.props.match.params.id;
+
+    this.props.changeLocation('learn');
     this.props.changeLastLocation(`/sets/${setId}`);
+    this.props.currentSetId(setId);
   }
 
   render() {
-    const { terms } = this.props;
-    let layerIndex = terms == null ? 0 : -terms.length;
     return (
       <Cards>
-        { terms && terms.map(term => {
-          layerIndex += 1;
-          return (
-            <Card
-              layerIndex={layerIndex}
-              key={term.termId}
-              term={term}
-            />
-          )
-        })}
+        { this.props.terms &&
+          <CardList
+            terms={this.props.terms}
+            shuffled={this.props.shuffled}
+            shuffleCard={this.props.shuffleCard}
+            throwoutCard={this.props.throwoutCard}
+          />
+        }
       </Cards>
-    )
+    );
   }
 }
+
+class CardList extends Component {
+  state = {
+    terms: []
+  }
+
+  render() {
+    return (
+      <div>
+        {
+          this.props.terms.map(term => {
+            if (term.layerIndex >= -1) {
+              return (
+                <Card
+                  layerIndex={term.layerIndex}
+                  key={term.id}
+                  term={term}
+                  shuffleCard={this.props.shuffleCard}
+                  throwoutCard={this.props.throwoutCard}
+                />
+              )
+            } else {
+              return <></>
+            }
+          })
+        }
+      </div>
+    );
+  }
+}
+
 
 class Card extends Component {
   constructor(props) {
@@ -186,7 +261,7 @@ class Card extends Component {
 
     this.state = {
       isFlipped: true,
-      isMoved: true,
+      isMoved: false,
       toggle: false,
       cardCenter: 0,
       point: { x: 0, y: 0 },
@@ -194,7 +269,9 @@ class Card extends Component {
       rotateFront: 0,
       rotateBack: -180,
       transformCard: { x: 0, y: 0, rotate: 0 },
-      backAmplitude: 120,
+      moveLeft: 0,
+      moveRight: 0,
+      backAmplitude: 60,
       horizontalAmp: 100,
       verticalAmp: 50
     }
@@ -210,7 +287,7 @@ class Card extends Component {
 
   flipCard = () => {
     if (this.state.isFlipped) {
-      if (this.state.isMoved) {
+      if (!this.state.isMoved) {
         this.setState(prevState => {
           const rotateFront = prevState.rotateFront + 180;
           const rotateBack = prevState.rotateBack + 180;
@@ -223,7 +300,7 @@ class Card extends Component {
         })
         this.setState({ isFlipped: false });
       } else {
-        this.setState({ isMoved: true });
+        this.setState({ isMoved: false });
       }
     }
   }
@@ -271,7 +348,7 @@ class Card extends Component {
           y: delta.y,
           rotate: rotate
         },
-        isMoved: false
+        isMoved: true
       })
     })
 
@@ -281,11 +358,11 @@ class Card extends Component {
 
   stopTouch = event => {
     const position = event.changedTouches[0].pageX;
-    const { cardCenter, backAmplitude } = this.state;
+    const { isMoved, cardCenter, backAmplitude } = this.state;
 
-    if (position < (cardCenter - backAmplitude)) {
+    if (position < (cardCenter - backAmplitude) && isMoved) {
       this.moveLeft();
-    } else if (position > (cardCenter + backAmplitude)) {
+    } else if (position > (cardCenter + backAmplitude) && isMoved) {
       this.moveRight();
     } else {
       this.setState({ transformCard: {
@@ -297,11 +374,11 @@ class Card extends Component {
   }
 
   moveLeft = () => {
-    console.log("move left");
+    this.props.shuffleCard(this.props.term.id);
   }
 
   moveRight = () => {
-    console.log("move right");
+    this.props.throwoutCard(this.props.term.id);
   }
 
   render() {
@@ -312,18 +389,20 @@ class Card extends Component {
         flip={this.state.toggle}
         layerIndex={this.props.layerIndex}
         transform={this.state.transformCard}
+        moveLeft={this.state.moveLeft}
+        moveRight={this.state.moveRight}
 
         onClick={this.flipCard}
         onTransitionEnd={this.animateCard}
         onTouchMove={this.moveCard}
         onTouchStart={this.startTouch}
         onTouchEnd={this.stopTouch}
-        >
+      >
         <Front
           rotate={this.state.rotateFront}>
 
           <Top>
-            <Term>{ this.props.term.english }</Term>
+            <Term>{ this.props.term.term }</Term>
           </Top>
 
           <Bottom>
@@ -337,7 +416,7 @@ class Card extends Component {
           onTouchMove={this.moveCard}>
 
           <Top>
-            <Term>{ this.props.term.polish }</Term>
+            <Term>{ this.props.term.definition }</Term>
           </Top>
 
           <Bottom>
@@ -352,24 +431,44 @@ class Card extends Component {
 }
 
 
-const mapStateToProps = (state, ownProps) => {
-  const setId = ownProps.match.params.id;
-  const sets = state.firestore.data.sets;
-  const terms = sets ? state.firestore.data.sets[setId].terms : null;
+const renderCards = (terms) => {
+  if (terms) {
+    let layerIndex = 1;
+    let visibleCards = terms.map(term => {
+      layerIndex -= 1;
 
-  return ({
-    location: state.location,
-    lastLocation: state.lastLocation,
-    terms: terms
-  })
+      return Object.assign({}, term, { layerIndex: layerIndex })
+    });
+
+    return visibleCards
+  }
 }
+
+const mapStateToProps = state => ({
+  uid: state.firebase.auth.uid,
+  shuffled: state.shuffled,
+  location: state.location,
+  lastLocation: state.lastLocation,
+  terms: renderCards(state.firestore.ordered.terms)
+})
+
 
 export default compose(
   connect(
     mapStateToProps,
-    { changeLocation, changeLastLocation }
+    { changeLocation, changeLastLocation, currentSetId, shuffleCard, throwoutCard }
   ),
-  firestoreConnect([
-    { collection: 'sets' }
+  firestoreConnect(props => [
+    {
+      collection: 'users',
+      doc: props.uid,
+      subcollections: [{
+        collection: 'learn',
+        doc: props.match.params.id,
+        subcollections: [{ collection: 'basic' }]
+      }],
+      storeAs: 'terms',
+      orderBy: ["time"]
+    }
   ])
 )(LearnSet);

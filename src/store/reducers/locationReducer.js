@@ -15,3 +15,12 @@ export const lastLocationReducer = (state = "/", action) => {
       return state;
   }
 };
+
+export const setIdReducer = (state = "", action) => {
+  switch (action.type) {
+    case 'CURRENT_SET_ID':
+      return action.id;
+    default:
+      return state;
+  }
+}

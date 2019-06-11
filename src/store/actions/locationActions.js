@@ -7,3 +7,8 @@ export const changeLastLocation = location => ({
   type: 'LAST_LOCATION',
   location
 });
+
+export const currentSetId = id => ({
+  type: 'CURRENT_SET_ID',
+  id
+})
