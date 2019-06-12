@@ -1,9 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase'
-import { compose } from 'redux'
-import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { editSetName, updateTerm, addNewTerm, removeTerm, submitEditedSet } from '../../store/actions/editSetActions';
 import { Redirect } from 'react-router-dom';
 
 import styled, { css } from 'styled-components';
@@ -110,11 +105,6 @@ const DeleteButton = styled.button`
   display: ${ props => props.isMoved ? 'block' : 'none' }
 `
 
-const RemoveImg = styled.img`
-  width: 25px;
-  height: 25px
-`
-
 
 class EditSet extends Component {
   state = {
@@ -142,7 +132,7 @@ class EditSet extends Component {
   addTerm = event => {
     event.preventDefault();
     this.props.addNewTerm();
-    console.log('added');
+    this.setState({ state: this.state });
   }
 
   submitName = () => {
@@ -151,19 +141,18 @@ class EditSet extends Component {
 
   submitSet = event => {
     event.preventDefault();
-    // this.setState({ redirect: true });
     this.props.submitEditedSet(true)
   }
 
   render() {
-    const { author, signedUser, setId, terms, isNewTerm, updateTerm, removeTerm } = this.props;
-    const { setName, redirect } = this.state;
+    const { setId, terms, updateTerm, removeTerm } = this.props;
+    const { setName } = this.state;
     const isFilled = setName ? true : false;
 
     // if (signedUser !== author) return <Redirect to={`/sets/${setId}`} />;
-
-    // TODO: fix firestoreConnect update
     if (this.props.isEditSubmited) return <Redirect to={`/sets/${setId}`} />
+
+    console.log('updated firestore');
 
     return (
       <Main>
@@ -204,20 +193,24 @@ class TermList extends Component {
       <>
         {terms.map((term, index) => {
           if (index === lastTerm) {
-            return <Term
-                      key={term.id}
-                      termDetails={term}
-                      updateTerm={updateTerm}
-                      focused={true}
-                      removeTerm={removeTerm}
-                    />
+            return (
+              <Term
+                key={term.id}
+                termDetails={term}
+                updateTerm={updateTerm}
+                focused={true}
+                removeTerm={removeTerm}
+              />
+            )
           } else {
-            return <Term
-                      key={term.id}
-                      termDetails={term}
-                      updateTerm={updateTerm}
-                      removeTerm={removeTerm}
-                    />
+            return (
+              <Term
+                key={term.id}
+                termDetails={term}
+                updateTerm={updateTerm}
+                removeTerm={removeTerm}
+              />
+            )
           }
 
         })}
@@ -285,7 +278,7 @@ class Term extends Component {
         isDeleted = false;
         if (isMoved >= 0) {
           isMoved = 0
-          // TODO: fix moving back too fast
+          // TODO: moving back too fast
         } else if (isMoved < -80) {
           isMoved = -80
         }
@@ -310,9 +303,9 @@ class Term extends Component {
       })
     }
 
-    if (this.state.isDeleted) {
-      console.log('remove');
-    }
+    // if (this.state.isDeleted) {
+    //   console.log('remove');
+    // }
   }
 
   removeElement = event => {
@@ -356,7 +349,7 @@ class Term extends Component {
           isMoved={isMoved}
           onClick={this.removeElement}
         >
-          <img src={removeButton} />
+          <img src={removeButton} alt="remove" />
         </DeleteButton>
       </Wrapper>
     );
@@ -370,6 +363,8 @@ const mapStateToProps = (state, ownProps) => {
   const authorId = set ? set.authorId : null;
   const terms =  state.firestore.ordered.terms;
   const name = set ? set.name : null;
+
+  console.log(state.firestore.ordered.terms);
 
   return ({
     location: state.location,
