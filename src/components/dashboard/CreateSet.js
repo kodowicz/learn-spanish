@@ -104,7 +104,7 @@ class CreateSet extends Component {
   }
 
   componentWillReceiveProps (newProps) {
-    const { unsavedSetName, unsavedSetTerms } = this.props;
+    const { unsavedSetName } = this.props;
 
     if (unsavedSetName !== newProps.unsavedSetName) {
       this.setState({
@@ -134,7 +134,7 @@ class CreateSet extends Component {
   }
 
   render() {
-    const { auth, unsavedSetTerms, isNewTerm, newSetKey, addUnsavedTerm } = this.props;
+    const { auth, unsavedSetTerms, newSetKey, addUnsavedTerm } = this.props;
     const { setName } = this.state;
     const isFilled = setName ? true : false;
 

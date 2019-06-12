@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
+
 import { Redirect } from 'react-router-dom';
-import { firestoreConnect } from 'react-redux-firebase';
-import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { removeNewKey } from '../../store/actions/createSetActions';
-import { submitEditedSet } from '../../store/actions/editSetActions';
 
 import styled from 'styled-components';
 import { LinkButton, Main, BlockShadow, Title, colors } from '../../assets/styles/GlobalStyles';
@@ -93,7 +88,7 @@ class ViewSet extends Component {
 
     if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
 
-    if (terms) {
+    if (set && terms) {
       return (
         <Main>
           <Description set={set} />
@@ -122,9 +117,9 @@ const Description = ({ set }) => (
 
 const Buttons = ({ setId, iseditable }) => (
   <ButtonsWrapper iseditable={iseditable.toString()}>
-    { iseditable &&
+    {/* { iseditable && */}
       <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
-    }
+    {/* } */}
     <ButtonLink
       iseditable={iseditable.toString()}
       to={`/learn/${setId}`}>
@@ -150,46 +145,4 @@ const TermsList = ({ terms }) => (
   </>
 );
 
-
-
-const mapStateToProps = (state, ownProps) => {
-  const id = ownProps.match.params.id;
-  const set = state.firestore.data.set ? state.firestore.data.set[id] : null;
-  const authorId = set ? set.authorId : null;
-  const terms = state.firestore.ordered.terms;
-
-  return ({
-    set: set,
-    signedUser: state.firebase.auth.uid,
-    author: authorId,
-    terms: terms,
-    lastLocation: state.lastLocation,
-    isEditSubmited: state.isEditSubmited
-  })
-}
-
-export default compose(
-  connect(
-    mapStateToProps,
-    {
-      removeNewKey,
-      submitEditedSet,
-      changeLocation,
-      changeLastLocation
-    }
-  ),
-  firestoreConnect(props => [
-    {
-      collection: 'sets',
-      doc: props.match.params.id,
-      storeAs: 'set'
-    },
-    {
-      collection: 'sets',
-      doc: props.match.params.id,
-      subcollections: [{ collection: 'terms' }],
-      storeAs: 'terms',
-      orderBy: ["time"]
-    }
-  ])
-)(ViewSet);
+export default ViewSet
