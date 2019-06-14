@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase'
-import { compose } from 'redux'
-import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
-import { setUnsavedName, basicTwoTerms, addUnsavedTerm, addNewUnsavedTerm, submitSet } from '../../store/actions/createSetActions';
 import { Redirect } from 'react-router-dom';
+import TermsList from './TermsList';
 
 import styled, { css } from 'styled-components';
-import { Button, Main, BlockShadow, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { Button, Main, BasicInput, colors } from '../../assets/styles/GlobalStyles';
 
 
 const SetName = styled.div`
@@ -64,32 +60,6 @@ const SubmitButton = styled(Button)`
   width: 100%
 `;
 
-const TermWrapper = styled(BlockShadow)`
-  padding: 5px 20px 25px 20px;
-  margin: 25px 0;
-`;
-
-const DefineTerm = styled.div`
-  position: relative;
-  padding: 5px 0 10px 0;
-`;
-
-const Label = styled.label`
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  color: ${colors.gray};
-  font-size: 10px;
-  text-transform: uppercase;
-`;
-
-const Input = styled(BasicInput)`
-  width: 100%;
-  border: none;
-  padding: 0px 0;
-  outline-color: ${colors.blue}
-`;
-
 
 
 
@@ -104,13 +74,9 @@ class CreateSet extends Component {
   }
 
   componentWillReceiveProps (newProps) {
-    const { unsavedSetName } = this.props;
-
-    if (unsavedSetName !== newProps.unsavedSetName) {
-      this.setState({
-        setName: newProps.unsavedSetName
-      })
-    }
+    this.setState({
+      setName: newProps.unsavedSetName
+    })
   }
 
   setName = event => {
@@ -134,7 +100,7 @@ class CreateSet extends Component {
   }
 
   render() {
-    const { auth, unsavedSetTerms, newSetKey, addUnsavedTerm } = this.props;
+    const { auth, unsavedSetTerms, newSetKey, updateUnsavedTerm, removeUnsavedTerm } = this.props;
     const { setName } = this.state;
     const isFilled = setName ? true : false;
 
@@ -152,10 +118,11 @@ class CreateSet extends Component {
         <Form>
           { unsavedSetTerms ?
               <>
-                <UnsavedTerms
+                <TermsList
                   basicTwoTerms={this.props.basicTwoTerms}
-                  unsavedSetTerms={unsavedSetTerms}
-                  addUnsavedTerm={addUnsavedTerm}
+                  terms={unsavedSetTerms}
+                  updateTerm={updateUnsavedTerm}
+                  removeTerm={removeUnsavedTerm}
                 />
               </>
             :
@@ -170,123 +137,46 @@ class CreateSet extends Component {
   }
 }
 
-class UnsavedTerms extends Component {
-  componentDidMount () {
-    if (this.props.unsavedSetTerms.length < 2) {
-      this.props.basicTwoTerms(2)
-    }
-  }
-
-  render() {
-    const { unsavedSetTerms, addUnsavedTerm } = this.props;
-    const lastTerm = unsavedSetTerms.length - 1;
-
-    return (
-      <>
-        {unsavedSetTerms.map((term, index) => {
-          // is basic terms added /* */
-            if (index === lastTerm) {
-              return <Term
-                termDetails={term}
-                key={term.id}
-                addUnsavedTerm={addUnsavedTerm}
-                focused={true} />
-            } else {
-              return <Term termDetails={term} key={term.id} addUnsavedTerm={addUnsavedTerm} />
-            }
-
-        })}
-      </>
-    );
-  }
-}
-
-class Term extends Component {
-  state = {
-    term: "",
-    definition: "",
-    id: null
-  }
-
-  componentDidMount () {
-    if (this.props.termDetails) {
-      const { definition, term, id } = this.props.termDetails;
-      this.setState({
-        term,
-        definition,
-        id
-      })
-    }
-  }
-
-  handleChange = event => {
-    this.setState({
-      [event.target.id]: event.target.value
-    }, () => this.props.addUnsavedTerm(this.state));
-  }
-
-  render() {
-    return (
-      <TermWrapper>
-        <DefineTerm>
-          <Input
-            autoFocus={this.props.focused ? true : false}
-            id="term"
-            tabIndex={this.props.index}
-            value={this.state.term}
-            onChange={this.handleChange}
-          />
-          <Label htmlFor="term">term</Label>
-          <Border />
-        </DefineTerm>
-        <DefineTerm>
-          <Input
-            id="definition"
-            tabIndex={this.props.index}
-            value={this.state.definition}
-            onChange={this.handleChange}
-          />
-          <Label htmlFor="definition">definition</Label>
-          <Border />
-        </DefineTerm>
-      </TermWrapper>
-    );
-  }
-}
+// class UnsavedTerms extends Component {
+//   componentDidMount () {
+//     if (this.props.unsavedSetTerms.length < 2) {
+//       this.props.basicTwoTerms(2)
+//     }
+//   }
+//
+//   render() {
+//     const { unsavedSetTerms, updateTerm, removeTerm } = this.props;
+//     const lastTerm = unsavedSetTerms.length - 1;
+//
+//     return (
+//       <>
+//         {unsavedSetTerms.map((term, index) => {
+//             if (index === lastTerm) {
+//               return (
+//                 <Term
+//                   termDetails={term}
+//                   key={term.id}
+//                   updateTerm={updateTerm}
+//                   removeTerm={removeTerm}
+//                   focused={true}
+//                 />
+//               )
+//             } else {
+//               return (
+//                 <Term
+//                   termDetails={term}
+//                   key={term.id}
+//                   updateTerm={updateTerm}
+//                   removeTerm={removeTerm}
+//                 />
+//               )
+//             }
+//
+//         })}
+//       </>
+//     );
+//   }
+// }
 
 
-
-const mapStateToProps = state => ({
-  auth: state.firebase.auth,
-  location: state.location,
-  lastLocation: state.lastLocation,
-  unsavedSetName: state.firebase.profile.unsavedSet,
-  unsavedSetTerms: state.firestore.ordered.unsaved,
-  isTermAdded: state.isTermAdded,
-  isNewTerm: state.isNewTerm,
-  newSetKey: state.newSetKey
-})
-
-export default compose(
-  connect(
-    mapStateToProps,
-    {
-      setUnsavedName,
-      basicTwoTerms,
-      addUnsavedTerm,
-      addNewUnsavedTerm,
-      submitSet,
-      changeLocation,
-      changeLastLocation
-    }
-  ),
-  firestoreConnect(props => [
-    {
-      collection: 'users',
-      doc: props.auth.uid,
-      subcollections: [{ collection: 'unsaved' }],
-      storeAs: 'unsaved',
-      orderBy: ["time"]
-    }
-  ])
-)(CreateSet);
+export default CreateSet

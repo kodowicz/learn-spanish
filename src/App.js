@@ -2,32 +2,35 @@ import React, { Component } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import Navbar from './components/navbar/Navbar';
-import SignUp from './components/navbar/SignUp';
-import Home from './components/dashboard/Home';
-import ViewSet from './components/dashboard/ViewSet';
-import EditSet from './components/dashboard/EditSet';
-import CreateSet from './components/dashboard/CreateSet';
-import LearnSet from './components/dashboard/LearnSet';
-import ViewProfile from './components/dashboard/ViewProfile';
+import Login from './components/navbar/Login';
+import ViewProfile from './components/navbar/ViewProfile';
+import HomePage from './containers/HomePageContainer';
+import ViewSet from './containers/ViewSetContainer';
+import EditSet from './containers/EditSetContainer';
+import CreateSet from './containers/CreateSetContainer';
+import LearnSet from './components/dashboard/Learn';
+import Test from './components/Test.js';
 
+import { GlobalStyle } from './assets/styles/GlobalStyles';
 
 class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <div>
+        <>
+          <GlobalStyle />
           <Route component={Navbar} />
-          <hr />
           <Switch>
-            <Route path="/" exact component={Home} />
+            <Route path="/" exact component={HomePage} />
             <Route path="/sets/:id" component={ViewSet} />
             <Route path="/edit/:id" component={EditSet} />
             <Route path="/create" component={CreateSet} />
             <Route path="/learn/:id" component={LearnSet} />
-            <Route path="/signup" component={SignUp} />
+            <Route path="/signup" component={Login} />
             <Route path="/profile/:user" component={ViewProfile} />
+            <Route path="/test" component={Test} />
           </Switch>
-        </div>
+        </>
       </BrowserRouter>
     );
   }

@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 
 import styled from 'styled-components';
-import { LinkButton, Main, BlockShadow, Title } from '../../styled/GlobalStyles';
+import { LinkButton, Main, BlockShadow, Title } from '../../assets/styles/GlobalStyles';
 
 
 
@@ -32,6 +28,7 @@ const SetWrapper = styled(BlockShadow)`
   justify-content: space-between;
   align-items: center;
   padding: 20px 25px;
+  box-sizing: content-box;
 `;
 
 const Topic = styled.p`
@@ -50,17 +47,20 @@ const Info = styled.p`
 `
 
 
-class Home extends Component {
+class HomePage extends Component {
   componentDidMount() {
     this.props.changeLocation('home');
     this.props.changeLastLocation("/");
   }
 
   render() {
+    // if (!isLoaded(users)) return <LoadingComponent inverted={true} />;
+
     return (
       <Main>
         <Title>flashcards</Title>
-        {this.props.sets && <Sets sets={this.props.sets} />}
+        <Link to="/test">Test</Link>
+        {this.props.sets && <SetsList sets={this.props.sets} />}
         <LinkButton to="/create">add new set</LinkButton>
       </Main>
     );
@@ -68,7 +68,7 @@ class Home extends Component {
 }
 
 
-class Sets extends Component {
+class SetsList extends Component {
   render() {
     return (
       <List>
@@ -77,7 +77,7 @@ class Sets extends Component {
             <Link to={`/sets/${set.id}`}>
               <SetWrapper>
                 <Topic>{ set.name }</Topic>
-                <Info>{ set.terms.length } terms</Info>
+                <Info>{ set.amount } terms</Info>
                 <Info>by { set.author }</Info>
               </SetWrapper>
             </Link>
@@ -88,13 +88,4 @@ class Sets extends Component {
   }
 };
 
-const mapStateToProps = state => ({
-  sets: state.firestore.ordered.sets
-})
-
-export default compose(
-  connect(mapStateToProps, { changeLocation, changeLastLocation }),
-  firestoreConnect([
-    { collection: 'sets' }
-  ])
-)(Home);
+export default HomePage
