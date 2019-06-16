@@ -71,5 +71,4 @@ class CardList extends Component {
   }
 }
 
-
 export default LearnSet
