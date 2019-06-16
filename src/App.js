@@ -8,8 +8,7 @@ import HomePage from './containers/HomePageContainer';
 import ViewSet from './containers/ViewSetContainer';
 import EditSet from './containers/EditSetContainer';
 import CreateSet from './containers/CreateSetContainer';
-import LearnSet from './components/dashboard/Learn';
-import Test from './components/Test.js';
+import LearnSet from './containers/LearnSetContainer';
 
 import { GlobalStyle } from './assets/styles/GlobalStyles';
 
@@ -28,7 +27,6 @@ class App extends Component {
             <Route path="/learn/:id" component={LearnSet} />
             <Route path="/signup" component={Login} />
             <Route path="/profile/:user" component={ViewProfile} />
-            <Route path="/test" component={Test} />
           </Switch>
         </>
       </BrowserRouter>

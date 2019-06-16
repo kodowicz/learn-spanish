@@ -1,10 +1,4 @@
 import React, { Component } from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { changeLocation, changeLastLocation, currentSetId } from '../../store/actions/locationActions';
-import { shuffleCard, throwoutCard } from '../../store/actions/learnSetActions';
-
 import styled, { css, keyframes } from 'styled-components';
 
 const Cards = styled.div`
@@ -444,31 +438,4 @@ const renderCards = (terms) => {
   }
 }
 
-const mapStateToProps = state => ({
-  uid: state.firebase.auth.uid,
-  shuffled: state.shuffled,
-  location: state.location,
-  lastLocation: state.lastLocation,
-  terms: renderCards(state.firestore.ordered.terms)
-})
-
-
-export default compose(
-  connect(
-    mapStateToProps,
-    { changeLocation, changeLastLocation, currentSetId, shuffleCard, throwoutCard }
-  ),
-  firestoreConnect(props => [
-    {
-      collection: 'users',
-      doc: props.uid,
-      subcollections: [{
-        collection: 'learn',
-        doc: props.match.params.id,
-        subcollections: [{ collection: 'basic' }]
-      }],
-      storeAs: 'terms',
-      orderBy: ["time"]
-    }
-  ])
-)(LearnSet);
+export default LearnSet
