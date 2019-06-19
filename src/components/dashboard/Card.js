@@ -13,17 +13,17 @@ const Wrapper = styled.div`
   transition: transform .2s;
   z-index: ${ props => props.layerIndex };
   visibility: hidden;
+  opacity: 1;
 
   ${ props => props.layerIndex === 0 && css`
     visibility: visible;
-
   `};
 
   ${ props => props.layerIndex === -1 && css`
     visibility: visible;
-    opacity: 0.5;
     transform: translate(-2px, -5px) rotate(5deg);
     box-shadow: 0 0 20px #d8d8d8;
+    transition: opacity 0.1s ease-in 0.5s;
 
     &::before, &::after {
       content: "";
@@ -69,26 +69,26 @@ const Wrapper = styled.div`
     transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
   `};
 
-  ${ ({ moveLeft, layerIndex }) => moveLeft && layerIndex === 0 && css` /* front*/
-    animation: ${shuffle} 0.8s ease-out forwards
+  ${ ({ moveLeft, transform, layerIndex }) => moveLeft && layerIndex === 0 && css`
+    animation: ${shuffle(transform)} 0.8s ease-out forwards
   `};
 
-  ${ ({ moveRight, layerIndex }) => moveRight && layerIndex === -1 && css`  /* back */
+  ${ ({ moveRight, transform, layerIndex }) => moveRight && layerIndex === 0 && css`
     animation: ${throwOut} 0.5s ease-out forwards
   `};
 `;
 
 
-const shuffle = keyframes`
+const shuffle = (transform) => keyframes`
   0% {
-    /*transform: rotate(0deg)*/
+   z-index: 10
   }
 
   50% {
-    transform: translateX(-200px) rotate(-15deg);
+    transform: translate(-200px, ${transform.y}px) rotate(-15deg);
   }
 
-  55% {
+  70% {
     z-index: -10
   }
 
@@ -100,12 +100,7 @@ const shuffle = keyframes`
 
 const throwOut = keyframes`
   0% {
-    /*transform: rotate(0deg);
-    opacity: 1 */
-  }
-
-  30% {
-    /*opacity: 1*/
+    opacity: 1
   }
 
   50% {
@@ -185,6 +180,7 @@ class Card extends Component {
     this.cardRef = React.createRef();
 
     this.state = {
+      id: null,
       isFlipped: true,
       isMoved: false,
       toggle: false,
@@ -203,11 +199,12 @@ class Card extends Component {
   }
 
   componentDidMount () {
-    if (this.cardRef.current) {
+    // if (this.cardRef.current) {
       this.setState({
+        // id: this.props.term.id,
         cardCenter: this.cardRef.current.offsetParent.offsetLeft
       })
-    }
+    // }
   }
 
   flipCard = () => {
@@ -296,18 +293,32 @@ class Card extends Component {
   }
 
   moveLeft = () => {
-    this.props.shuffleCard(this.props.term.id);
+    const { term, shuffleCard } = this.props;
+
+    this.setState({
+      moveLeft: true
+    })
+
+    this.cardRef.current.addEventListener('animationend', function() {
+      // console.log(term.id);
+      shuffleCard(term);
+    }, false);
   }
 
   moveRight = () => {
-    this.props.throwoutCard(this.props.term.id);
+    this.setState({
+      moveLeft: true
+    })
+    // this.props.throwoutCard(this.props.term.id);
   }
 
   render() {
+    // console.log(this.props.isCardShuffled);
     return (
       <Wrapper
-        ref={this.props.layerIndex === 0 ? this.cardRef : null}
-
+        // ref={this.props.layerIndex === 0 ? this.cardRef : null}
+        ref={this.cardRef}
+        // isCardShuffled={isCardShuffled}
         flip={this.state.toggle}
         layerIndex={this.props.layerIndex}
         transform={this.state.transformCard}

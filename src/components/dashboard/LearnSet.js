@@ -23,18 +23,62 @@ class LearnSet extends Component {
     this.props.changeLocation('learn');
     this.props.changeLastLocation(`/sets/${setId}`);
     this.props.currentSetId(setId);
+
+    if (this.props.terms) {
+      this.setState({
+        terms: this.renderCards(this.props.terms)
+      })
+    }
   }
 
+  componentWillReceiveProps (newProps) {
+    if (this.props.terms !== newProps.terms) {
+      this.setState({
+        terms: this.renderCards(newProps.terms)
+      })
+    }
+  }
+
+  renderCards = (terms) => {
+    let orderedTerms = this.orderTermsByTime(terms);
+    let layerIndex = 1;
+
+    let visibleCards = orderedTerms.map(term => {
+      layerIndex -= 1;
+
+      return Object.assign({}, term, { layerIndex: layerIndex })
+    });
+
+    return visibleCards
+  }
+
+  orderTermsByTime (terms) {
+    return terms.sort((prev, next) => prev.time - next.time)
+  }
+
+
   render() {
+    const { shuffleCard, throwoutCard, isCardShuffled } = this.props;
+    const { terms } = this.state;
     return (
       <Cards>
-        { this.props.terms &&
-          <CardList
-            terms={this.props.terms}
-            shuffled={this.props.shuffled}
-            shuffleCard={this.props.shuffleCard}
-            throwoutCard={this.props.throwoutCard}
-          />
+        { terms &&
+          terms.map(term => {
+            if (term.layerIndex >= -1) {
+              return (
+                <Card
+                  layerIndex={term.layerIndex}
+                  key={term.id}
+                  term={term}
+                  // isCardShuffled={isCardShuffled}
+                  shuffleCard={shuffleCard}
+                  throwoutCard={throwoutCard}
+                  />
+              )
+            } else {
+              return <></>
+            }
+          })
         }
       </Cards>
     );
