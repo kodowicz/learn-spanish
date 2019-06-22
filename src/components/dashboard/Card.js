@@ -3,11 +3,13 @@ import styled, { css, keyframes } from 'styled-components';
 
 const Wrapper = styled.div`
   perspective: 1000px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  ${'' /* position: absolute; */}
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+  ${'' /* top: 0;
+  left: 0; */}
+  width: 220px;
+  height: 300px;
   background: transparent;
   -webkit-user-select: none;
   transition: transform .2s;
@@ -15,11 +17,11 @@ const Wrapper = styled.div`
   visibility: hidden;
   opacity: 1;
 
-  ${ props => props.layerIndex === 0 && css`
+  ${ ({ layerIndex }) => layerIndex === 0 && css`
     visibility: visible;
   `};
 
-  ${ props => props.layerIndex === -1 && css`
+  ${ ({ layerIndex }) => layerIndex === -1 && css`
     visibility: visible;
     transform: translate(-2px, -5px) rotate(5deg);
     box-shadow: 0 0 20px #d8d8d8;
@@ -52,7 +54,7 @@ const Wrapper = styled.div`
 
 
   /*flipping a card */
-  ${ props => props.flip && css`
+  ${ ({ flip, layerIndex }) => flip && layerIndex === 0 && css`
     ${Front} {
       transition: transform .6s, opacity 0s .5s;
       opacity: 0;
@@ -65,7 +67,7 @@ const Wrapper = styled.div`
   `};
 
   /* move card */
-  ${ ({ transform }) => transform.rotate !== 0 && css`
+  ${ ({ transform, layerIndex }) => transform.rotate !== 0 && layerIndex === 0 && css`
     transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
   `};
 
@@ -81,7 +83,7 @@ const Wrapper = styled.div`
 
 const shuffle = (transform) => keyframes`
   0% {
-   z-index: 10
+   z-index: 1
   }
 
   50% {
@@ -89,12 +91,12 @@ const shuffle = (transform) => keyframes`
   }
 
   70% {
-    z-index: -10
+    z-index: -1
   }
 
   100% {
     transform: rotate(0deg);
-    z-index: -10
+    z-index: -1
   }
 `
 
@@ -199,12 +201,10 @@ class Card extends Component {
   }
 
   componentDidMount () {
-    // if (this.cardRef.current) {
-      this.setState({
-        // id: this.props.term.id,
-        cardCenter: this.cardRef.current.offsetParent.offsetLeft
-      })
-    // }
+    const cardCenter = this.cardRef.current.offsetLeft + (this.cardRef.current.offsetWidth / 2);
+    this.setState({
+      cardCenter: cardCenter
+    })
   }
 
   flipCard = () => {
@@ -306,24 +306,29 @@ class Card extends Component {
   }
 
   moveRight = () => {
+    const { term, throwoutCard } = this.props;
+
     this.setState({
-      moveLeft: true
+      moveRight: true
     })
-    // this.props.throwoutCard(this.props.term.id);
+
+    this.cardRef.current.addEventListener('animationend', function() {
+      throwoutCard(term.id);
+    }, false);
   }
 
   render() {
-    // console.log(this.props.isCardShuffled);
+    const { toggle, rotateFront, rotateBack, transformCard, moveLeft, moveRight } = this.state;
+    const { layerIndex, term } = this.props;
+
     return (
       <Wrapper
-        // ref={this.props.layerIndex === 0 ? this.cardRef : null}
         ref={this.cardRef}
-        // isCardShuffled={isCardShuffled}
-        flip={this.state.toggle}
-        layerIndex={this.props.layerIndex}
-        transform={this.state.transformCard}
-        moveLeft={this.state.moveLeft}
-        moveRight={this.state.moveRight}
+        flip={toggle}
+        layerIndex={layerIndex}
+        transform={transformCard}
+        moveLeft={moveLeft}
+        moveRight={moveRight}
 
         onClick={this.flipCard}
         onTransitionEnd={this.animateCard}
@@ -332,32 +337,25 @@ class Card extends Component {
         onTouchEnd={this.stopTouch}
       >
         <Front
-          rotate={this.state.rotateFront}>
-
+          rotate={rotateFront}>
           <Top>
-            <Term>{ this.props.term.term }</Term>
+            <Term>{ term.term }</Term>
           </Top>
-
           <Bottom>
             <Tap>tap to flip</Tap>
           </Bottom>
-
         </Front>
 
         <Back
-          rotate={this.state.rotateBack}
+          rotate={rotateBack}
           onTouchMove={this.moveCard}>
-
           <Top>
-            <Term>{ this.props.term.definition }</Term>
+            <Term>{ term.definition }</Term>
           </Top>
-
           <Bottom>
             <Tap>tap to flip</Tap>
           </Bottom>
-
         </Back>
-
       </Wrapper>
     )
   }

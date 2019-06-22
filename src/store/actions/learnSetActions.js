@@ -1,18 +1,25 @@
+// if firebase updating subcollections worked this function wouldn't be neccessery
+export const fetchTerms = terms => ({
+  type: 'FETCH_TERMS',
+  terms
+})
+
 export const shuffleCard = term => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().setId;
+  const newTime = new Date();
 
-  const docRef = firestore.doc(`users/${user}/learn/${set}/basic/${term}`);
+  const docRef = firestore.doc(`users/${user}/learn/${set}/basic/${term.id}`);
 
-  docRef.get().then(thisDoc => {
-    docRef.update({
-      time: new Date()
-    })
+  docRef.update({
+    time: newTime
   })
   .then(() => {
     dispatch({
-      type: 'SHUFFLE_CARD'
+      type: 'SHUFFLE_CARD',
+      time: term.time,
+      newTime: newTime.getTime()
     })
   }).catch(error => {
     dispatch({
@@ -29,12 +36,11 @@ export const throwoutCard = term => (dispatch, getState, { getFirebase, getFires
 
   const docRef = firestore.doc(`users/${user}/learn/${set}/basic/${term}`);
 
-  docRef.get().then(thisDoc => {
-    docRef.delete()
-  })
+  docRef.delete()
   .then(() => {
     dispatch({
-      type: 'THROWOUT_CARD'
+      type: 'THROWOUT_CARD',
+      id: term
     })
   }).catch(error => {
     dispatch({
@@ -43,3 +49,8 @@ export const throwoutCard = term => (dispatch, getState, { getFirebase, getFires
     })
   })
 }
+
+export const isCardShuffled = (isShuffled) => ({
+  type: 'SHUFFLED_CARD',
+  isShuffled
+})

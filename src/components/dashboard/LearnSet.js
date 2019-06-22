@@ -3,18 +3,23 @@ import Card from './Card';
 import styled from 'styled-components';
 
 const Cards = styled.div`
-  position: relative;
-  width: 220px;
-  height: 300px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-`;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  place-items: center;
+`
 
 
 class LearnSet extends Component {
   state = {
     terms: []
+  }
+
+  componentWillMount() {
+    this.props.fetchTerms(this.props.fetchedTerms)
   }
 
   componentDidMount() {
@@ -24,11 +29,12 @@ class LearnSet extends Component {
     this.props.changeLastLocation(`/sets/${setId}`);
     this.props.currentSetId(setId);
 
-    if (this.props.terms) {
-      this.setState({
-        terms: this.renderCards(this.props.terms)
-      })
-    }
+    // console.log(this.props.terms);
+    // if (this.props.terms) {
+    //   this.setState({
+    //     terms: this.renderCards(this.props.terms)
+    //   })
+    // }
   }
 
   componentWillReceiveProps (newProps) {
@@ -45,7 +51,6 @@ class LearnSet extends Component {
 
     let visibleCards = orderedTerms.map(term => {
       layerIndex -= 1;
-
       return Object.assign({}, term, { layerIndex: layerIndex })
     });
 
@@ -53,13 +58,15 @@ class LearnSet extends Component {
   }
 
   orderTermsByTime (terms) {
-    return terms.sort((prev, next) => prev.time - next.time)
+    const orderedTerms = terms.slice();
+    return orderedTerms.sort((prev, next) => prev.time - next.time)
   }
 
 
   render() {
     const { shuffleCard, throwoutCard, isCardShuffled } = this.props;
     const { terms } = this.state;
+
     return (
       <Cards>
         { terms &&
@@ -70,7 +77,6 @@ class LearnSet extends Component {
                   layerIndex={term.layerIndex}
                   key={term.id}
                   term={term}
-                  // isCardShuffled={isCardShuffled}
                   shuffleCard={shuffleCard}
                   throwoutCard={throwoutCard}
                   />
@@ -81,36 +87,6 @@ class LearnSet extends Component {
           })
         }
       </Cards>
-    );
-  }
-}
-
-class CardList extends Component {
-  state = {
-    terms: []
-  }
-
-  render() {
-    return (
-      <div>
-        {
-          this.props.terms.map(term => {
-            if (term.layerIndex >= -1) {
-              return (
-                <Card
-                  layerIndex={term.layerIndex}
-                  key={term.id}
-                  term={term}
-                  shuffleCard={this.props.shuffleCard}
-                  throwoutCard={this.props.throwoutCard}
-                />
-              )
-            } else {
-              return <></>
-            }
-          })
-        }
-      </div>
     );
   }
 }
