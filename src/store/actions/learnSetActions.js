@@ -49,8 +49,3 @@ export const throwoutCard = term => (dispatch, getState, { getFirebase, getFires
     })
   })
 }
-
-export const isCardShuffled = (isShuffled) => ({
-  type: 'SHUFFLED_CARD',
-  isShuffled
-})

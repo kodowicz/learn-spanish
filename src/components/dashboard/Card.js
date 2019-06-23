@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
+import { Button } from '../../assets/styles/GlobalStyles';
+
 
 const Wrapper = styled.div`
   perspective: 1000px;
@@ -10,107 +12,7 @@ const Wrapper = styled.div`
   background: transparent;
   -webkit-user-select: none;
   transition: transform .2s;
-  z-index: ${ props => props.layerIndex };
-  visibility: hidden;
-  opacity: 1;
-
-  ${ ({ layerIndex }) => layerIndex === 0 && css`
-    visibility: visible;
-  `};
-
-  ${ ({ layerIndex }) => layerIndex === -1 && css`
-    visibility: visible;
-    transform: translate(-2px, -5px) rotate(5deg);
-    box-shadow: 0 0 20px #d8d8d8;
-    transition: opacity 0.1s ease-in 0.5s;
-
-    &::before, &::after {
-      content: "";
-      position: absolute;
-      background: #f7f7f7;
-      height: 100%;
-      width: 100%;
-      top: 0;
-      left: 0;
-      box-shadow: 0 0 5px #d8d8d8;
-    }
-
-    &::before {
-      transform: translate(-2px, 0px) rotate(-7deg)
-    }
-
-    &::after {
-      transform: translate(-5px, 5px) rotate(-2deg);
-      z-index: -1
-    }
-
-    ${Front}, ${Back} {
-      background: #fbfbfb
-    }
-  `};
-
-  /*flipping a card */
-  ${ ({ flip, layerIndex }) => flip && layerIndex === 0 && css`
-    ${Front} {
-      transition: transform .6s, opacity 0s .5s;
-      opacity: 0;
-    }
-
-    ${Back} {
-      transition: transform .6s, opacity 0s .15s;
-      opacity: 1
-    }
-  `};
-
-  /* move card */
-  ${ ({ transform, layerIndex }) => transform.rotate !== 0 && layerIndex === 0 && css`
-    transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
-  `};
-
-  ${ ({ moveLeft, transform, layerIndex }) => moveLeft && layerIndex === 0 && css`
-    animation: ${shuffle(transform)} 0.8s ease-out forwards
-  `};
-
-  ${ ({ moveRight, transform, layerIndex }) => moveRight && layerIndex === 0 && css`
-    animation: ${throwOut} 0.5s ease-out forwards
-  `};
 `;
-
-
-const shuffle = (transform) => keyframes`
-  0% {
-   z-index: 1
-  }
-
-  50% {
-    transform: translate(-200px, ${transform.y}px) rotate(-15deg);
-  }
-
-  70% {
-    z-index: -1
-  }
-
-  100% {
-    transform: rotate(0deg);
-    z-index: -1
-  }
-`
-
-const throwOut = keyframes`
-  0% {
-    opacity: 1
-  }
-
-  50% {
-    transform: translateX(300px) rotate(15deg);
-    opacity: 0.5
-  }
-
-  100% {
-    transform: translateX(300px) rotate(15deg);
-    opacity: 0
-  }
-`
 
 const Front = styled.div`
   position: absolute;
@@ -142,6 +44,126 @@ const Back = styled.div`
   opacity: 0
 `;
 
+const FrontWrapper = styled(Wrapper)`
+  z-index: 10;
+
+  /*flipping a card */
+  ${ ({ flip }) => flip && css`
+    ${Front} {
+      transition: transform .6s, opacity 0s .5s;
+      opacity: 0;
+    }
+
+    ${Back} {
+      transition: transform .6s, opacity 0s .15s;
+      opacity: 1
+    }
+  `};
+
+  /* move card */
+  ${ ({ transform }) => transform.rotate !== 0 && css`
+    transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
+  `};
+
+  ${ ({ moveLeft, transform }) => moveLeft && css`
+    animation: ${shuffle(transform)} 0.8s ease-out forwards
+  `};
+
+  ${ ({ moveRight, transform }) => moveRight && css`
+    animation: ${throwOut} 1s ease-out forwards
+  `};
+`;
+
+const BackWrapper = styled(Wrapper)`
+  z-index: -1
+  transform: translate(-2px, -5px) rotate(5deg);
+  box-shadow: 0 0 20px #d8d8d8;
+
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    background: #f7f7f7;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    box-shadow: 0 0 5px #d8d8d8;
+  }
+
+  &::before {
+    transform: translate(-2px, 0px) rotate(-7deg)
+  }
+
+  &::after {
+    transform: translate(-5px, 5px) rotate(-2deg);
+    z-index: -1
+  }
+`;
+
+const Congrats = styled(Wrapper)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px #d8d8d8;
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0
+`;
+
+const Text = styled.p`
+  font-size: 1.4rem;
+  margin: 0 0 40px
+`;
+
+const Restart = styled(Button)`
+  font-size: 1.4rem;
+  padding: 1rem 4rem;
+`;
+
+const shuffle = (transform) => keyframes`
+  0% {
+   z-index: 1
+  }
+
+  50% {
+    transform: translate(-200px, ${transform.y}px) rotate(-15deg);
+  }
+
+  70% {
+    z-index: -1
+  }
+
+  100% {
+    transform: rotate(0deg);
+    z-index: -1
+  }
+`;
+
+const throwOut = keyframes`
+  0% {
+    opacity: 1
+  }
+
+  30% {
+    opacity: 0.5
+  }
+
+  50% {
+    transform: translateX(300px) rotate(15deg);
+    opacity: 0.5
+  }
+
+  100% {
+    transform: translateX(300px) rotate(15deg);
+    opacity: 0
+  }
+`;
+
 const Top = styled.div`
   flex-grow: 1;
   display: flex;
@@ -171,7 +193,7 @@ const Tap = styled.button`
 `;
 
 
-class Card extends Component {
+export class FrontCard extends Component {
   constructor(props) {
     super(props);
 
@@ -188,9 +210,9 @@ class Card extends Component {
       rotateFront: 0,
       rotateBack: -180,
       transformCard: { x: 0, y: 0, rotate: 0 },
-      moveLeft: 0,
-      moveRight: 0,
-      backAmplitude: 60,
+      moveLeft: false,
+      moveRight: false,
+      backAmplitude: 20,
       horizontalAmp: 100,
       verticalAmp: 50
     }
@@ -198,7 +220,9 @@ class Card extends Component {
 
   componentDidMount () {
     const cardCenter = this.cardRef.current.getBoundingClientRect();
+    const horizontalAmp = this.props.moveEnabled ? 100 : 35;
     this.setState({
+      horizontalAmp,
       cardCenter: {
         left: cardCenter.left,
         right: cardCenter.right
@@ -278,10 +302,10 @@ class Card extends Component {
     const { isMoved, cardCenter, backAmplitude } = this.state;
     const cardPosition = this.cardRef.current.getBoundingClientRect();
 
-    if (cardCenter.left - cardPosition.left > 20 && isMoved) {
+    if (cardCenter.left - cardPosition.left > backAmplitude && isMoved) {
       this.moveLeft();
 
-    } else if (cardPosition.right - cardCenter.right > 20 && isMoved) {
+    } else if (cardPosition.right - cardCenter.right > backAmplitude && isMoved) {
       this.moveRight();
 
     } else {
@@ -296,15 +320,26 @@ class Card extends Component {
   }
 
   moveLeft = () => {
-    const { term, shuffleCard } = this.props;
+    const { term, shuffleCard, moveEnabled } = this.props;
 
-    this.setState({
-      moveLeft: true
-    })
+    if (moveEnabled) {
+      this.setState({
+        moveLeft: true
+      })
 
-    this.cardRef.current.addEventListener('animationend', function() {
-      shuffleCard(term);
-    }, false);
+      this.cardRef.current.addEventListener('animationend', function() {
+        shuffleCard(term);
+      }, false);
+
+    } else {
+      this.setState({
+        transformCard: {
+          x: 0,
+          y: 0,
+          rotate: 0
+        }
+      })
+    }
   }
 
   moveRight = () => {
@@ -324,22 +359,20 @@ class Card extends Component {
     const { layerIndex, term } = this.props;
 
     return (
-      <Wrapper
+      <FrontWrapper
         ref={this.cardRef}
         flip={toggle}
         layerIndex={layerIndex}
         transform={transformCard}
         moveLeft={moveLeft}
         moveRight={moveRight}
-
         onClick={this.flipCard}
         onTransitionEnd={this.animateCard}
         onTouchMove={this.moveCard}
         onTouchStart={this.startTouch}
         onTouchEnd={this.stopTouch}
       >
-        <Front
-          rotate={rotateFront}>
+        <Front rotate={rotateFront}>
           <Top>
             <Term>{ term.term }</Term>
           </Top>
@@ -348,9 +381,7 @@ class Card extends Component {
           </Bottom>
         </Front>
 
-        <Back
-          rotate={rotateBack}
-          onTouchMove={this.moveCard}>
+        <Back rotate={rotateBack} onTouchMove={this.moveCard}>
           <Top>
             <Term>{ term.definition }</Term>
           </Top>
@@ -358,9 +389,39 @@ class Card extends Component {
             <Tap>tap to flip</Tap>
           </Bottom>
         </Back>
-      </Wrapper>
+      </FrontWrapper>
     )
   }
 }
 
-export default Card
+
+export const BackCard = ({ term }) => (
+  <BackWrapper>
+    <Front>
+      <Top>
+        <Term>{ term.term || "" }</Term>
+      </Top>
+      <Bottom>
+        <Tap>tap to flip</Tap>
+      </Bottom>
+    </Front>
+
+    <Back>
+      <Top>
+        <Term>{ term.definition || "" }</Term>
+      </Top>
+      <Bottom>
+        <Tap>tap to flip</Tap>
+      </Bottom>
+    </Back>
+  </BackWrapper>
+)
+
+
+export const Congratulations = () => (
+  <Congrats>
+    <Title>Congratulations!</Title>
+    <Text>You've learnt everything!</Text>
+    <Restart>restart</Restart>
+  </Congrats>
+)

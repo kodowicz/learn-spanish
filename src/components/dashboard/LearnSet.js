@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Card from './Card';
+import { FrontCard, BackCard, Congratulations } from './Card';
 import styled from 'styled-components';
 
 const Cards = styled.div`
@@ -69,22 +69,50 @@ class LearnSet extends Component {
 
     return (
       <Cards>
-        { terms &&
+        { (terms.length > 1) ?
           terms.map(term => {
-            if (term.layerIndex >= -1) {
+            if (term.layerIndex === 0) {
               return (
-                <Card
-                  layerIndex={term.layerIndex}
+                <FrontCard
                   key={term.id}
+                  layerIndex={term.layerIndex}
                   term={term}
+                  moveEnabled={true}
                   shuffleCard={shuffleCard}
                   throwoutCard={throwoutCard}
-                  />
+                />
+              )
+            } else if (term.layerIndex === -1) {
+              return (
+                <BackCard
+                  key={term.id}
+                  layerIndex={term.layerIndex}
+                  term={term}
+                />
               )
             } else {
               return <></>
             }
           })
+          :
+          (terms.length === 1) ?
+            <>
+              <FrontCard
+                key={terms[0].id}
+                layerIndex={terms[0].layerIndex}
+                term={terms[0]}
+                moveEnabled={false}
+                shuffleCard={shuffleCard}
+                throwoutCard={throwoutCard}
+              />
+              <BackCard
+                key={0}
+                layerIndex={0}
+                term={terms[0]}
+              />
+            </>
+            :
+            <Congratulations />
         }
       </Cards>
     );
