@@ -3,11 +3,8 @@ import styled, { css, keyframes } from 'styled-components';
 
 const Wrapper = styled.div`
   perspective: 1000px;
-  ${'' /* position: absolute; */}
   grid-column: 1 / 1;
   grid-row: 1 / 1;
-  ${'' /* top: 0;
-  left: 0; */}
   width: 220px;
   height: 300px;
   background: transparent;
@@ -51,7 +48,6 @@ const Wrapper = styled.div`
       background: #fbfbfb
     }
   `};
-
 
   /*flipping a card */
   ${ ({ flip, layerIndex }) => flip && layerIndex === 0 && css`
@@ -186,7 +182,7 @@ class Card extends Component {
       isFlipped: true,
       isMoved: false,
       toggle: false,
-      cardCenter: 0,
+      cardCenter: {},
       point: { x: 0, y: 0 },
       position: { x: 0, y: 0 },
       rotateFront: 0,
@@ -201,9 +197,12 @@ class Card extends Component {
   }
 
   componentDidMount () {
-    const cardCenter = this.cardRef.current.offsetLeft + (this.cardRef.current.offsetWidth / 2);
+    const cardCenter = this.cardRef.current.getBoundingClientRect();
     this.setState({
-      cardCenter: cardCenter
+      cardCenter: {
+        left: cardCenter.left,
+        right: cardCenter.right
+      }
     })
   }
 
@@ -276,19 +275,23 @@ class Card extends Component {
   }
 
   stopTouch = event => {
-    const position = event.changedTouches[0].pageX;
     const { isMoved, cardCenter, backAmplitude } = this.state;
+    const cardPosition = this.cardRef.current.getBoundingClientRect();
 
-    if (position < (cardCenter - backAmplitude) && isMoved) {
+    if (cardCenter.left - cardPosition.left > 20 && isMoved) {
       this.moveLeft();
-    } else if (position > (cardCenter + backAmplitude) && isMoved) {
+
+    } else if (cardPosition.right - cardCenter.right > 20 && isMoved) {
       this.moveRight();
+
     } else {
-      this.setState({ transformCard: {
-        x: 0,
-        y: 0,
-        rotate: 0
-      }})
+      this.setState({
+        transformCard: {
+          x: 0,
+          y: 0,
+          rotate: 0
+        }
+      })
     }
   }
 
@@ -300,7 +303,6 @@ class Card extends Component {
     })
 
     this.cardRef.current.addEventListener('animationend', function() {
-      // console.log(term.id);
       shuffleCard(term);
     }, false);
   }
