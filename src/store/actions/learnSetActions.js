@@ -1,3 +1,32 @@
+export const createLearnSet = setId => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firestore = getFirestore();
+  const userId = getState().firebase.auth.uid;
+
+  const setRef = firestore.collection(`sets/${setId}/terms`);
+  const learnSetRef = firestore.collection(`users/${userId}/learn/${setId}/basic`);
+
+  learnSetRef.get().then(snap => {
+    if (!snap.size) {
+      setRef.get().then(snapshot => {
+
+        snapshot.forEach(doc => {
+          const { term, definition, time } = doc.data();
+          const termRef = learnSetRef.doc();
+          const termId = termRef.id;
+
+          termRef.set({
+            id : termId,
+            term,
+            definition,
+            time
+          })
+        })
+      })
+    }
+  })
+
+}
+
 // if firebase updating subcollections worked this function wouldn't be neccessery
 export const fetchTerms = terms => ({
   type: 'FETCH_TERMS',

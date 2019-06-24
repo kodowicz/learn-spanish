@@ -92,7 +92,7 @@ class ViewSet extends Component {
       return (
         <Main>
           <Description set={set} />
-          <Buttons setId={match.params.id} iseditable={iseditable} />
+          <Buttons setId={match.params.id} iseditable={iseditable} createLearnSet={createLearnSet} />
           <TermsList terms={terms} />
         </Main>
       )
@@ -115,14 +115,16 @@ const Description = ({ set }) => (
   </>
 );
 
-const Buttons = ({ setId, iseditable }) => (
+const Buttons = ({ setId, iseditable, createLearnSet }) => (
   <ButtonsWrapper iseditable={iseditable.toString()}>
-    {/* { iseditable && */}
+    { iseditable &&
       <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
-    {/* } */}
+    }
     <ButtonLink
+      onClick={() => createLearnSet(setId)}
       iseditable={iseditable.toString()}
-      to={`/learn/${setId}`}>
+      to={`/learn/${setId}`}
+      >
       learn set
     </ButtonLink>
   </ButtonsWrapper>
