@@ -4,7 +4,6 @@ import { Button } from '../../assets/styles/GlobalStyles';
 
 
 const Wrapper = styled.div`
-  perspective: 1000px;
   grid-column: 1 / 1;
   grid-row: 1 / 1;
   width: 220px;
@@ -45,7 +44,8 @@ const Back = styled.div`
 `;
 
 const FrontWrapper = styled(Wrapper)`
-  z-index: 10;
+  perspective: 1000px;
+  z-index: 1;
 
   /*flipping a card */
   ${ ({ flip }) => flip && css`
@@ -100,12 +100,42 @@ const BackWrapper = styled(Wrapper)`
   }
 `;
 
-const Congrats = styled(Wrapper)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+const CongratsWrapper = styled(Wrapper)`
   box-shadow: 0 0 20px #d8d8d8;
+  position: relative;
+  background: white;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    &::before, &::after {
+      content: "";
+      position: absolute;
+      background: #f7f7f7;
+      background: white;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      box-shadow: 0 0 5px #d8d8d8;
+    }
+
+    &::before {
+      z-index: -3;
+      transform: translate(7px, -7px) rotate(3deg)
+    }
+
+    &::after {
+      transform: translate(-5px, 5px) rotate(-2deg);
+      z-index: -2
+    }
+  }
 `;
 
 const Title = styled.h2`
@@ -399,7 +429,7 @@ export const BackCard = ({ term }) => (
   <BackWrapper>
     <Front>
       <Top>
-        <Term>{ term.term || "" }</Term>
+        <Term>{ term.term }</Term>
       </Top>
       <Bottom>
         <Tap>tap to flip</Tap>
@@ -408,7 +438,7 @@ export const BackCard = ({ term }) => (
 
     <Back>
       <Top>
-        <Term>{ term.definition || "" }</Term>
+        <Term>{ term.definition }</Term>
       </Top>
       <Bottom>
         <Tap>tap to flip</Tap>
@@ -418,10 +448,12 @@ export const BackCard = ({ term }) => (
 )
 
 
-export const Congratulations = () => (
-  <Congrats>
-    <Title>Congratulations!</Title>
-    <Text>You've learnt everything!</Text>
-    <Restart>restart</Restart>
-  </Congrats>
+export const Congratulations = ({ setId, layerIndex, createLearnSet }) => (
+  <CongratsWrapper layerIndex={layerIndex}>
+    <div>
+      <Title>Congratulations!</Title>
+      <Text>You've learnt everything!</Text>
+      <Restart onClick={() => createLearnSet(setId)}>restart</Restart>
+    </div>
+  </CongratsWrapper>
 )

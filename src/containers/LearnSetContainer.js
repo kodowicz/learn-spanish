@@ -3,7 +3,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation, currentSetId } from '../store/actions/locationActions';
-import { fetchTerms, shuffleCard, throwoutCard } from '../store/actions/learnSetActions';
+import { fetchTerms, shuffleCard, throwoutCard, createLearnSet } from '../store/actions/learnSetActions';
 import LearnSet from '../components/dashboard/LearnSet';
 
 
@@ -20,6 +20,7 @@ const LearnSetContainer = (props) => (
         currentSetId={props.currentSetId}
         shuffleCard={props.shuffleCard}
         throwoutCard={props.throwoutCard}
+        createLearnSet={props.createLearnSet}
       />
     }
   </>
@@ -36,7 +37,7 @@ const mapStateToProps = state => ({
 export default compose(
   connect(
     mapStateToProps,
-    { changeLocation, changeLastLocation, currentSetId, fetchTerms, shuffleCard, throwoutCard }
+    { changeLocation, changeLastLocation, currentSetId, fetchTerms, shuffleCard, throwoutCard, createLearnSet }
   ),
   firestoreConnect(props => [
     {

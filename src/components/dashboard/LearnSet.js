@@ -19,6 +19,7 @@ class LearnSet extends Component {
   }
 
   componentWillMount() {
+    // unneccessery if firebase works properly
     this.props.fetchTerms(this.props.fetchedTerms)
   }
 
@@ -64,7 +65,7 @@ class LearnSet extends Component {
 
 
   render() {
-    const { shuffleCard, throwoutCard, isCardShuffled } = this.props;
+    const { match, shuffleCard, throwoutCard, isCardShuffled, createLearnSet } = this.props;
     const { terms } = this.state;
 
     return (
@@ -105,14 +106,15 @@ class LearnSet extends Component {
                 shuffleCard={shuffleCard}
                 throwoutCard={throwoutCard}
               />
-              <BackCard
+              <Congratulations layerIndex={-1} />
+              {/* <BackCard
                 key={0}
-                layerIndex={0}
-                term={terms[0]}
-              />
+                layerIndex={-1}
+                term={{ term: "", definition: "" }}
+              /> */}
             </>
             :
-            <Congratulations />
+            <Congratulations layerIndex={0} createLearnSet={createLearnSet} setId={match.params.id} />
         }
       </Cards>
     );

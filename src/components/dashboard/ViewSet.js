@@ -13,15 +13,15 @@ const SetName = styled(Title)`
 
 const Details = styled.div`
   height: 20px;
-  display: flex;
-  justify-content: space-around;
-  width: 50%;
+  display: grid;
+  grid-template: 1fr / repeat(3, max-content);
+  grid-column-gap: 10px;
   color: #7B91C3
 `;
 
 const Border = styled.div`
   height: 100%;
-  width: 1px;
+  width: 1.5px;
   background: #7B91C3
 `;
 
@@ -29,10 +29,16 @@ const ButtonsWrapper = styled.div`
   margin: ${props => props.iseditable ? '40px 0 60px 0' : '30px 0 60px 0' };
   display: ${props => props.iseditable ? 'flex' : 'block' };
   ${props => props.iseditable ? 'justify-content: space-evenly' : false };
+  max-width: 300px;
+
+  @media (min-width: 768px) {
+    ${props => props.iseditable ? 'justify-content: space-between' : false };
+  }
 `;
 
 const ButtonLink = styled(LinkButton)`
   padding: 1rem 3.5rem;
+  margin: 0;
   display: ${props => props.iseditable ? 'block' : 'inline' };
 `;
 
@@ -83,16 +89,16 @@ class ViewSet extends Component {
   }
 
   render() {
-    const { match, set, author, terms, signedUser } = this.props;
+    const { match, set, author, terms, signedUser, createLearnSet } = this.props;
     const iseditable = author === signedUser ? true : false;
 
-    if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
+    // if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
 
     if (set && terms) {
       return (
         <Main>
           <Description set={set} />
-          <Buttons setId={match.params.id} iseditable={iseditable} createLearnSet={createLearnSet} />
+          <Buttons signedUser={signedUser} setId={match.params.id} iseditable={iseditable} createLearnSet={createLearnSet} />
           <TermsList terms={terms} />
         </Main>
       )
@@ -115,15 +121,15 @@ const Description = ({ set }) => (
   </>
 );
 
-const Buttons = ({ setId, iseditable, createLearnSet }) => (
+const Buttons = ({ signedUser, setId, iseditable, createLearnSet }) => (
   <ButtonsWrapper iseditable={iseditable.toString()}>
     { iseditable &&
       <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
     }
     <ButtonLink
-      onClick={() => createLearnSet(setId)}
+      onClick={ () => signedUser ? createLearnSet(setId) : null }
       iseditable={iseditable.toString()}
-      to={`/learn/${setId}`}
+      to={signedUser ? `/learn/${setId}` : '/signup'}
       >
       learn set
     </ButtonLink>

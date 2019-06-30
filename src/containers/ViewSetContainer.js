@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
+import { createLearnSet } from '../store/actions/learnSetActions';
 import { removeNewKey } from '../store/actions/createSetActions';
 import { submitEditedSet } from '../store/actions/editSetActions';
 
@@ -23,6 +24,7 @@ const ViewSetContainer = (props) => (
     changeLastLocation={props.changeLastLocation}
     removeNewKey={props.removeNewKey}
     submitEditedSet={props.submitEditedSet}
+    createLearnSet={props.createLearnSet}
   />
 )
 
@@ -49,7 +51,8 @@ export default compose(
       removeNewKey,
       submitEditedSet,
       changeLocation,
-      changeLastLocation
+      changeLastLocation,
+      createLearnSet
     }
   ),
   firestoreConnect(props => [
