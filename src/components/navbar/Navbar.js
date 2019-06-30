@@ -3,14 +3,34 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import styled from 'styled-components';
+import menu from '../../assets/images/menu.svg';
+import back from '../../assets/images/back.svg';
 
 
 const Nav = styled.nav`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
   height: 60px;
   padding: 0 7vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 2;
+  background: white;
+`;
+
+const BackButton = styled.button`
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  padding: 0;
+  visibility: ${props =>
+    props.visible ? "visible" : "hidden"
+  }
 `;
 
 const Button = styled(Link)`
@@ -30,34 +50,38 @@ const Title = styled.p`
   font-size: 18px;
   margin: 0
 `
-const Path = styled.path`
-  fill: none;
-  stroke: black;
-  stroke-width: 7;
-  stroke-linecap: round
-`
+
 
 class Navbar extends Component {
   render() {
-    const { location, lastLocation } = this.props;
-    
+    const { location } = this.props;
+    // if /learn/${numbers} => back button looks like "x", show 12/156 and nav provides to settings
+    // if /create/ => menu is a submit button
     return (
       <Nav>
-        <Button
+        <BackButton
+          tabIndex="2"
+          visible={location === "home" ? 0 : 1}
+          onClick={() => this.props.history.goBack()}
+        >
+          <img src={back} alt="go back" />
+        </BackButton>
+        {/* <Button
           to={lastLocation}
           visible={location === "home" ? 0 : 1}>
-          <BackButton />
-        </Button>
+          <img src={back} />
+        </Button> */}
 
         <Title> { this.props.location }</Title>
 
         <Button
+          tabIndex="2"
           visible={1}
           to={ this.props.auth.uid ?
             `/profile/${this.props.auth.uid}` :
             "/signup"
           }>
-          <MenuButton />
+          <img src={menu} alt="menu" />
         </Button>
       </Nav>
 
@@ -65,23 +89,11 @@ class Navbar extends Component {
   }
 }
 
-const MenuButton = () => (
-  <svg viewBox="0 0 100 100">
-    <Path d="M10,25 L90,25 M10,50 L90,50 M10,75 L90,75" />
-  </svg>
-);
-
-const BackButton = () => (
-  <svg viewBox="0 0 100 100">
-    <Path
-      d="M5,50 L95,50 M3,50 L19,34 M3,50 L19,66" />
-  </svg>
-);
 
 const mapStateToProps = state => ({
   auth: state.firebase.auth,
   location: state.location,
-  lastLocation: state.lastLocation
+  // lastLocation: state.lastLocation
 })
 
 export default connect(mapStateToProps)(Navbar)

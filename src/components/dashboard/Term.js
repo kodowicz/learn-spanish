@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 
 import { BlockShadow, BasicInput, colors } from '../../assets/styles/GlobalStyles';
-import removeButton from '../../assets/images/remove.png';
+import remove from '../../assets/images/remove.svg';
 
 const Border = styled.div`
   width: 100%;
@@ -189,7 +189,7 @@ class Term extends Component {
           isMoved={isMoved}
           onClick={this.removeElement}
         >
-          <img src={removeButton} alt="remove" />
+          <img src={remove} alt="remove" />
         </DeleteButton>
       </Wrapper>
     );
