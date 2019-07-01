@@ -43,19 +43,58 @@ export const isSubmitedEditReducer = (state = null, action) => {
   switch (action.type) {
     case 'SUBMIT_EDIT_SET':
       return action.isSubmited;
-      
+
     default:
       return state;
   }
 };
 
-export const shuffleReducer = (state = '', action) => {
+export const updatedTermReducer = (state = '', action) => {
   switch (action.type) {
-    case 'SHUFFLE_CARD':
-      return action.move;
-    case 'THROWOUT_CARD':
-      return action.move;
+    case 'EDIT_SET':
+      return action.message;
+    case 'EDIT_SET_ERROR':
+      return action.error;
     default:
       return state;
   }
-}
+};
+
+// const initState = {
+//   addedTerm: '',
+//   updatedTerm: '',
+//   removeTerm: ''
+// }
+
+export const addedTermReducer = (state = '', action) => {
+  switch (action.type) {
+    case 'ADDED_NEW_TERM':
+      return action.message;
+    case 'ADDED_NEW_TERM_ERROR':
+      return action.error;
+    default:
+      return state;
+  }
+};
+
+export const removedTermReducer = (state = '', action) => {
+  switch (action.type) {
+    case 'DELETE_TERM':
+    return action.message;
+    case 'DELETE_TERM_ERROR':
+      return action.error;
+    default:
+      return state;
+  }
+};
+
+export const setDeletedReducer = (state = false, action) => {
+  switch (action.type) {
+    case 'DELETE_SET':
+    return action.isDeleted;
+    case 'DELETE_SET_ERROR':
+      return action.isDeleted;
+    default:
+      return state;
+  }
+};

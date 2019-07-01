@@ -6,6 +6,16 @@ export const setUnsavedName = name => (dispatch, getState, { getFirestore }) => 
 
   docRef.update({
     unsavedSet: name
+  }).then(() => {
+    dispatch({
+      type: 'CREATE_UNSAVED_NAME'
+
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'CREATE_UNSAVED_NAME_ERROR',
+      error
+    })
   })
 }
 
@@ -44,12 +54,23 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
         time: new Date()
       })
     }
-  });
+  })
+  .then(() => {
+    dispatch({
+      type: 'CREATE_BASIC_SET'
+
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'CREATE_BASIC_SET_ERROR',
+      error
+    })
+  })
 
 }
 
 // on change input
-export const addUnsavedTerm = term => (dispatch, getState, { getFirestore }) => {
+export const updateUnsavedTerm = term => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
   const subcollection = term.id;
@@ -78,6 +99,27 @@ export const addUnsavedTerm = term => (dispatch, getState, { getFirestore }) => 
   }).catch(error => {
     dispatch({
       type: 'CREATE_UNSAVED_SET_ERROR',
+      error
+    })
+  })
+}
+
+export const removeUnsavedTerm = termID => (dispatch, getState, { getFirestore }) => {
+  const firestore = getFirestore();
+  const authId = getState().firebase.auth.uid;
+
+  const docRef = firestore.doc(`users/${authId}/unsaved/${termID}`);
+
+  docRef.get().then(() => {
+    docRef.delete()
+  }).then(() => {
+    dispatch({
+      type: 'DELETE_UNSAVED_TERM',
+      message: 'term removed'
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'DELETE_UNSAVED_TERM_ERROR',
       error
     })
   })
@@ -187,19 +229,4 @@ export const submitSet = () => (dispatch, getState, { getFirestore }) => {
 
 export const removeNewKey = () => ({
   type: 'REMOVE_KEY'
-})
-
-export const learnSet = () => (dispatch, getState, { getFirebase, getFirestore }) => {
-  // download set
-  // return shuffled elements with indexes
-}
-
-export const shuffleCard = () => ({
-  type: 'SHUFFLE_CARD',
-  move: 'left'
-})
-
-export const throwoutCard = () => ({
-  type: 'THROWOUT_CARD',
-  move: 'right'
 })

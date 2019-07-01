@@ -94,3 +94,22 @@ export const submitEditedSet = isSubmited => ({
   type: 'SUBMIT_EDIT_SET',
   isSubmited
 })
+
+export const deleteSet = () => (dispatch, getState, { getFirestore }) => {
+  const firestore = getFirestore();
+  const setId = getState().firestore.ordered.set[0].id;
+
+  const docRef = firestore.doc(`sets/${setId}`);
+
+  docRef.delete().then(() => {
+    dispatch({
+      type: 'DELETE_SET',
+      isDeleted: true
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'DELETE_SET_ERROR',
+      isDeleted: false
+    })
+  })
+}
