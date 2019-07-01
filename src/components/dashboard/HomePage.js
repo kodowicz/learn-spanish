@@ -55,13 +55,13 @@ class HomePage extends Component {
 
   render() {
     // if (!isLoaded(users)) return <LoadingComponent inverted={true} />;
+    const { isLogged, sets } = this.props;
 
     return (
       <Main>
         <Title>flashcards</Title>
-        <Link to="/test">Test</Link>
-        {this.props.sets && <SetsList sets={this.props.sets} />}
-        <LinkButton to="/create">add new set</LinkButton>
+        {sets && <SetsList sets={sets} />}
+        <LinkButton to={ isLogged ? "/create" : "/signup" }>add new set</LinkButton>
       </Main>
     );
   }

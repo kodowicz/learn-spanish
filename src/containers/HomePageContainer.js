@@ -8,6 +8,7 @@ import HomePage from '../components/dashboard/HomePage';
 
 const HomePageContainer = (props) => (
   <HomePage
+    isLogged={props.isLogged}
     sets={props.sets}
     changeLocation={props.changeLocation}
     changeLastLocation={props.changeLastLocation}
@@ -15,6 +16,7 @@ const HomePageContainer = (props) => (
 );
 
 const mapStateToProps = state => ({
+  isLogged: state.firebase.auth.uid ? true : false,
   sets: state.firestore.ordered.sets
 })
 

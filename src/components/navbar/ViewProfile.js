@@ -75,7 +75,7 @@ class ViewProfile extends Component {
         <Title>hello {user.username}</Title>
         <UserDetails user={user} />
         <Button onClick={this.handleClick}>log out</Button>
-        { userSets.length > 0 &&
+        { userSets &&
           <List>
             <Subtitle>your sets</Subtitle>
             <UserSets userSets={userSets} />
@@ -92,7 +92,7 @@ const UserSets = ({ userSets }) => {
     <SetWrapper key={ set.id }>
       <Link to={`/sets/${set.id}`}>
         <Topic>{ set.name }</Topic>
-        <Info>{ set.terms.length } terms</Info>
+        <Info>{ set.amount } terms</Info>
       </Link>
     </SetWrapper>
   )
@@ -123,7 +123,7 @@ const mapStateToProps = state => {
   const userId = state.firebase.auth.uid;
   const sets = state.firestore.ordered.sets;
   const userSets = sets ? sets.filter(set => set.authorId === userId) : [];
-  console.log(state);
+
   return ({
     userSets: userSets,
     user: state.firebase.profile,
