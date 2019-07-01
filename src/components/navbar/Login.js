@@ -4,7 +4,7 @@ import { signUp, signIn, cleanError, signUpError } from '../../store/actions/aut
 import { changeLocation, changeLastLocation } from '../../store/actions/locationActions';
 import { Redirect } from 'react-router-dom';
 
-import { Main, Button, colors } from '../../styled/GlobalStyles';
+import { Main, Button, BasicInput, colors } from '../../assets/styles/GlobalStyles';
 import styled from 'styled-components';
 
 
@@ -19,9 +19,9 @@ const Switch = styled.button`
   border: none;
   font-family: 'Open Sans', sans-serif;
   color: ${colors.black};
-  font-size: 16px;
+  font-size: 1.6rem;
   width: 50%;
-  ${'' /* outline: none */}
+  outline-color: ${colors.blue}
 `;
 
 const Border = styled.div`
@@ -40,37 +40,31 @@ const Form = styled.form`
 `;
 
 const ErrorMessage = styled.p`
-  color: #F65D5D;
-  font-size: 14px;
+  color: ${colors.warming};
+  font-size: 1.4rem;
   text-align: center;
 `;
 
 const Wrapper = styled.div`
   position: relative;
   border-radius: 5px;
-  box-shadow: 0 7px 15px -5px rgba(7, 22, 124, 0.2);
+  box-shadow: 0 7px 15px -5px ${colors.navyBoxShadow};
   margin: 40px 0;
 `;
 
 const Label = styled.label`
   position: absolute;
-  top: -1.2rem;
+  top: -1.6rem;
   left: 0;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: ${colors.gray}
-
-  ${'' /* ${props => props.error === "auth/wrong-password"} */}
 `;
 
-const Input = styled.input`
+const Input = styled(BasicInput)`
+  background: none;
   border-radius: 5px;
-  border: none;
   padding: 1rem 1rem;
   width: 100%;
-  box-sizing: border-box;
-  font-size: 16px;
-  font-family: 'Open Sans', sans-serif;
-  color: ${colors.black};
   outline-color: ${colors.blue};
 `;
 
@@ -165,7 +159,7 @@ class SignUpForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    if (this.state.username.length <= 4) {
+    if (this.state.username.length < 4) {
       this.props.signUpError("Username should be at least 4 characters.")
     } else if (this.state.password !== this.state.confirm) {
       this.props.signUpError("The password hasn't been confirmed properly.")
