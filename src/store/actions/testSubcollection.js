@@ -39,7 +39,6 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
 // on change input
 export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
   const subcollection = element.id;
 
   const docRef = firestore.doc(`subcollection/7Wlu4hMX2ILQPLHHZ9Js/sets/${subcollection}`);

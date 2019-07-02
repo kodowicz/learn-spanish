@@ -39,7 +39,6 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
 // on change input
 export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
   const subcollection = element.id;
 
   const docRef = firestore.doc(`collection/${subcollection}`);
@@ -66,7 +65,6 @@ export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
 
 export const removeTerm = termID => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
 
   const docRef = firestore.doc(`collection/${termID}`);
 
@@ -87,7 +85,6 @@ export const removeTerm = termID => (dispatch, getState, { getFirestore }) => {
 // add term button
 export const addNewTerm = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
   const newDocument = firestore.collection("collection").doc();
   const keyId = newDocument.id;
 

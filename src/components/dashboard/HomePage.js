@@ -60,6 +60,9 @@ class HomePage extends Component {
     return (
       <Main>
         <Title>flashcards</Title>
+        <Link to="/collection">test collection</Link>
+        <br/>
+        <Link to="/subcollection">test subcollection</Link>
         {sets && <SetsList sets={sets} />}
         <LinkButton to={ isLogged ? "/create" : "/signup" }>add new set</LinkButton>
       </Main>

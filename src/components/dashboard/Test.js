@@ -3,46 +3,8 @@ import { Redirect } from 'react-router-dom';
 import TermsList from './TermsList';
 
 import styled, { css } from 'styled-components';
-import { Button, Main, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { Button, Main, colors } from '../../assets/styles/GlobalStyles';
 
-
-const SetName = styled.div`
-  position: relative;
-  margin: 100px 10px 60px;
-`;
-
-const NameLabel = styled.label`
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  font-size: 20px;
-  color: ${colors.gray};
-  transition: opacity 0.1s;
-
-  ${props => props.isFilled && css `
-    opacity: 0;
-  `}
-`;
-
-const NameInput = styled(BasicInput)`
-  padding: 2px 0;
-  width: 100%;
-  font-size: 20px;
-  outline-color: ${colors.blue};
-
-  &:focus + ${NameLabel} {
-    opacity: 0;
-  }
-`;
-
-const Border = styled.div`
-  width: 100%;
-  height: 1px;
-  background: ${colors.gray};
-  position: absolute;
-  bottom: ${props => props.isBig ? '0' : '10px'};
-  left: 0;
-`;
 
 const Form = styled.form`
   margin: 100px 0;
@@ -64,6 +26,10 @@ const SubmitButton = styled(Button)`
 
 
 class Test extends Component {
+  state = {
+    redirect: false
+  }
+
   componentDidMount() {
     this.props.changeLocation(this.props.title);
   }
@@ -75,11 +41,15 @@ class Test extends Component {
 
   submitSet = event => {
     event.preventDefault();
-    this.props.submitSet()
+    this.setState({
+      redirect: true
+    })
   }
 
   render() {
     const { terms, updateTerm, removeTerm } = this.props;
+
+    if (this.state.redirect) return <Redirect to="/" />;
 
     return (
       <Main>
