@@ -21,11 +21,13 @@ const TestCollection = (props) => (
   />
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = state => {
+  console.log(state.firestore.ordered);
+  return({
   terms: state.firestore.ordered.collection,
   isTermAdded: state.isTermAdded,
   isNewTerm: state.isNewTerm,
-})
+})}
 
 export default compose(
   connect(

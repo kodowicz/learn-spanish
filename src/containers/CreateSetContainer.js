@@ -27,16 +27,18 @@ const CreateSetContainer = (props) => (
   />
 );
 
-const mapStateToProps = state => ({
-  auth: state.firebase.auth,
-  location: state.location,
-  lastLocation: state.lastLocation,
-  unsavedSetName: state.firebase.profile.unsavedSet,
-  unsavedSetTerms: state.firestore.ordered.terms,
-  isTermAdded: state.isTermAdded,
-  isNewTerm: state.isNewTerm,
-  newSetKey: state.newSetKey
-})
+const mapStateToProps = state => {
+  console.log(state.firestore.ordered);
+  return({
+    auth: state.firebase.auth,
+    location: state.location,
+    lastLocation: state.lastLocation,
+    unsavedSetName: state.firebase.profile.unsavedSet,
+    unsavedSetTerms: state.firestore.ordered.unsavedTerms,
+    isTermAdded: state.isTermAdded,
+    isNewTerm: state.isNewTerm,
+    newSetKey: state.newSetKey
+})}
 
 export default compose(
   connect(
@@ -57,7 +59,7 @@ export default compose(
       collection: 'users',
       doc: props.auth.uid,
       subcollections: [{ collection: 'unsaved' }],
-      storeAs: 'terms',
+      storeAs: 'unsavedTerms',
       orderBy: ["time"]
     }
   ])

@@ -1,6 +1,6 @@
 export const editSetName = name => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const setId = getState().firestore.ordered.set[0].id;
+  const setId = getState().firestore.ordered.editSetDetails[0].id;
 
   const docRef = firestore.doc(`sets/${setId}/`);
 
@@ -11,7 +11,7 @@ export const editSetName = name => (dispatch, getState, { getFirestore }) => {
 
 export const updateTerm = project => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const docId = getState().firestore.ordered.set[0].id;
+  const docId = getState().firestore.ordered.editSetDetails[0].id;
   const subcollection = project.id;
 
   const docRef = firestore.doc(`sets/${docId}/terms/${subcollection}`);
@@ -39,7 +39,7 @@ export const updateTerm = project => (dispatch, getState, { getFirestore }) => {
 
 export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
   const firestore = getFirestore();
-  const setId = getState().firestore.ordered.set[0].id;
+  const setId = getState().firestore.ordered.editSetDetails[0].id;
 
   const setRef = firestore.doc(`sets/${setId}`);
   const newDocRef = firestore.collection(`sets/${setId}/terms`).doc();
@@ -74,7 +74,7 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
 
 export const removeTerm = termId => (dispatch, getState, { getFirestore })  => {
   const firestore = getFirestore();
-  const setId = getState().firestore.ordered.set[0].id;
+  const setId = getState().firestore.ordered.editSetDetails[0].id;
 
   const termRef = firestore.doc(`sets/${setId}/terms/${termId}`)
 
@@ -97,7 +97,7 @@ export const submitEditedSet = isSubmited => ({
 
 export const deleteSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const setId = getState().firestore.ordered.set[0].id;
+  const setId = getState().firestore.ordered.editSetDetails[0].id;
 
   const docRef = firestore.doc(`sets/${setId}`);
 

@@ -14,7 +14,7 @@ import ViewSet from '../components/dashboard/ViewSet';
 const ViewSetContainer = (props) => (
   <ViewSet
     match={props.match}
-    set={props.set}
+    set={props.setDetails}
     signedUser={props.signedUser}
     author={props.author}
     terms={props.terms}
@@ -30,12 +30,13 @@ const ViewSetContainer = (props) => (
 
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
-  const set = state.firestore.data.set ? state.firestore.data.set[id] : null;
-  const authorId = set ? set.authorId : null;
+  const setDetails = state.firestore.data.setDetails ? state.firestore.data.setDetails[id] : null;
+  const authorId = setDetails ? setDetails.authorId : null;
   const terms = state.firestore.ordered.terms;
 
-  return ({
-    set: set,
+  console.log(state.firestore.ordered);
+  return({
+    setDetails: setDetails,
     signedUser: state.firebase.auth.uid,
     author: authorId,
     terms: terms,
@@ -59,7 +60,7 @@ export default compose(
     {
       collection: 'sets',
       doc: props.match.params.id,
-      storeAs: 'set'
+      storeAs: 'setDetails'
     },
     {
       collection: 'sets',

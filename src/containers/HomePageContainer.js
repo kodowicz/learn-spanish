@@ -15,10 +15,12 @@ const HomePageContainer = (props) => (
   />
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = state => {
+  console.log(state.firestore.ordered);
+  return({
   isLogged: state.firebase.auth.uid ? true : false,
   sets: state.firestore.ordered.sets
-})
+})}
 
 export default compose(
   connect(mapStateToProps, { changeLocation, changeLastLocation }),

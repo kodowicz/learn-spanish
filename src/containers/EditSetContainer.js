@@ -36,11 +36,11 @@ const EditSetContainer = (props) => (
 
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
-  const set = state.firestore.data.set ? state.firestore.data.set[id] : null;
-  const authorId = set ? set.authorId : null;
-  const terms =  state.firestore.ordered.terms;
-  const name = set ? set.name : null;
-
+  const editSetDetails = state.firestore.data.editSetDetails ? state.firestore.data.editSetDetails[id] : null;
+  const authorId = editSetDetails ? editSetDetails.authorId : null;
+  const terms =  state.firestore.ordered.editTerms;
+  const name = editSetDetails ? editSetDetails.name : null;
+console.log(state.firestore.ordered);
   return ({
     signedUser: state.firebase.auth.uid,
     author: authorId,
@@ -74,13 +74,13 @@ export default compose(
     {
       collection: 'sets',
       doc: props.match.params.id,
-      storeAs: 'set'
+      storeAs: 'editSetDetails'
     },
     {
       collection: 'sets',
       doc: props.match.params.id,
       subcollections: [{ collection: 'terms' }],
-      storeAs: 'terms',
+      storeAs: 'editTerms',
       orderBy: ["time"]
     }
   ])

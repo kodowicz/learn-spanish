@@ -70,16 +70,19 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
 }
 
 // on change input
-export const updateUnsavedTerm = term => (dispatch, getState, { getFirestore }) => {
+export const updateUnsavedTerm = element => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
-  const subcollection = term.id;
+  const subcollection = element.id;
 
   const docRef = firestore.doc(`users/${authId}/unsaved/${subcollection}`);
 
   docRef.get().then(thisDoc => {
     if (thisDoc.exists) {
-      docRef.update(term)
+      docRef.update({
+        term: element.term,
+        definition: element.definition
+      })
     // } else {
     //   const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
     //   const keyId = newDocument.id;

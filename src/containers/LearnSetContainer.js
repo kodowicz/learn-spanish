@@ -26,13 +26,15 @@ const LearnSetContainer = (props) => (
   </>
 );
 
-const mapStateToProps = state => ({
+const mapStateToProps = state => {
+  console.log(state.firestore.ordered);
+  return({
   uid: state.firebase.auth.uid,
   location: state.location,
   lastLocation: state.lastLocation,
   terms: state.terms,
-  fetchedTerms: state.firestore.ordered.terms
-})
+  fetchedTerms: state.firestore.ordered.learnTerms
+})}
 
 export default compose(
   connect(
@@ -48,7 +50,7 @@ export default compose(
         doc: props.match.params.id,
         subcollections: [{ collection: 'basic' }]
       }],
-      storeAs: 'terms',
+      storeAs: 'learnTerms',
       orderBy: ["time"]
     }
   ])

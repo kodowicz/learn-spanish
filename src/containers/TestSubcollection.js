@@ -21,11 +21,14 @@ const TestSubcollection = (props) => (
   />
 );
 
-const mapStateToProps = state => ({
-  terms: state.firestore.ordered.subcollection,
-  isTermAdded: state.isTermAdded,
-  isNewTerm: state.isNewTerm,
-})
+const mapStateToProps = state => {
+  console.log(state.firestore.ordered);
+  return({
+    terms: state.firestore.ordered.subcollection,
+    isTermAdded: state.isTermAdded,
+    isNewTerm: state.isNewTerm,
+  })
+}
 
 export default compose(
   connect(
@@ -42,7 +45,6 @@ export default compose(
   firestoreConnect([
     {
       collection: 'subcollection',
-      // doc: 'zT0EN7WyPINGTi4gUPrA',
       doc: '7Wlu4hMX2ILQPLHHZ9Js',
       subcollections: [{ collection: 'sets' }],
       storeAs: 'subcollection',
