@@ -9,8 +9,6 @@ import ViewSet from './containers/ViewSetContainer';
 import EditSet from './containers/EditSetContainer';
 import CreateSet from './containers/CreateSetContainer';
 import LearnSet from './containers/LearnSetContainer';
-import TestCollection from './containers/TestCollection';
-import TestSubcollection from './containers/TestSubcollection';
 
 import { GlobalStyle } from './assets/styles/GlobalStyles';
 
@@ -29,8 +27,6 @@ class App extends Component {
             <Route path="/learn/:id" component={LearnSet} />
             <Route path="/signup" component={Login} />
             <Route path="/profile/:user" component={ViewProfile} />
-            <Route path="/collection" component={TestCollection} />
-            <Route path="/subcollection" component={TestSubcollection} />
           </Switch>
         </>
       </BrowserRouter>

@@ -1,34 +1,50 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
-import rootReducer from './store/reducers/rootReducer';
 import thunk from 'redux-thunk';
-import { reduxFirestore, getFirestore } from 'redux-firestore';
-import { reactReduxFirebase, getFirebase } from 'react-redux-firebase';
-import fbConfig from './config/fbConfig';
+import { reduxFirestore, getFirestore, createFirestoreInstance } from 'redux-firestore';
+import { getFirebase, ReactReduxFirebaseProvider } from 'react-redux-firebase';
+import fbConfig  from './config/fbConfig';
+import firebase from 'firebase/app';
+import rootReducer from './store/reducers/rootReducer';
+import App from './App';
 
+
+const initialState = window && window.__INITIAL_STATE__;
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const rrfConfig = {
+  userProfile: 'users',
+  useFirestoreForProfile: true
+}
+
+const middlewares = [
+  thunk.withExtraArgument(getFirebase)
+]
 
 const store = createStore(
   rootReducer,
+  initialState,
   composeEnhancers(
     applyMiddleware(thunk.withExtraArgument({ getFirebase, getFirestore })),
-    reduxFirestore(fbConfig),
-    reactReduxFirebase(fbConfig, {
-      useFirestoreForProfile: true,
-      userProfile: 'users',
-      attachAuthIsReady: true
-    })
+    reduxFirestore(firebase, fbConfig)
   )
-);
+)
 
-store.firebaseAuthIsReady.then(() => {
-  ReactDOM.render(
-    <Provider store={store}>
+const rrfProps = {
+  firebase,
+  config: rrfConfig,
+  dispatch: store.dispatch,
+  createFirestoreInstance
+}
+
+
+ReactDOM.render(
+  <Provider store={store}>
+    <ReactReduxFirebaseProvider {...rrfProps}>
       <App />
-    </Provider>,
-    document.getElementById('root')
-  )
-})
+    </ReactReduxFirebaseProvider>
+  </Provider>,
+  document.getElementById('root')
+);
