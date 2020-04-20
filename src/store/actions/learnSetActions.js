@@ -12,10 +12,10 @@ export const createLearnSet = setId => (dispatch, getState, { getFirebase, getFi
         snapshot.forEach(doc => {
           const { term, definition, time } = doc.data();
           const termRef = learnSetRef.doc();
-          const termId = termRef.id;
+          const id = termRef.id;
 
           termRef.set({
-            id : termId,
+            id,
             term,
             definition,
             time
@@ -27,28 +27,20 @@ export const createLearnSet = setId => (dispatch, getState, { getFirebase, getFi
 
 }
 
-// if firebase updating subcollections worked this function wouldn't be neccessery
-export const fetchTerms = terms => ({
-  type: 'FETCH_TERMS',
-  terms
-})
-
 export const shuffleCard = term => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().setId;
-  const newTime = new Date();
+  const time = new Date();
 
   const docRef = firestore.doc(`users/${user}/learn/${set}/basic/${term.id}`);
 
   docRef.update({
-    time: newTime
+    time
   })
   .then(() => {
     dispatch({
-      type: 'SHUFFLE_CARD',
-      time: term.time,
-      newTime: newTime.getTime()
+      type: 'SHUFFLE_CARD'
     })
   }).catch(error => {
     dispatch({
@@ -68,8 +60,7 @@ export const throwoutCard = term => (dispatch, getState, { getFirebase, getFires
   docRef.delete()
   .then(() => {
     dispatch({
-      type: 'THROWOUT_CARD',
-      id: term
+      type: 'THROWOUT_CARD'
     })
   }).catch(error => {
     dispatch({

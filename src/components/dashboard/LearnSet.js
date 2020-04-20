@@ -14,59 +14,14 @@ const Cards = styled.div`
 
 
 class LearnSet extends Component {
-  state = {
-    terms: []
-  }
-
-  componentWillMount() {
-    // unneccessery if firebase works properly
-    this.props.fetchTerms(this.props.fetchedTerms)
-  }
-
   componentDidMount() {
-    const setId = this.props.match.params.id;
-
     this.props.changeLocation('learn');
-    this.props.changeLastLocation(`/sets/${setId}`);
-    this.props.currentSetId(setId);
-
-    // console.log(this.props.terms);
-    // if (this.props.terms) {
-    //   this.setState({
-    //     terms: this.renderCards(this.props.terms)
-    //   })
-    // }
+    this.props.changeLastLocation(`/sets/${this.props.setID}`);
+    this.props.currentSetId(this.props.setID);
   }
-
-  componentWillReceiveProps (newProps) {
-    if (this.props.terms !== newProps.terms) {
-      this.setState({
-        terms: this.renderCards(newProps.terms)
-      })
-    }
-  }
-
-  renderCards = (terms) => {
-    let orderedTerms = this.orderTermsByTime(terms);
-    let layerIndex = 1;
-
-    let visibleCards = orderedTerms.map(term => {
-      layerIndex -= 1;
-      return Object.assign({}, term, { layerIndex: layerIndex })
-    });
-
-    return visibleCards
-  }
-
-  orderTermsByTime (terms) {
-    const orderedTerms = terms.slice();
-    return orderedTerms.sort((prev, next) => prev.time - next.time)
-  }
-
 
   render() {
-    const { match, shuffleCard, throwoutCard, isCardShuffled, createLearnSet } = this.props;
-    const { terms } = this.state;
+    const { setID, terms, shuffleCard, throwoutCard, isCardShuffled, createLearnSet } = this.props;
 
     return (
       <Cards>
@@ -92,7 +47,7 @@ class LearnSet extends Component {
                 />
               )
             } else {
-              return <></>
+              return <div key={term.id}></div>
             }
           })
           :
@@ -107,14 +62,9 @@ class LearnSet extends Component {
                 throwoutCard={throwoutCard}
               />
               <Congratulations layerIndex={-1} />
-              {/* <BackCard
-                key={0}
-                layerIndex={-1}
-                term={{ term: "", definition: "" }}
-              /> */}
             </>
             :
-            <Congratulations layerIndex={0} createLearnSet={createLearnSet} setId={match.params.id} />
+            <Congratulations layerIndex={0} createLearnSet={createLearnSet} setID={setID} />
         }
       </Cards>
     );
