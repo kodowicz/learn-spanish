@@ -1,20 +1,20 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
 import { createLearnSet } from '../store/actions/learnSetActions';
 import { removeNewKey } from '../store/actions/createSetActions';
 import { submitEditedSet } from '../store/actions/editSetActions';
 
-import ViewSet from '../components/dashboard/ViewSet';
+import ViewSet from '../pages/ViewSet';
 
 
 const ViewSetContainer = (props) => (
   <ViewSet
     match={props.match}
-    set={props.setDetails}
+    setDetails={props.setDetails}
     signedUser={props.signedUser}
     author={props.author}
     terms={props.terms}
@@ -30,19 +30,18 @@ const ViewSetContainer = (props) => (
 
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
-  const setDetails = state.firestore.data.setDetails ? state.firestore.data.setDetails[id] : null;
+  const setDetails = state.firestore.data.setDetails;
   const authorId = setDetails ? setDetails.authorId : null;
   const terms = state.firestore.ordered.terms;
 
-  console.log(state.firestore.ordered);
-  return({
+  return {
     setDetails: setDetails,
     signedUser: state.firebase.auth.uid,
     author: authorId,
     terms: terms,
     lastLocation: state.lastLocation,
     isEditSubmited: state.isEditSubmited
-  })
+  }
 }
 
 export default compose(

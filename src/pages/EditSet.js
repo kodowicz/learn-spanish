@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import TermsList from './TermsList';
+import TermsList from '../components/dashboard/TermsList';
+import DeleteSetOverlay from '../components/overlay/DeleteSetOverlay';
 
 import styled, { css } from 'styled-components';
-import { Button, Main, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { Button, Main, BasicInput, colors } from '../assets/styles/GlobalStyles';
 
 
 
@@ -46,8 +47,8 @@ const Border = styled.div`
 `;
 
 const Form = styled.form`
-  margin: 100px 0;
-  padding-bottom: 100px
+  margin: 100px 0 0;
+  ${'' /* padding-bottom: 100px */}
 `;
 
 const AddButton = styled(Button)`
@@ -58,7 +59,15 @@ const SubmitButton = styled(Button)`
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 200px;
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 `;
 
 
@@ -101,9 +110,10 @@ class EditSet extends Component {
     this.props.submitEditedSet(true)
   }
 
-  handleDelete = () => {
-    this.props.deleteSet()
+  handleDeleteSet = () => {
+    // this.props.deleteSet()
   }
+
 
   render() {
     const { setId, terms, isEditSubmited, isSetDeleted, updateTerm, removeTerm } = this.props;
@@ -115,14 +125,15 @@ class EditSet extends Component {
     if (isSetDeleted) return <Redirect to="/" />
 
     return (
-      <Main>
+      <Main width={30} minWidth={350} maxWidth={450}>
         <SetName>
           <NameInput value={setName} onChange={this.setName} onBlur={this.submitName} />
           <NameLabel isFilled={isFilled} htmlFor="name">Name your set</NameLabel>
           <Border isBig="true" />
         </SetName>
 
-        <Button onClick={this.handleDelete}>delete set</Button>
+        <SubmitButton onClick={this.submitSet}>save set</SubmitButton>
+        <SubmitButton onClick={this.deleteSet}>delete set</SubmitButton>
 
         <Form>
           { terms ?
@@ -137,7 +148,6 @@ class EditSet extends Component {
             <></>
           }
           <AddButton onClick={this.addTerm}>add term</AddButton>
-          <SubmitButton onClick={this.submitSet}>done</SubmitButton>
         </Form>
 
       </Main>

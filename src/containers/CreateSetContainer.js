@@ -4,7 +4,9 @@ import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
 import { setUnsavedName, basicTwoTerms, updateUnsavedTerm, addNewUnsavedTerm, removeUnsavedTerm, submitSet } from '../store/actions/createSetActions';
-import CreateSet from '../components/dashboard/CreateSet';
+
+import CreateSet from '../pages/CreateSet';
+
 
 const CreateSetContainer = (props) => (
   <CreateSet
@@ -27,18 +29,21 @@ const CreateSetContainer = (props) => (
   />
 );
 
+
 const mapStateToProps = state => {
-  console.log(state.firestore.ordered);
-  return({
+  const unsavedSetTerms = state.firestore.ordered.unsavedTerms;
+  const unsavedSetName = state.firebase.profile.unsavedSet;
+  return ({
     auth: state.firebase.auth,
     location: state.location,
     lastLocation: state.lastLocation,
-    unsavedSetName: state.firebase.profile.unsavedSet,
-    unsavedSetTerms: state.firestore.ordered.unsavedTerms,
+    unsavedSetName,
+    unsavedSetTerms,
     isTermAdded: state.isTermAdded,
     isNewTerm: state.isNewTerm,
     newSetKey: state.newSetKey
-})}
+  })
+}
 
 export default compose(
   connect(

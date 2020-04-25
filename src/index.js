@@ -8,7 +8,7 @@ import { getFirebase, ReactReduxFirebaseProvider } from 'react-redux-firebase';
 import fbConfig  from './config/fbConfig';
 import firebase from 'firebase/app';
 import rootReducer from './store/reducers/rootReducer';
-import App from './App';
+import App from './pages/App';
 
 
 const initialState = window && window.__INITIAL_STATE__;

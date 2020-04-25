@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation, currentSetId } from '../store/actions/locationActions';
 import { createLearnSet, shuffleCard, throwoutCard,  } from '../store/actions/learnSetActions';
-import LearnSet from '../components/dashboard/LearnSet';
+
+import LearnSet from '../pages/LearnSet';
 
 
 const LearnSetContainer = (props) => (

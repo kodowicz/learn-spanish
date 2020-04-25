@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { FrontCard, BackCard, Congratulations } from './Card';
+import { FrontCard, BackCard, Congratulations } from '../components/dashboard/Flashcard';
+
 import styled from 'styled-components';
+
 
 const Cards = styled.div`
   display: grid;

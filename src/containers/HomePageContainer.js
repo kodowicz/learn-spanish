@@ -3,7 +3,8 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
-import HomePage from '../components/dashboard/HomePage';
+
+import HomePage from '../pages/HomePage';
 
 
 const HomePageContainer = (props) => (
@@ -15,12 +16,11 @@ const HomePageContainer = (props) => (
   />
 );
 
-const mapStateToProps = state => {
-  console.log(state.firestore.ordered);
-  return({
+
+const mapStateToProps = (state) => ({
   isLogged: state.firebase.auth.uid ? true : false,
   sets: state.firestore.ordered.sets
-})}
+})
 
 export default compose(
   connect(mapStateToProps, { changeLocation, changeLastLocation }),

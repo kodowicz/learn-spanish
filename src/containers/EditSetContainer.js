@@ -6,7 +6,7 @@ import { firestoreConnect } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
 import { editSetName, updateTerm, addNewTerm, removeTerm, submitEditedSet, deleteSet } from '../store/actions/editSetActions';
 
-import EditSet from '../components/dashboard/EditSet';
+import EditSet from '../pages/EditSet';
 
 
 const EditSetContainer = (props) => (
@@ -34,26 +34,27 @@ const EditSetContainer = (props) => (
   />
 )
 
+
 const mapStateToProps = (state, ownProps) => {
-  const id = ownProps.match.params.id;
-  const editSetDetails = state.firestore.data.editSetDetails ? state.firestore.data.editSetDetails[id] : null;
-  const authorId = editSetDetails ? editSetDetails.authorId : null;
-  const terms =  state.firestore.ordered.editTerms;
-  const name = editSetDetails ? editSetDetails.name : null;
-console.log(state.firestore.ordered);
-  return ({
+  const setId = ownProps.match.params.id;
+  const editSetDetails = state.firestore.data.editSetDetails ? state.firestore.data.editSetDetails[setId] : null;
+  const author = editSetDetails ? editSetDetails.authorId : null;
+  const terms = state.firestore.ordered.editTerms;
+  const setName = editSetDetails ? editSetDetails.name : null;
+
+  return {
     signedUser: state.firebase.auth.uid,
-    author: authorId,
-    terms: terms,
-    setId: id,
-    setName: name,
+    author,
+    terms,
+    setId,
+    setName,
     isNewTerm: state.isNewTerm,
     isTermDeleted: state.isTermDeleted,
     isEditSubmited: state.isEditSubmited,
     isSetDeleted: state.isSetDeleted,
     location: state.location,
     lastLocation: state.lastLocation
-  })
+  }
 }
 
 export default compose(

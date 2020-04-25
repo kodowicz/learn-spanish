@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-
 import { Redirect } from 'react-router-dom';
+import ChoiceOverlay from '../components/overlay/ChoiceOverlay';
 
 import styled from 'styled-components';
-import { LinkButton, Main, BlockShadow, Title, colors } from '../../assets/styles/GlobalStyles';
-
+import { LinkButton, Main, BlockShadow, Title, colors } from '../assets/styles/GlobalStyles';
 
 
 const SetName = styled(Title)`
@@ -37,16 +36,21 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ButtonLink = styled(LinkButton)`
-  padding: 1rem 3.5rem;
   margin: 0;
   display: ${props => props.iseditable ? 'block' : 'inline' };
+`;
+
+const TermListWrapper = styled.div`
+  @media (min-width: 786px) {
+    margin: 0 40px
+  }
 `;
 
 const SubTitle = styled.h2`
   text-transform: uppercase;
   color: ${colors.gray};
-  font-size: 14px
-`
+  font-size: 14px;
+`;
 
 const List = styled.ul`
   margin: 0 0 40px 0;
@@ -61,6 +65,15 @@ const ListItem = styled.li`
 
 const SetWrapper = styled(BlockShadow)`
   padding: 10px 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 20px 1px 20px;
+
+  @media (min-width: 768px) {
+    padding: 20px 0;
+    grid-template-columns: 1fr 1px 1fr;
+    grid-template-rows: 1fr
+  }
 `;
 
 const Counter = styled.span`
@@ -70,14 +83,29 @@ const Counter = styled.span`
   color: #E5E5E5;
   font-weight: 700;
   font-size: 25px;
-`
+
+  @media (min-width: 768px) {
+    left: -50px
+  }
+`;
 
 const Term = styled.p`
   font-weight: ${({ weight }) => weight};
-  font-size: 16px
-  margin: 0.3rem 0
-`
+  font-size: 16px;
+  margin: 0;
 
+  @media (min-width: 768px) {
+    padding-left: 40px
+  }
+`;
+
+const Line = styled.div`
+  @media (min-width: 768px) {
+    width: 1.5px;
+    height: 20px;
+    background: ${colors.gray};
+  }
+`;
 
 
 class ViewSet extends Component {
@@ -89,15 +117,15 @@ class ViewSet extends Component {
   }
 
   render() {
-    const { match, set, author, terms, signedUser, createLearnSet } = this.props;
+    const { match, setDetails, author, terms, signedUser, createLearnSet } = this.props;
     const iseditable = author === signedUser ? true : false;
 
     // if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
 
-    if (set && terms) {
+    if (setDetails && terms) {
       return (
-        <Main>
-          <Description set={set} />
+        <Main width={50} maxWidth={650}>
+          <Description setDetails={setDetails} />
           <Buttons signedUser={signedUser} setId={match.params.id} iseditable={iseditable} createLearnSet={createLearnSet} />
           <TermsList terms={terms} />
         </Main>
@@ -110,47 +138,56 @@ class ViewSet extends Component {
   }
 }
 
-const Description = ({ set }) => (
+const Description = ({ setDetails }) => (
   <>
-    <SetName>{set.name}</SetName>
+    <SetName>{setDetails.name}</SetName>
     <Details>
-      <span>{set.amount} terms</span>
+      <span>{setDetails.amount} terms</span>
       <Border />
-      <span>by {set.author}</span>
+      <span>by {setDetails.author}</span>
     </Details>
   </>
 );
 
-const Buttons = ({ signedUser, setId, iseditable, createLearnSet }) => (
-  <ButtonsWrapper iseditable={iseditable.toString()}>
-    { iseditable &&
-      <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
-    }
-    <ButtonLink
-      onClick={ () => signedUser ? createLearnSet(setId) : null }
-      iseditable={iseditable.toString()}
-      to={signedUser ? `/learn/${setId}` : '/signup'}
-      >
-      learn set
-    </ButtonLink>
-  </ButtonsWrapper>
-);
+const Buttons = ({ signedUser, setId, iseditable, createLearnSet }) => {
+  const handleChoice = () => {
+    console.log('g');
+    // open overlay then create
+    // signedUser ? createLearnSet(setId) : null
+  }
+  return (
+    <ButtonsWrapper iseditable={iseditable.toString()}>
+      { iseditable &&
+        <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
+      }
+      <ButtonLink
+        onClick={handleChoice}
+        iseditable={iseditable.toString()}
+        to={signedUser ? `/learn/${setId}` : '/signup'}
+        >
+        learn set
+      </ButtonLink>
+    </ButtonsWrapper>
+  );
+};
 
-const TermsList = ({ terms }) => (
-  <>
+const TermsList = ({ terms }) => {
+  return(
+  <TermListWrapper>
     <SubTitle>terms</SubTitle>
     <List>
       {terms.map((term, index) =>
         <ListItem key={ term.id }>
-          <Counter>{ index }</Counter>
+          <Counter>{ index + 1 }</Counter>
           <SetWrapper>
             <Term weight={700}>{ term.term }</Term>
+            <Line />
             <Term weight={600}>{ term.definition }</Term>
           </SetWrapper>
         </ListItem>
       )}
     </List>
-  </>
-);
+  </TermListWrapper>
+)};
 
 export default ViewSet

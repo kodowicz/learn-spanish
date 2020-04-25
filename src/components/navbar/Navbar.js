@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
+import StopLearningOverlay from '../overlay/StopLearningOverlay';
+
 import styled from 'styled-components';
 import menu from '../../assets/images/menu.svg';
 import back from '../../assets/images/back.svg';
@@ -55,8 +57,10 @@ const Title = styled.p`
 class Navbar extends Component {
   render() {
     const { location } = this.props;
-    // if /learn/${numbers} => back button looks like "x", show 12/156 and nav provides to settings
+    // if /learn/${numbers} => ask about ending learning set by overlay <StopLearningOverlay />
+    // if /play/${numbers} => ask about ending learning set by overlay <StopLearningOverlay />
     // if /create/ => menu is a submit button
+    // if
     return (
       <Nav>
         <BackButton

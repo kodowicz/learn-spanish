@@ -2,13 +2,17 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
-import { LinkButton, Main, BlockShadow, Title } from '../../assets/styles/GlobalStyles';
+import { LinkButton, Main, BlockShadow, Title } from '../assets/styles/GlobalStyles';
 
 
 
 const List = styled.ul`
   margin: 40px 0 60px 0;
   padding: 0;
+
+  @media (min-width: 768px) {
+    margin: 60px auto;
+  }
 `;
 
 const ListItem = styled.li`
@@ -54,41 +58,36 @@ class HomePage extends Component {
   }
 
   render() {
-    // if (!isLoaded(users)) return <LoadingComponent inverted={true} />;
+    // loading page => manipulacja transform, nie top/left
+    // różniaca przy zastosowaniu will-change: transform
     const { isLogged, sets } = this.props;
 
     return (
-      <Main>
-        <Title>flashcards</Title>
-        <Link to="/collection">test collection</Link>
-        <br/>
-        <Link to="/subcollection">test subcollection</Link>
-        {sets && <SetsList sets={sets} />}
-        <LinkButton to={ isLogged ? "/create" : "/signup" }>add new set</LinkButton>
-      </Main>
+      <>
+        <Main width={30} minWidth={350} maxWidth={450}>
+          <Title>flashcards</Title>
+          {sets && <SetsList sets={sets} />}
+          <LinkButton to={ isLogged ? "/create" : "/signup" }>new set</LinkButton>
+        </Main>
+      </>
     );
   }
 }
 
-
-class SetsList extends Component {
-  render() {
-    return (
-      <List>
-        { this.props.sets.map(set =>
-          <ListItem key={ set.id }>
-            <Link to={`/sets/${set.id}`}>
-              <SetWrapper>
-                <Topic>{ set.name }</Topic>
-                <Info>{ set.amount } terms</Info>
-                <Info>by { set.author }</Info>
-              </SetWrapper>
-            </Link>
-          </ListItem>
-        )}
-      </List>
-    )
-  }
-};
+const SetsList = ({ sets }) => (
+  <List>
+    { sets.map(set =>
+      <ListItem key={ set.id }>
+        <Link to={`/sets/${set.id}`}>
+          <SetWrapper>
+            <Topic>{ set.name }</Topic>
+            <Info>{ set.amount } terms</Info>
+            <Info>by { set.author }</Info>
+          </SetWrapper>
+        </Link>
+      </ListItem>
+    )}
+  </List>
+);
 
 export default HomePage

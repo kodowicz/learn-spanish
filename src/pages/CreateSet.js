@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import TermsList from './TermsList';
+import TermsList from '../components/dashboard/TermsList';
+import DeleteSetOverlay from '../components/overlay/DeleteSetOverlay';
 
 import styled, { css } from 'styled-components';
-import { Button, Main, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { Button, Main, BasicInput, colors } from '../assets/styles/GlobalStyles';
 
 
 const SetName = styled.div`
@@ -55,11 +56,28 @@ const AddButton = styled(Button)`
 
 const SubmitButton = styled(Button)`
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%
+  bottom: 2px;
+  left: 2px;
+  width: calc(100% - 4px);
+  color: white;
+  background: ${colors.blue};
+
+  @media (min-width: 768px) {
+    width: 200px;
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    &:focus {
+      transform: translate(-50%, 2px);
+    }
+  }
 `;
 
+const DeleteButton = styled(Button)`
+
+`
 
 
 
@@ -99,6 +117,11 @@ class CreateSet extends Component {
     this.props.submitSet()
   }
 
+  deleteSet = event => {
+    event.preventDefault();
+    this.props.submitSet()
+  }
+
   render() {
     const { auth, unsavedSetTerms, newSetKey, updateUnsavedTerm, removeUnsavedTerm } = this.props;
     const { setName } = this.state;
@@ -108,13 +131,17 @@ class CreateSet extends Component {
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
     return (
-      <Main>
+      <Main width={30} minWidth={350} maxWidth={450}>
         <SetName>
           <NameInput value={setName} onChange={this.setName} onBlur={this.submitName} />
           <NameLabel isFilled={isFilled} htmlFor="name">Name your set</NameLabel>
           <Border isBig="true" />
         </SetName>
 
+        <SubmitButton onClick={this.submitSet}>save set</SubmitButton>
+        <DeleteButton onClick={this.deleteSet}>delete set</DeleteButton>
+
+        <DeleteSetOverlay />
         <Form>
           { unsavedSetTerms ?
               <>
@@ -129,54 +156,11 @@ class CreateSet extends Component {
             <></>
           }
           <AddButton onClick={this.addTerm}>add term</AddButton>
-          <SubmitButton onClick={this.submitSet}>done</SubmitButton>
         </Form>
 
       </Main>
     )
   }
 }
-
-// class UnsavedTerms extends Component {
-//   componentDidMount () {
-//     if (this.props.unsavedSetTerms.length < 2) {
-//       this.props.basicTwoTerms(2)
-//     }
-//   }
-//
-//   render() {
-//     const { unsavedSetTerms, updateTerm, removeTerm } = this.props;
-//     const lastTerm = unsavedSetTerms.length - 1;
-//
-//     return (
-//       <>
-//         {unsavedSetTerms.map((term, index) => {
-//             if (index === lastTerm) {
-//               return (
-//                 <Term
-//                   termDetails={term}
-//                   key={term.id}
-//                   updateTerm={updateTerm}
-//                   removeTerm={removeTerm}
-//                   focused={true}
-//                 />
-//               )
-//             } else {
-//               return (
-//                 <Term
-//                   termDetails={term}
-//                   key={term.id}
-//                   updateTerm={updateTerm}
-//                   removeTerm={removeTerm}
-//                 />
-//               )
-//             }
-//
-//         })}
-//       </>
-//     );
-//   }
-// }
-
 
 export default CreateSet
