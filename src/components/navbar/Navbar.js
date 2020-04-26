@@ -56,48 +56,38 @@ const Title = styled.p`
 
 class Navbar extends Component {
   render() {
-    const { location } = this.props;
+    const { uid, location, goBack } = this.props;
     // if /learn/${numbers} => ask about ending learning set by overlay <StopLearningOverlay />
     // if /play/${numbers} => ask about ending learning set by overlay <StopLearningOverlay />
     // if /create/ => menu is a submit button
-    // if
     return (
-      <Nav>
-        <BackButton
-          tabIndex="2"
-          visible={location === "home" ? 0 : 1}
-          onClick={() => this.props.history.goBack()}
-        >
-          <img src={back} alt="go back" />
-        </BackButton>
-        {/* <Button
-          to={lastLocation}
-          visible={location === "home" ? 0 : 1}>
-          <img src={back} />
-        </Button> */}
+      <>
+        { location &&
+          <Nav>
+            <BackButton
+              tabIndex="2"
+              visible={location === "home" ? 0 : 1}
+              onClick={() => goBack()}
+            >
+              <img src={back} alt="go back" />
+            </BackButton>
 
-        <Title> { this.props.location }</Title>
+            <Title> { location }</Title>
 
-        <Button
-          tabIndex="2"
-          visible={1}
-          to={ this.props.auth.uid ?
-            `/profile/${this.props.auth.uid}` :
-            "/signup"
-          }>
-          <img src={menu} alt="menu" />
-        </Button>
-      </Nav>
-
+            <Button
+              tabIndex="2"
+              visible={1}
+              to={ uid ?
+                `/profile/${uid}` :
+                "/signup"
+              }>
+              <img src={menu} alt="menu" />
+            </Button>
+          </Nav>
+        }
+      </>
     );
   }
 }
 
-
-const mapStateToProps = state => ({
-  auth: state.firebase.auth,
-  location: state.location,
-  // lastLocation: state.lastLocation
-})
-
-export default connect(mapStateToProps)(Navbar)
+export default Navbar;

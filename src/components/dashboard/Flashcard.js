@@ -448,12 +448,12 @@ export const BackCard = ({ term }) => (
 )
 
 
-export const Congratulations = ({ setID, layerIndex, createLearnSet }) => (
+export const Congratulations = ({ setid, layerIndex, createLearnSet }) => (
   <CongratsWrapper layerIndex={layerIndex}>
     <div>
       <Title>Congratulations!</Title>
       <Text>You've learnt everything!</Text>
-      <Restart onClick={() => createLearnSet(setID)}>restart</Restart>
+      <Restart onClick={() => createLearnSet(setid)}>restart</Restart>
     </div>
   </CongratsWrapper>
 )

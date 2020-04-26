@@ -1,30 +1,57 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
 
 import HomePage from '../pages/HomePage';
 
 
-const HomePageContainer = (props) => (
-  <HomePage
-    isLogged={props.isLogged}
-    sets={props.sets}
-    changeLocation={props.changeLocation}
-    changeLastLocation={props.changeLastLocation}
-  />
-);
+const HomePageContainer = (props) => {
+  return props.isLoaded ?
+    <HomePage
+      isLogged={props.isLogged}
+      userSets={props.userSets}
+      allSets={props.allSets}
+      changeLocation={props.changeLocation}
+      changeLastLocation={props.changeLastLocation}
+    />
+    :
+    <></>
+};
 
 
-const mapStateToProps = (state) => ({
-  isLogged: state.firebase.auth.uid ? true : false,
-  sets: state.firestore.ordered.sets
-})
+const mapStateToProps = (state) => {
+  const uid = state.firebase.auth.uid;
+  const allSets = state.firestore.ordered.allSets;
+  const userSets = state.firestore.ordered.userSets;
+
+  return {
+    uid,
+    allSets,
+    userSets,
+    isLogged: uid ? true : false,
+    isLoaded: isLoaded(allSets, userSets)
+  }
+}
 
 export default compose(
   connect(mapStateToProps, { changeLocation, changeLastLocation }),
-  firestoreConnect([
-    { collection: 'sets' }
-  ])
+  firestoreConnect(props => {
+    return props.uid ?
+      [
+        {
+          collection: 'sets',
+          storeAs: 'allSets'
+        },
+        {
+          collection: 'users',
+          doc: props.uid,
+          subcollections: [{ collection: 'learn' }],
+          storeAs: 'userSets'
+        }
+      ]
+      :
+      [] // if user refreshes the page
+  })
 )(HomePageContainer);

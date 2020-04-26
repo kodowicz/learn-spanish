@@ -11,22 +11,25 @@ import { submitEditedSet } from '../store/actions/editSetActions';
 import ViewSet from '../pages/ViewSet';
 
 
-const ViewSetContainer = (props) => (
-  <ViewSet
-    match={props.match}
-    setDetails={props.setDetails}
-    signedUser={props.signedUser}
-    author={props.author}
-    terms={props.terms}
-    lastLocation={props.lastLocation}
-    isEditSubmited={props.isEditSubmited}
-    changeLocation={props.changeLocation}
-    changeLastLocation={props.changeLastLocation}
-    removeNewKey={props.removeNewKey}
-    submitEditedSet={props.submitEditedSet}
-    createLearnSet={props.createLearnSet}
-  />
-)
+const ViewSetContainer = (props) => {
+  return props.isLoaded ?
+    <ViewSet
+      match={props.match}
+      setDetails={props.setDetails}
+      signedUser={props.signedUser}
+      author={props.author}
+      terms={props.terms}
+      lastLocation={props.lastLocation}
+      isEditSubmited={props.isEditSubmited}
+      changeLocation={props.changeLocation}
+      changeLastLocation={props.changeLastLocation}
+      removeNewKey={props.removeNewKey}
+      submitEditedSet={props.submitEditedSet}
+      createLearnSet={props.createLearnSet}
+    />
+    :
+    <></>
+}
 
 const mapStateToProps = (state, ownProps) => {
   const id = ownProps.match.params.id;
@@ -40,7 +43,8 @@ const mapStateToProps = (state, ownProps) => {
     author: authorId,
     terms: terms,
     lastLocation: state.lastLocation,
-    isEditSubmited: state.isEditSubmited
+    isEditSubmited: state.isEditSubmited,
+    isLoaded: isLoaded(terms)
   }
 }
 

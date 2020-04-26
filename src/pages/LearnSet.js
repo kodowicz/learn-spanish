@@ -18,12 +18,12 @@ const Cards = styled.div`
 class LearnSet extends Component {
   componentDidMount() {
     this.props.changeLocation('learn');
-    this.props.changeLastLocation(`/sets/${this.props.setID}`);
-    this.props.currentSetId(this.props.setID);
+    this.props.changeLastLocation(`/sets/${this.props.setid}`);
+    this.props.currentSetId(this.props.setid);
   }
 
   render() {
-    const { setID, terms, shuffleCard, throwoutCard, isCardShuffled, createLearnSet } = this.props;
+    const { setid, terms, shuffleCard, throwoutCard, isCardShuffled, createLearnSet } = this.props;
 
     return (
       <Cards>
@@ -66,7 +66,7 @@ class LearnSet extends Component {
               <Congratulations layerIndex={-1} />
             </>
             :
-            <Congratulations layerIndex={0} createLearnSet={createLearnSet} setID={setID} />
+            <Congratulations layerIndex={0} createLearnSet={createLearnSet} setid={setid} />
         }
       </Cards>
     );

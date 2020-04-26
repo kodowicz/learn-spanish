@@ -1,23 +1,26 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 import { logOut } from '../store/actions/authActions';
 import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
 
 import ViewProfile from '../pages/ViewProfile';
 
 
-const ViewProfileContainer = (props) => (
-  <ViewProfile
-    userSets={props.userSets}
-    user={props.user}
-    uid={props.uid}
-    logOut={props.logOut}
-    changeLocation={props.changeLocation}
-    changeLastLocation={props.changeLastLocation}
-  />
-)
+const ViewProfileContainer = (props) => {
+  return props.isLoaded ?
+    <ViewProfile
+      userSets={props.userSets}
+      user={props.user}
+      uid={props.uid}
+      logOut={props.logOut}
+      changeLocation={props.changeLocation}
+      changeLastLocation={props.changeLastLocation}
+    />
+  :
+    <></>
+}
 
 
 const mapStateToProps = state => {
@@ -29,7 +32,8 @@ const mapStateToProps = state => {
     uid: uid,
     user: state.firebase.profile,
     userSets,
-    authError: state.auth.authError
+    authError: state.auth.authError,
+    isLoaded: isLoaded(sets)
   }
 }
 

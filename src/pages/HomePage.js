@@ -3,8 +3,15 @@ import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { LinkButton, Main, BlockShadow, Title } from '../assets/styles/GlobalStyles';
+import percent from '../assets/images/percentage.svg';
 
+const ListWrapper = styled.div`
 
+`;
+
+const ListTitle = styled.p`
+
+`;
 
 const List = styled.ul`
   margin: 40px 0 60px 0;
@@ -50,6 +57,10 @@ const Info = styled.p`
   margin: 0
 `
 
+const Percentage = styled.div`
+
+`
+
 
 class HomePage extends Component {
   componentDidMount() {
@@ -60,34 +71,64 @@ class HomePage extends Component {
   render() {
     // loading page => manipulacja transform, nie top/left
     // różniaca przy zastosowaniu will-change: transform
-    const { isLogged, sets } = this.props;
+    const { isLogged, allSets, userSets } = this.props;
 
     return (
       <>
         <Main width={30} minWidth={350} maxWidth={450}>
-          <Title>flashcards</Title>
-          {sets && <SetsList sets={sets} />}
-          <LinkButton to={ isLogged ? "/create" : "/signup" }>new set</LinkButton>
+          <Title>Are you ready for a new dose of words?</Title>
+          <UserSetsList sets={userSets} />
+          <AllSetsList sets={allSets} />
+          <LinkButton transparent={true.toString()} to={ isLogged ? "/create" : "/signup" }>create set</LinkButton>
         </Main>
       </>
     );
   }
 }
 
-const SetsList = ({ sets }) => (
-  <List>
-    { sets.map(set =>
-      <ListItem key={ set.id }>
-        <Link to={`/sets/${set.id}`}>
-          <SetWrapper>
-            <Topic>{ set.name }</Topic>
-            <Info>{ set.amount } terms</Info>
-            <Info>by { set.author }</Info>
-          </SetWrapper>
-        </Link>
-      </ListItem>
-    )}
-  </List>
-);
+
+const UserSetsList = ({ sets }) => {
+  return(
+    <ListWrapper>
+      <ListTitle>get back to learn</ListTitle>
+
+      <List>
+        { sets.map(set =>
+          <ListItem key={ set.id }>
+            <Link to={`/sets/${set.id}`}>
+              <SetWrapper>
+                <Topic>{ set.name }</Topic>
+                <Info>{ set.amount } terms</Info>
+                <Percentage>{ set.knowledge }</Percentage>
+              </SetWrapper>
+            </Link>
+          </ListItem>
+        )}
+      </List>
+    </ListWrapper>
+)};
+
+const AllSetsList = ({ sets }) => {
+  return (
+    <ListWrapper>
+      <ListTitle>available sets</ListTitle>
+      <List>
+        { sets.map(set =>
+          <ListItem key={ set.id }>
+            <Link to={`/sets/${set.id}`}>
+              <SetWrapper>
+                <Topic>{ set.name }</Topic>
+                <Info>{ set.amount } terms</Info>
+                <Info>by { set.author }</Info>
+              </SetWrapper>
+            </Link>
+          </ListItem>
+        )}
+      </List>
+    </ListWrapper>
+  )
+};
+
+
 
 export default HomePage

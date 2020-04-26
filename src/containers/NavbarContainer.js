@@ -16,7 +16,6 @@ const mapStateToProps = (state, ownProps) => ({
   uid: state.firebase.auth.uid,
   location: state.location,
   goBack: ownProps.history.goBack
-  // lastLocation: state.lastLocation
 })
 
 export default connect(mapStateToProps)(NavbarContainer)
