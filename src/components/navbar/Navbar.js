@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-
-import StopLearningOverlay from '../overlay/StopLearningOverlay';
 
 import styled from 'styled-components';
 import menu from '../../assets/images/menu.svg';
@@ -54,40 +51,42 @@ const Title = styled.p`
 `
 
 
-class Navbar extends Component {
-  render() {
-    const { uid, location, goBack } = this.props;
-    // if /learn/${numbers} => ask about ending learning set by overlay <StopLearningOverlay />
-    // if /play/${numbers} => ask about ending learning set by overlay <StopLearningOverlay />
-    // if /create/ => menu is a submit button
-    return (
-      <>
-        { location &&
-          <Nav>
-            <BackButton
-              tabIndex="2"
-              visible={location === "home" ? 0 : 1}
-              onClick={() => goBack()}
-            >
-              <img src={back} alt="go back" />
-            </BackButton>
-
-            <Title> { location }</Title>
-
-            <Button
-              tabIndex="2"
-              visible={1}
-              to={ uid ?
-                `/profile/${uid}` :
-                "/signup"
-              }>
-              <img src={menu} alt="menu" />
-            </Button>
-          </Nav>
-        }
-      </>
-    );
+const Navbar = ({ uid, location, goBack, cancelSesion }) => {
+  const handleBackButton = () => {
+    if (location === 'learn') {
+      cancelSesion(true)
+    } else {
+      goBack()
+    }
   }
+
+  return (
+    <>
+      { location &&
+        <Nav>
+
+          <BackButton
+            tabIndex='2'
+            visible={location === 'home' ? false : true}
+            onClick={handleBackButton}
+          >
+            <img src={back} alt='go back' />
+          </BackButton>
+
+          <Title>{ location }</Title>
+
+          <Button
+            tabIndex='2'
+            visible={true}
+            to={ uid ? `/profile/${uid}` : '/signup' }
+          >
+            <img src={menu} alt='menu' />
+          </Button>
+
+        </Nav>
+      }
+    </>
+  );
 }
 
 export default Navbar;

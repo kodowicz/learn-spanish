@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { FrontCard, BackCard, Congratulations } from '../components/dashboard/Flashcard';
+import StopLearningOverlay from '../components/overlay/StopLearningOverlay';
 
 import styled from 'styled-components';
 
@@ -23,53 +24,58 @@ class LearnSet extends Component {
   }
 
   render() {
-    const { setid, terms, shuffleCard, throwoutCard, isCardShuffled, createLearnSet } = this.props;
+    const { setid, terms, isOverlayOpen, cancelSesion, shuffleCard, throwoutCard, createLearnSet } = this.props;
 
-    return (
-      <Cards>
-        { (terms.length > 1) ?
-          terms.map(term => {
-            if (term.layerIndex === 0) {
-              return (
+    if (isOverlayOpen) {
+      return <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
+    } else {
+
+      return (
+        <Cards>
+          { (terms.length > 1) ?
+            terms.map(term => {
+              if (term.layerIndex === 0) {
+                return (
+                  <FrontCard
+                    key={term.id}
+                    layerIndex={term.layerIndex}
+                    term={term}
+                    moveEnabled={true}
+                    shuffleCard={shuffleCard}
+                    throwoutCard={throwoutCard}
+                  />
+                )
+              } else if (term.layerIndex === -1) {
+                return (
+                  <BackCard
+                    key={term.id}
+                    layerIndex={term.layerIndex}
+                    term={term}
+                  />
+                )
+              } else {
+                return <div key={term.id}></div>
+              }
+            })
+            :
+            (terms.length === 1) ?
+              <>
                 <FrontCard
-                  key={term.id}
-                  layerIndex={term.layerIndex}
-                  term={term}
-                  moveEnabled={true}
+                  key={terms[0].id}
+                  layerIndex={terms[0].layerIndex}
+                  term={terms[0]}
+                  moveEnabled={false}
                   shuffleCard={shuffleCard}
                   throwoutCard={throwoutCard}
                 />
-              )
-            } else if (term.layerIndex === -1) {
-              return (
-                <BackCard
-                  key={term.id}
-                  layerIndex={term.layerIndex}
-                  term={term}
-                />
-              )
-            } else {
-              return <div key={term.id}></div>
-            }
-          })
-          :
-          (terms.length === 1) ?
-            <>
-              <FrontCard
-                key={terms[0].id}
-                layerIndex={terms[0].layerIndex}
-                term={terms[0]}
-                moveEnabled={false}
-                shuffleCard={shuffleCard}
-                throwoutCard={throwoutCard}
-              />
-              <Congratulations layerIndex={-1} />
-            </>
-            :
-            <Congratulations layerIndex={0} createLearnSet={createLearnSet} setid={setid} />
-        }
-      </Cards>
-    );
+                <Congratulations layerIndex={-1} />
+              </>
+              :
+              <Congratulations layerIndex={0} createLearnSet={createLearnSet} setid={setid} />
+          }
+        </Cards>
+      );
+    }
   }
 }
 

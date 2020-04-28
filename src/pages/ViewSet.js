@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import ChoiceOverlay from '../components/overlay/ChoiceOverlay';
+// import { Redirect } from 'react-router-dom';
+import MethodChoiceOverlay from '../components/overlay/MethodChoiceOverlay';
 
 import styled from 'styled-components';
-import { LinkButton, Main, BlockShadow, Title, colors } from '../assets/styles/GlobalStyles';
+import { LinkButton, Button, Main, BlockShadow, Title, colors } from '../assets/styles/GlobalStyles';
 
 
 const SetName = styled(Title)`
@@ -107,7 +107,6 @@ const Line = styled.div`
   }
 `;
 
-
 class ViewSet extends Component {
   componentDidMount() {
     this.props.changeLocation('set');
@@ -117,22 +116,27 @@ class ViewSet extends Component {
   }
 
   render() {
-    const { match, setDetails, author, terms, signedUser, createLearnSet } = this.props;
+    const { match, setDetails, author, terms, signedUser, isOverlayOpen, chooseMethod, createLearnSet, createPlaySet } = this.props;
     const iseditable = author === signedUser ? true : false;
-
     // if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
 
-    if (setDetails && terms) {
+    if (isOverlayOpen) {
       return (
-        <Main width={50} maxWidth={650}>
-          <Description setDetails={setDetails} />
-          <Buttons signedUser={signedUser} setId={match.params.id} iseditable={iseditable} createLearnSet={createLearnSet} />
-          <TermsList terms={terms} />
-        </Main>
+        <MethodChoiceOverlay
+          signedUser={signedUser}
+          setid={match.params.id}
+          chooseMethod={chooseMethod}
+          createLearnSet={createLearnSet}
+          createPlaySet={createPlaySet}
+        />
       )
     } else {
       return (
-        <Main></Main>
+        <Main width={50} maxWidth={650}>
+          <Description setDetails={setDetails} />
+          <Buttons setid={match.params.id} iseditable={iseditable} chooseMethod={chooseMethod} />
+          <TermsList terms={terms} />
+        </Main>
       )
     }
   }
@@ -149,24 +153,18 @@ const Description = ({ setDetails }) => (
   </>
 );
 
-const Buttons = ({ signedUser, setId, iseditable, createLearnSet }) => {
+const Buttons = ({ setid, iseditable, chooseMethod }) => {
   const handleChoice = () => {
-    console.log('g');
     // open overlay then create
-    // signedUser ? createLearnSet(setId) : null
+    chooseMethod(true)
   }
+
   return (
     <ButtonsWrapper iseditable={iseditable.toString()}>
       { iseditable &&
-        <ButtonLink to={`/edit/${setId}`}>edit set</ButtonLink>
+        <ButtonLink to={`/edit/${setid}`}>edit set</ButtonLink>
       }
-      <ButtonLink
-        onClick={handleChoice}
-        iseditable={iseditable.toString()}
-        to={signedUser ? `/learn/${setId}` : '/signup'}
-        >
-        learn set
-      </ButtonLink>
+      <Button onClick={handleChoice} iseditable={iseditable.toString()}>learn set</Button>
     </ButtonsWrapper>
   );
 };

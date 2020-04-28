@@ -1,12 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
 
 class StopLearningOverlay extends React.Component {
   handleKeepLearning = event => {
-    // close overlay
+    this.props.cancelSesion(false)
   }
 
   handleStopLearning = event => {
-    // this.props.stopLearning()
+    this.props.cancelSesion(false)
   }
 
   render() {
@@ -14,7 +16,7 @@ class StopLearningOverlay extends React.Component {
       <div role="alertdialog" aria-describedby="info">
         <p id="info">Are you sure you want to finish learning?</p>
         <button onClick={this.handleKeepLearning} type="button">no</button>
-        <button onClick={this.handleStopLearning} type="button">yes</button>
+        <Link to={`/sets/${this.props.setid}`} onClick={this.handleStopLearning} type="button">yes</Link>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import { authReducer } from './authReducer';
 import { createdSetReducer, isSubmitedEditReducer, setDeletedReducer } from './setsReducer';
 import { locationReducer, lastLocationReducer, setIdReducer } from './locationReducer';
+import { choiceMethodReducer, cancelSesionReducer } from './overlayReducers';
 import { shuffleCardReducer } from './learnSetReducer';
 import { combineReducers } from 'redux';
 import { firestoreReducer } from 'redux-firestore';
@@ -14,6 +15,8 @@ const rootReducer = combineReducers({
   isEditSubmited: isSubmitedEditReducer,
   isSetDeleted: setDeletedReducer,
   terms: shuffleCardReducer,
+  isChoiceOverlayOpen: choiceMethodReducer,
+  isCancelOverlayOpen: cancelSesionReducer,
   location: locationReducer,
   lastLocation: lastLocationReducer,
   firestore: firestoreReducer,

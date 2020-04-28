@@ -3,7 +3,8 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 import { changeLocation, changeLastLocation, currentSetId } from '../store/actions/locationActions';
-import { createLearnSet, shuffleCard, throwoutCard,  } from '../store/actions/learnSetActions';
+import { createLearnSet, shuffleCard, throwoutCard } from '../store/actions/learnSetActions';
+import { cancelSesion } from '../store/actions/overlayActions';
 
 import LearnSet from '../pages/LearnSet';
 
@@ -13,9 +14,11 @@ const LearnSetContainer = (props) => {
     <LearnSet
       setid={props.setid}
       terms={props.terms}
+      isOverlayOpen={props.isOverlayOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
       currentSetId={props.currentSetId}
+      cancelSesion={props.cancelSesion}
       shuffleCard={props.shuffleCard}
       throwoutCard={props.throwoutCard}
       createLearnSet={props.createLearnSet}
@@ -45,6 +48,7 @@ const mapStateToProps = (state, ownProps) => {
     uid: state.firebase.auth.uid,
     location: state.location,
     lastLocation: state.lastLocation,
+    isOverlayOpen: state.isCancelOverlayOpen,
     terms: terms ? layerCards(terms) : undefined,
     isLoaded: isLoaded(terms)
   }
@@ -53,7 +57,7 @@ const mapStateToProps = (state, ownProps) => {
 export default compose(
   connect(
     mapStateToProps,
-    { changeLocation, changeLastLocation, currentSetId, shuffleCard, throwoutCard, createLearnSet }
+    { changeLocation, changeLastLocation, currentSetId, cancelSesion, shuffleCard, throwoutCard, createLearnSet }
   ),
   firestoreConnect(props => {
     return props.uid ?
