@@ -1,16 +1,30 @@
-import styled, { createGlobalStyle  } from 'styled-components';
+import React from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Link } from 'react-router-dom';
+
+
 
 export const colors = {
   white: "#FFFFFF",
-  navy: "#07167C",
-  blue: "#2561EA",
+  navy: "#21066F",
+  blue: "#6F40FC",
+  bluish: "rgba(247, 244, 255, 20)",
+  shadow: "rgba(66, 49, 119, 0.5)",
+  azure: "#EFF3F7",
   black: "#303030",
-  gray: "#849197",
-  background: "#E6E6E6",
+  progress: "#A080FF",
+  darkGray: "#B4AEC5",
+  lightGray: "#EDE7FF",
   warming: "#F65D5D",
   navyBoxShadow: "rgba(7, 22, 124, 0.2)"
 }
+
+export const fonts = {
+  semiBold: 500,
+  bold: 600,
+  family: `'Open Sans', sans-serif`
+}
+
 
 export const GlobalStyle = createGlobalStyle`
   html {
@@ -18,12 +32,14 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'Open Sans', sans-serif;
-    color: ${colors.black};
+    font-family: ${fonts.family};
+
+    color: ${colors.white};
     margin: 0;
     font-size: 1.6rem;
+    font-weight: ${fonts.semiBold};
     height: 100vh;
-    overflow-x: hidden
+    overflow-x: hidden;
   }
 
   *, *::before, *::after {
@@ -39,73 +55,93 @@ export const GlobalStyle = createGlobalStyle`
 
 
 export const Main = styled.main`
-  margin: 80px 12vw;
+  padding: 85px 10vw;
 `;
 
-export const BlockShadow = styled.div`
-  border-radius: 5px;
-  box-shadow: 0 7px 15px -5px rgba(40, 60, 200, 0.25);
+export const BlockElement = styled.div`
+    border-radius: 15px;
+    background: rgba(247, 244, 255, 0.2);
 `
 
 export const Title = styled.h1`
   text-align: center;
-  color: ${colors.navy};
-  font-size: 30px;
-  font-weight: 700;
+  color: ${colors.white};
+  font-size: 1.8rem;
+  font-weight: ${fonts.bold};
   margin: 0;
 `;
 
+
 export const Button = styled.button`
+  margin: ${props => props.center ? '0 auto' : 0 };
+  color: ${({ color }) => color || `${colors.white}`};
+  border: 1px solid ${({ color }) => color || `${colors.white}`};
+  font-family: ${fonts.family};
   display: block;
-  margin: 0 auto;
-  background: ${colors.white};
-  padding: 1rem 3.3rem;
-  color: ${colors.blue};
-  border: 1px solid ${colors.blue};
-  box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.3);
-  border-radius: 7px;
-  transition: box-shadow .2s, transform .2s;
-  font-size: 16px;
-  font-family: 'Open Sans', sans-serif;
+  width: 13rem;
+  height: 4rem;
+  text-align: center;
+  font-size: 1.4rem;
+  background: transparent;
+  border-radius: 50px;
+  transition: transform .2s;
 
   &:hover {
-    box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.5);
+    color: ${colors.blue};
+    background: ${colors.white};
   }
 
   &:focus {
     transform: translateY(2px);
-    box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.15);
   }
 `;
 
-export const LinkButton = styled(Link)`
-  text-decoration: none;
-  color: ${colors.blue};
-  padding: 1rem 3rem;
+const Anchor = styled(Link)`
+  margin: ${props => props.center ? '0 auto' : 0 };
+  color: ${({ color }) => color || `${colors.white}`};
+  border: 1px solid ${({ color }) => color || `${colors.white}`};
+  position: relative;
   display: block;
-  margin: 0 auto;
-  width: max-content;
-  border-radius: 7px;
-  background: ${colors.white};
-  border: 1px solid ${colors.blue};
-  box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.3);
-  transition: box-shadow .2s, transform .2s;
+  width: 13rem;
+  height: 4rem;
+  text-decoration: none;
+  font-size: 1.4rem;
+  border-radius: 50px;
+  transition: transform .2s;
 
-  &:hover{
-    box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.5);
+  &:hover {
+    color: ${colors.blue};
+    background: ${colors.white};
   }
 
   &:focus {
     transform: translateY(2px);
-    box-shadow: 0 5px 15px -5px rgba(7, 22, 124, 0.15);
   }
+`;
+
+const AnchorWrapper = styled.span`
+  width: max-content;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `
+
+export const LinkButton = (props) => (
+  <Anchor
+    to={props.to}
+    center={props.center}
+    color={props.color}
+  >
+    <AnchorWrapper>{props.children}</AnchorWrapper>
+  </Anchor>
+);
 
 export const BasicInput = styled.input`
   background: none;
   border: none;
   box-sizing: border-box;
-  font-size: 16px;
-  font-family: 'Open Sans', sans-serif;
+  font-size: 1.4rem;
+  font-family: ${fonts.family};
   color: ${colors.black};
 `
