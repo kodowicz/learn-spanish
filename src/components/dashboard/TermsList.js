@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import Term from './Term';
 
+import styled from 'styled-components';
+import { colors, fonts } from '../../assets/styles/GlobalStyles';
+
+
 class TermsList extends Component {
   componentDidMount () {
     if (this.props.terms.length < 2 && this.props.basicTwoTerms) {
@@ -10,35 +14,65 @@ class TermsList extends Component {
 
   render() {
     const { terms, updateTerm, removeTerm } = this.props;
-    const lastTerm = terms.length - 1;
 
     return (
       <>
-        {terms.map((term, index) => {
-            if (index === lastTerm) {
-              return (
-                <Term
-                  termDetails={term}
-                  key={term.id}
-                  updateTerm={updateTerm}
-                  removeTerm={removeTerm}
-                  focused={true}
-                />
-              )
-            } else {
-              return (
-                <Term
-                  termDetails={term}
-                  key={term.id}
-                  updateTerm={updateTerm}
-                  removeTerm={removeTerm}
-                />
-              )
-            }
-        })}
+        {terms.map((term, index) => (
+          <ListItem key={term.id}>
+            <Counter
+              isLessThanTen={((index + 1) < 10) ? true : false}
+            >
+              {index + 1}
+            </Counter>
+            <SetWrapper>
+              <Term
+                termDetails={term}
+                updateTerm={updateTerm}
+                removeTerm={removeTerm}
+              />
+            </SetWrapper>
+          </ListItem>
+        ))}
       </>
     );
   }
 }
+
+
+const ListItem = styled.li`
+  margin-bottom: 2rem;
+  height: 9rem;
+  list-style: none;
+  position: relative;
+`;
+
+const SetWrapper = styled.div`
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, min-content);
+  grid-row-gap: 2px;
+  align-content: center;
+
+  @media (min-width: 768px) {
+    padding: 20px 0;
+    grid-template-columns: 1fr 1px 1fr;
+    grid-template-rows: 1fr
+  }
+`;
+
+const Counter = styled.span`
+  left: ${props => props.isLessThanTen ? '-8vw' : '-10vw' };
+  color: ${colors.lightGray};
+  font-weight: ${fonts.bold};
+  position: absolute;
+  top: 30%;
+  font-size: 2.5rem;
+
+  @media (min-width: 768px) {
+    left: -50px
+  }
+`;
+
 
 export default TermsList

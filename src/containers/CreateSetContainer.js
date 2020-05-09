@@ -2,8 +2,20 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
-import { changeLocation, changeLastLocation } from '../store/actions/locationActions';
-import { setUnsavedName, basicTwoTerms, updateUnsavedTerm, addNewUnsavedTerm, removeUnsavedTerm, submitSet } from '../store/actions/createSetActions';
+import { askForDeleting } from '../store/actions/overlayActions';
+import {
+  changeLocation,
+  changeLastLocation
+} from '../store/actions/locationActions';
+import {
+  setUnsavedName,
+  basicTwoTerms,
+  updateUnsavedTerm,
+  addNewUnsavedTerm,
+  removeUnsavedTerm,
+  submitSet,
+  deleteUnsavedSet
+} from '../store/actions/createSetActions';
 
 import CreateSet from '../pages/CreateSet';
 
@@ -14,6 +26,7 @@ const CreateSetContainer = (props) => {
       auth={props.auth}
       location={props.location}
       lastLocation={props.lastLocation}
+      isSetDeleted={props.isSetDeleted}
       unsavedSetName={props.unsavedSetName}
       unsavedSetTerms={props.unsavedSetTerms}
       isTermAdded={props.isTermAdded}
@@ -21,12 +34,14 @@ const CreateSetContainer = (props) => {
       newSetKey={props.newSetKey}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      askForDeleting={props.askForDeleting}
       setUnsavedName={props.setUnsavedName}
       basicTwoTerms={props.basicTwoTerms}
       updateUnsavedTerm={props.updateUnsavedTerm}
       addNewUnsavedTerm={props.addNewUnsavedTerm}
       removeUnsavedTerm={props.removeUnsavedTerm}
       submitSet={props.submitSet}
+      deleteUnsavedSet={props.deleteUnsavedSet}
     />
     :
     <></>
@@ -36,16 +51,18 @@ const CreateSetContainer = (props) => {
 const mapStateToProps = state => {
   const unsavedSetTerms = state.firestore.ordered.unsavedTerms;
   const unsavedSetName = state.firebase.profile.unsavedSet;
+
   return ({
+    unsavedSetName,
+    unsavedSetTerms,
     auth: state.firebase.auth,
     location: state.location,
     lastLocation: state.lastLocation,
-    unsavedSetName,
-    unsavedSetTerms,
+    isSetDeleted: state.isSetDeletedOverlayOpen,
     isTermAdded: state.isTermAdded,
     isNewTerm: state.isNewTerm,
     newSetKey: state.newSetKey,
-    isLoaded: isLoaded(unsavedSetTerms)
+    isLoaded: isLoaded(unsavedSetTerms, unsavedSetName)
   })
 }
 
@@ -59,8 +76,10 @@ export default compose(
       addNewUnsavedTerm,
       removeUnsavedTerm,
       submitSet,
+      deleteUnsavedSet,
       changeLocation,
-      changeLastLocation
+      changeLastLocation,
+      askForDeleting
     }
   ),
   firestoreConnect(props => {

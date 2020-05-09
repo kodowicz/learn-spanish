@@ -7,80 +7,6 @@ import styled, { css } from 'styled-components';
 import { Button, Main, BasicInput, colors } from '../assets/styles/GlobalStyles';
 
 
-const SetName = styled.div`
-  position: relative;
-  margin: 100px 10px 60px;
-`;
-
-const NameLabel = styled.label`
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  font-size: 20px;
-  color: ${colors.gray};
-  transition: opacity 0.1s;
-
-  ${props => props.isFilled && css `
-    opacity: 0;
-  `}
-`;
-
-const NameInput = styled(BasicInput)`
-  padding: 2px 0;
-  width: 100%;
-  font-size: 20px;
-  outline-color: ${colors.blue};
-
-  &:focus + ${NameLabel} {
-    opacity: 0;
-  }
-`;
-
-const Border = styled.div`
-  width: 100%;
-  height: 1px;
-  background: ${colors.gray};
-  position: absolute;
-  bottom: ${props => props.isBig ? '0' : '10px'};
-  left: 0;
-`;
-
-const Form = styled.form`
-  margin: 100px 0;
-  padding-bottom: 100px
-`;
-
-const AddButton = styled(Button)`
-  margin: 50px auto
-`;
-
-const SubmitButton = styled(Button)`
-  position: fixed;
-  bottom: 2px;
-  left: 2px;
-  width: calc(100% - 4px);
-  color: white;
-  background: ${colors.blue};
-
-  @media (min-width: 768px) {
-    width: 200px;
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-
-    &:focus {
-      transform: translate(-50%, 2px);
-    }
-  }
-`;
-
-const DeleteButton = styled(Button)`
-
-`
-
-
-
 class CreateSet extends Component {
   state = {
     setName: ""
@@ -89,11 +15,12 @@ class CreateSet extends Component {
   componentDidMount() {
     this.props.changeLocation('create');
     this.props.changeLastLocation("/");
+
   }
 
-  componentWillReceiveProps (newProps) {
+  componentWillMount() {
     this.setState({
-      setName: newProps.unsavedSetName
+      setName: this.props.unsavedSetName
     })
   }
 
@@ -112,55 +39,157 @@ class CreateSet extends Component {
     this.props.setUnsavedName(this.state.setName)
   }
 
-  submitSet = event => {
-    event.preventDefault();
-    this.props.submitSet()
-  }
-
-  deleteSet = event => {
-    event.preventDefault();
-    this.props.submitSet()
-  }
-
   render() {
-    const { auth, unsavedSetTerms, newSetKey, updateUnsavedTerm, removeUnsavedTerm } = this.props;
     const { setName } = this.state;
     const isFilled = setName ? true : false;
+    const {
+      auth,
+      unsavedSetTerms,
+      newSetKey,
+      isSetDeleted,
+      updateUnsavedTerm,
+      removeUnsavedTerm,
+      submitSet,
+      deleteUnsavedSet,
+      askForDeleting
+    } = this.props;
+
 
     if (!auth.uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
 
-    return (
-      <Main width={30} minWidth={350} maxWidth={450}>
-        <SetName>
-          <NameInput value={setName} onChange={this.setName} onBlur={this.submitName} />
-          <NameLabel isFilled={isFilled} htmlFor="name">Name your set</NameLabel>
-          <Border isBig="true" />
-        </SetName>
+    if (isSetDeleted) {
+      return (
+        <DeleteSetOverlay
+          deleteSet={deleteUnsavedSet}
+          askForDeleting={askForDeleting}
+         />
+       )
+    } else {
+      return (
 
-        <SubmitButton onClick={this.submitSet}>save set</SubmitButton>
-        <DeleteButton onClick={this.deleteSet}>delete set</DeleteButton>
+        <Main width={30} minWidth={350} maxWidth={450}>
+          <form>
+            <SetName>
+              <NameInput
+                value={setName}
+                maxLength="40"
+                onChange={this.setName}
+                onBlur={this.submitName}
+              />
+              <NameLabel
+                isFilled={isFilled}
+                htmlFor="name"
+              >
+                Name your set
+              </NameLabel>
+              <Border />
+            </SetName>
 
-        <DeleteSetOverlay />
-        <Form>
-          { unsavedSetTerms ?
-              <>
-                <TermsList
-                  basicTwoTerms={this.props.basicTwoTerms}
-                  terms={unsavedSetTerms}
-                  updateTerm={updateUnsavedTerm}
-                  removeTerm={removeUnsavedTerm}
-                />
-              </>
-            :
-            <></>
-          }
-          <AddButton onClick={this.addTerm}>add term</AddButton>
-        </Form>
+            <Buttons
+              terms={unsavedSetTerms}
+              submitSet={submitSet}
+              askForDeleting={askForDeleting}
+            />
 
-      </Main>
-    )
+            <TermsListWrapper>
+              <TermsList
+                basicTwoTerms={this.props.basicTwoTerms}
+                terms={unsavedSetTerms}
+                updateTerm={updateUnsavedTerm}
+                removeTerm={removeUnsavedTerm}
+              />
+            </TermsListWrapper>
+
+            <AddButton onClick={this.addTerm}>add term</AddButton>
+          </form>
+
+        </Main>
+      )
+    }
   }
 }
+
+const Buttons = ({ terms, submitSet, askForDeleting }) => {
+
+  const handleSubmitSet = (event) => {
+    event.preventDefault();
+    submitSet(terms);
+  }
+
+  const handleDeleteSet = (event) => {
+    event.preventDefault();
+    askForDeleting(true);
+  }
+
+  return (
+    <ButtonsWrapper>
+      <Button onClick={handleSubmitSet}>save set</Button>
+      <Button onClick={handleDeleteSet}>delete set</Button>
+    </ButtonsWrapper>
+  );
+};
+
+
+const SetName = styled.div`
+  position: relative;
+  z-index: 0;
+`;
+
+const NameLabel = styled.label`
+  color: ${colors.azure};
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  font-size: 2rem;
+  transition: opacity 0.1s;
+  z-index: -1;
+
+  ${props => props.isFilled && css `
+    opacity: 0;
+  `}
+`;
+
+const NameInput = styled(BasicInput)`
+  outline-color: ${colors.blue};
+  color: ${colors.white};
+  padding: 2px;
+  width: 100%;
+  font-size: 2rem;
+
+  &:focus + ${NameLabel} {
+    opacity: 0;
+  }
+`;
+
+const Border = styled.div`
+  background: ${colors.white};
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+`;
+
+const ButtonsWrapper = styled.div`
+  margin: 40px auto 60px auto;
+  display: flex;
+  justify-content: space-evenly;
+  max-width: 300px;
+`;
+
+const TermsListWrapper = styled.div`
+  width: 76vw;
+  margin: 0 auto;
+
+  @media (min-width: 786px) {
+    margin: 0 40px
+  }
+`;
+
+const AddButton = styled(Button)`
+  margin: 50px auto
+`;
+
 
 export default CreateSet

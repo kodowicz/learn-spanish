@@ -1,62 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
-import { BlockShadow, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { BlockElement, BasicInput, colors } from '../../assets/styles/GlobalStyles';
 import remove from '../../assets/images/remove.svg';
-
-const Border = styled.div`
-  width: 100%;
-  height: 1px;
-  background: ${colors.gray};
-  position: absolute;
-  bottom: ${props => props.isBig ? '0' : '10px'};
-  left: 0;
-`;
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-template: 1fr / 1fr 80px
-  margin: 25px 0;
-`
-
-const TermWrapper = styled(BlockShadow)`
-  grid-column: 1 / 3;
-  grid-row: 1 / 2;
-  padding: 5px 20px 25px 20px;
-  transition: transform 0.1s ease-out;
-  transform: ${props => `translateX(${props.isMoved}px)`};
-  background: white
-`;
-
-const DefineTerm = styled.div`
-  position: relative;
-  padding: 5px 0 10px 0;
-`;
-
-const Label = styled.label`
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  color: ${colors.gray};
-  font-size: 10px;
-  text-transform: uppercase;
-`;
-
-const Input = styled(BasicInput)`
-  width: 100%;
-  border: none;
-  padding: 0px 0;
-  outline-color: ${colors.blue}
-`;
-
-const DeleteButton = styled.button`
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-  background: none;
-  border: none;
-  padding: 0;
-  display: ${ props => props.isMoved ? 'block' : 'none' }
-`
 
 
 class Term extends Component {
@@ -68,18 +14,43 @@ class Term extends Component {
     lastTouch: null,
     currentTouch: null,
     isDeleted: false,
-    isMoved: 0
-  };
+    isMoved: 0,
+    termFocused: false,
+    definitionFocused: false,
+    termLabelVisible: false,
+    definitionLabelVisible: false
+  }
 
   componentDidMount () {
-    if (this.props.termDetails) {
-      const { definition, term, id } = this.props.termDetails;
+    const { termDetails } = this.props;
+
+    if (termDetails) {
+      const { definition, term, id } = termDetails;
+
       this.setState({
         term,
         definition,
-        id
+        id,
+        termLabelVisible: Boolean(term),
+        definitionLabelVisible: Boolean(definition),
       })
     }
+  }
+
+  handleFocus = event => {
+    this.setState({
+      [`${event.target.id}Focused`]: true,
+      [`${event.target.id}LabelVisible`]: true
+    })
+  }
+
+  handleBlur = event => {
+    const hasValue = event.target.value ? true : false;
+
+    this.setState({
+      [`${event.target.id}Focused`]: false,
+      [`${event.target.id}LabelVisible`]: hasValue
+    })
   }
 
   handleChange = event => {
@@ -142,10 +113,6 @@ class Term extends Component {
         isMoved: 0
       })
     }
-
-    // if (this.state.isDeleted) {
-    //   console.log('remove');
-    // }
   }
 
   removeElement = event => {
@@ -154,7 +121,16 @@ class Term extends Component {
   }
 
   render() {
-    const { isMoved } = this.state;
+    const {
+      term,
+      definition,
+      isMoved,
+      termFocused,
+      definitionFocused,
+      termLabelVisible,
+      definitionLabelVisible
+    } = this.state;
+
     return (
       <Wrapper>
         <TermWrapper
@@ -165,24 +141,35 @@ class Term extends Component {
         >
           <DefineTerm>
             <Input
-              autoFocus={this.props.focused ? true : false}
               id="term"
-              tabIndex={this.props.index}
-              value={this.state.term}
+              value={term}
               onChange={this.handleChange}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
             />
-            <Label htmlFor="term">term</Label>
-            <Border />
+            <Label
+              isVisible={termLabelVisible}
+              htmlFor="term"
+            >
+              term
+            </Label>
+            <Border focused={termFocused} />
           </DefineTerm>
           <DefineTerm>
             <Input
               id="definition"
-              tabIndex={this.props.index}
-              value={this.state.definition}
+              value={definition}
               onChange={this.handleChange}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
             />
-            <Label htmlFor="definition">definition</Label>
-            <Border />
+            <Label
+              isVisible={definitionLabelVisible}
+              htmlFor="definition"
+            >
+              definition
+            </Label>
+            <Border focused={definitionFocused} />
           </DefineTerm>
         </TermWrapper>
         <DeleteButton
@@ -195,5 +182,66 @@ class Term extends Component {
     );
   }
 }
+
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-template: 1fr / 1fr 80px;
+`;
+
+const TermWrapper = styled(BlockElement)`
+  transform: ${props => `translateX(${props.isMoved}px)`};
+  height: 9rem;
+  display: grid;
+  grid-template-columns: 80%;
+  grid-template-rows: repeat(2, min-content);
+  grid-row-gap: .5rem;
+  place-content: center;
+  grid-column: 1 / 3;
+  grid-row: 1 / 2;
+  transition: transform 0.1s ease-out;
+`;
+
+const DefineTerm = styled.div`
+  position: relative;
+`;
+
+const Label = styled.label`
+  display: ${(props) => props.isVisible && 'none'};
+  font-size: ${(props) => props.htmlFor === 'term' ? '1.6rem' : '1.4rem'};
+  color: ${colors.darkGray};
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  z-index: -1;
+`;
+
+const Input = styled(BasicInput)`
+  font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
+  color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+  width: 100%;
+  border: none;
+  outline: none;
+`;
+
+const Border = styled.div`
+  background: ${props => props.focused && `${colors.white}`};
+  width: 100%;
+  height: 1px;
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+
+`;
+
+const DeleteButton = styled.button`
+  display: ${ props => props.isMoved ? 'block' : 'none' };
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  background: none;
+  border: none;
+  padding: 0;
+`;
+
 
 export default Term
