@@ -8,7 +8,13 @@ export const changeLastLocation = location => ({
   location
 });
 
-export const currentSetId = id => ({
+export const setCurrentSetId = id => ({
   type: 'CURRENT_SET_ID',
   id
-})
+});
+
+
+export const enableEditSet = () => ({
+  type: 'ENABLE_CREATE_SET',
+  payload: false
+});

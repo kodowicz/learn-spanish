@@ -8,25 +8,26 @@ class HomePage extends Component {
   componentDidMount() {
     this.props.changeLocation('home');
     this.props.changeLastLocation("/");
+    this.props.enableEditSet();
   }
 
   render() {
     // will-change: transform
-    const { isLogged, allSets, userSets } = this.props;
+    const { isLogged, allSets } = this.props;
 
     return (
       <>
         <Main width={30} minWidth={350} maxWidth={450}>
           <Title>Are you ready for a new dose of words?</Title>
 
-          { (userSets.length > 0) &&        // change to nullish coalescing operator
+          {/* { (userSets.length > 0) &&        // change to nullish coalescing operator
             <SetsList
               isPercentage={true}
               sets={userSets}
               title="get back to learn"
               margin="4rem 0"
             />
-          }
+          } */}
           <SetsList
             isPercentage={false}
             sets={allSets}

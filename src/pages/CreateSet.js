@@ -25,18 +25,15 @@ class CreateSet extends Component {
   }
 
   setName = event => {
-    this.setState({
-      setName: event.target.value
-    })
+    const setName = event.target.value;
+
+    this.setState({ setName });
+    this.props.setUnsavedName(setName)
   }
 
   addTerm = event => {
     event.preventDefault();
     this.props.addNewUnsavedTerm();
-  }
-
-  submitName = () => {
-    this.props.setUnsavedName(this.state.setName)
   }
 
   render() {
@@ -49,14 +46,16 @@ class CreateSet extends Component {
       isSetDeleted,
       updateUnsavedTerm,
       removeUnsavedTerm,
+      askForDeleting,
       submitSet,
+      createSetError,
       deleteUnsavedSet,
-      askForDeleting
     } = this.props;
 
 
     if (!auth.uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
+    if (this.props.isEditSubmited) return <Redirect to="/" />
 
     if (isSetDeleted) {
       return (
@@ -67,15 +66,13 @@ class CreateSet extends Component {
        )
     } else {
       return (
-
         <Main width={30} minWidth={350} maxWidth={450}>
-          <form>
+          <Form>
             <SetName>
               <NameInput
                 value={setName}
                 maxLength="40"
                 onChange={this.setName}
-                onBlur={this.submitName}
               />
               <NameLabel
                 isFilled={isFilled}
@@ -83,13 +80,15 @@ class CreateSet extends Component {
               >
                 Name your set
               </NameLabel>
-              <Border />
+              <Border isBig="true" />
             </SetName>
 
             <Buttons
+              setName={setName}
               terms={unsavedSetTerms}
-              submitSet={submitSet}
               askForDeleting={askForDeleting}
+              submitSet={submitSet}
+              createSetError={createSetError}
             />
 
             <TermsListWrapper>
@@ -102,7 +101,7 @@ class CreateSet extends Component {
             </TermsListWrapper>
 
             <AddButton onClick={this.addTerm}>add term</AddButton>
-          </form>
+          </Form>
 
         </Main>
       )
@@ -110,16 +109,56 @@ class CreateSet extends Component {
   }
 }
 
-const Buttons = ({ terms, submitSet, askForDeleting }) => {
+const Buttons = ({
+  setName,
+  terms,
+  askForDeleting,
+  submitSet,
+  createSetError
+}) => {
+
+  const reduceTerms = terms => {
+    return terms
+      .map(element => {
+        const { term, definition } = element;
+
+        if (
+          (/\s/.test(term) || term.length === 0) &&
+          (/\s/.test(definition) || definition.length === 0)
+        ) {
+          return null
+
+        } else if (/\s/.test(term) || term.length === 0) {
+          return {...element, term: '...' };
+
+        } else if (/\s/.test(definition) || definition.length === 0) {
+          return {...element, definition: '...' };
+
+        } else {
+          return element
+        }
+      })
+      .filter(element => element)
+  }
 
   const handleSubmitSet = (event) => {
+    const reducedTerms = reduceTerms(terms);
     event.preventDefault();
-    submitSet(terms);
+
+    if (!setName || /\s/.test(setName)) {
+      createSetError('You must enter a title to save your set');
+
+    } else if (reducedTerms.length < 2) {
+      createSetError('You have to create at least 2 terms');
+
+    } else {
+      submitSet(reducedTerms);
+    }
   }
 
   const handleDeleteSet = (event) => {
     event.preventDefault();
-    askForDeleting(true);
+    askForDeleting(true)
   }
 
   return (
@@ -137,11 +176,11 @@ const SetName = styled.div`
 `;
 
 const NameLabel = styled.label`
-  color: ${colors.azure};
   position: absolute;
   bottom: 2px;
   left: 2px;
-  font-size: 2rem;
+  font-size: 20px;
+  color: ${colors.azure};
   transition: opacity 0.1s;
   z-index: -1;
 
@@ -151,11 +190,11 @@ const NameLabel = styled.label`
 `;
 
 const NameInput = styled(BasicInput)`
-  outline-color: ${colors.blue};
-  color: ${colors.white};
   padding: 2px;
   width: 100%;
   font-size: 2rem;
+  outline-color: ${colors.blue};
+  color: ${colors.white};
 
   &:focus + ${NameLabel} {
     opacity: 0;
@@ -163,11 +202,11 @@ const NameInput = styled(BasicInput)`
 `;
 
 const Border = styled.div`
-  background: ${colors.white};
   width: 100%;
   height: 2px;
+  background: ${colors.white};
   position: absolute;
-  bottom: -2px;
+  bottom: ${props => props.isBig ? '-2px' : '10px'};
   left: 0;
 `;
 
@@ -176,6 +215,13 @@ const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: space-evenly;
   max-width: 300px;
+
+  ${'' /* @media (min-width: 768px) {
+    ${props => props.iseditable ? 'justify-content: space-between' : false };
+  } */}
+`;
+
+const Form = styled.form`
 `;
 
 const TermsListWrapper = styled.div`

@@ -2,7 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
+
 import { askForDeleting } from '../store/actions/overlayActions';
+import { deleteUnsavedSet } from '../store/actions/deleteSetActions';
+import { createSetError } from '../store/actions/notificationActions';
 import {
   changeLocation,
   changeLastLocation
@@ -13,8 +16,7 @@ import {
   updateUnsavedTerm,
   addNewUnsavedTerm,
   removeUnsavedTerm,
-  submitSet,
-  deleteUnsavedSet
+  submitSet
 } from '../store/actions/createSetActions';
 
 import CreateSet from '../pages/CreateSet';
@@ -26,7 +28,8 @@ const CreateSetContainer = (props) => {
       auth={props.auth}
       location={props.location}
       lastLocation={props.lastLocation}
-      isSetDeleted={props.isSetDeleted}
+      isSetDeleted={props.isSetDeleted} // is overlay opened
+      isEditSubmited={props.isEditSubmited} //
       unsavedSetName={props.unsavedSetName}
       unsavedSetTerms={props.unsavedSetTerms}
       isTermAdded={props.isTermAdded}
@@ -42,8 +45,9 @@ const CreateSetContainer = (props) => {
       removeUnsavedTerm={props.removeUnsavedTerm}
       submitSet={props.submitSet}
       deleteUnsavedSet={props.deleteUnsavedSet}
+      createSetError={props.createSetError}
     />
-    :
+  :
     <></>
 };
 
@@ -53,15 +57,16 @@ const mapStateToProps = state => {
   const unsavedSetName = state.firebase.profile.unsavedSet;
 
   return ({
-    unsavedSetName,
     unsavedSetTerms,
+    unsavedSetName,
     auth: state.firebase.auth,
-    location: state.location,
-    lastLocation: state.lastLocation,
     isSetDeleted: state.isSetDeletedOverlayOpen,
+    isEditSubmited: state.isEditSubmited,
     isTermAdded: state.isTermAdded,
     isNewTerm: state.isNewTerm,
     newSetKey: state.newSetKey,
+    location: state.location,
+    lastLocation: state.lastLocation,
     isLoaded: isLoaded(unsavedSetTerms, unsavedSetName)
   })
 }
@@ -79,7 +84,8 @@ export default compose(
       deleteUnsavedSet,
       changeLocation,
       changeLastLocation,
-      askForDeleting
+      askForDeleting,
+      createSetError
     }
   ),
   firestoreConnect(props => {

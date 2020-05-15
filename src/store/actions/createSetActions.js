@@ -1,25 +1,26 @@
+// update set name
 export const setUnsavedName = name => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
+  const authid = getState().firebase.auth.uid;
 
-  const docRef = firestore.doc(`users/${authId}/`);
+  const userRef = firestore.doc(`users/${authid}/`);
 
-  docRef.update({
+  userRef.update({
     unsavedSet: name
   }).then(() => {
     dispatch({
-      type: 'CREATE_UNSAVED_NAME'
+      type: 'CREATE_SET_NAME'
 
     })
   }).catch(error => {
     dispatch({
-      type: 'CREATE_UNSAVED_NAME_ERROR',
+      type: 'CREATE_SET_NAME_ERROR',
       error
     })
   })
 }
 
-// if there is no subcollection
+// if there is no basic terms
 export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
@@ -72,10 +73,10 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
 // on change input
 export const updateUnsavedTerm = element => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
-  const subcollection = element.id;
+  const uid = getState().firebase.auth.uid;
+  const termid = element.id;
 
-  const docRef = firestore.doc(`users/${authId}/unsaved/${subcollection}`);
+  const docRef = firestore.doc(`users/${uid}/unsaved/${termid}`);
 
   docRef.get().then(thisDoc => {
     if (thisDoc.exists) {
@@ -83,46 +84,36 @@ export const updateUnsavedTerm = element => (dispatch, getState, { getFirestore 
         term: element.term,
         definition: element.definition
       })
-    // } else {
-    //   const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
-    //   const keyId = newDocument.id;
-    //   newDocument.set({
-    //     id: keyId,
-    //     term: term.term,
-    //     definition: term.definition,
-    //     time: new Date()
-    //   })
     }
   })
   .then(() => {
     dispatch({
-      type: 'CREATE_UNSAVED_SET'
-
+      type: 'CREATE_SET_TERM'
     })
   }).catch(error => {
     dispatch({
-      type: 'CREATE_UNSAVED_SET_ERROR',
+      type: 'CREATE_SET_TERM_ERROR',
       error
     })
   })
 }
 
-export const removeUnsavedTerm = termID => (dispatch, getState, { getFirestore }) => {
+// remove on delete button
+export const removeUnsavedTerm = termid => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
 
-  const docRef = firestore.doc(`users/${authId}/unsaved/${termID}`);
+  const docRef = firestore.doc(`users/${authId}/unsaved/${termid}`);
 
   docRef.get().then(() => {
     docRef.delete()
   }).then(() => {
     dispatch({
-      type: 'DELETE_UNSAVED_TERM',
-      message: 'term removed'
+      type: 'DELETE_CREATED_TERM'
     })
   }).catch(error => {
     dispatch({
-      type: 'DELETE_UNSAVED_TERM_ERROR',
+      type: 'DELETE_CREATED_TERM_ERROR',
       error
     })
   })
@@ -131,12 +122,11 @@ export const removeUnsavedTerm = termID => (dispatch, getState, { getFirestore }
 // at add term button
 export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
-  const newDocument = firestore.collection("users").doc(authId).collection("unsaved").doc();
-  const keyId = newDocument.id;
+  const uid = getState().firebase.auth.uid;
+  const termRef = firestore.collection(`users/${uid}/unsaved`).doc();
 
-  newDocument.set({
-    id: keyId,
+  termRef.set({
+    id: termRef.id,
     term: "",
     definition: "",
     time: new Date()
@@ -156,17 +146,16 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
 // submit set of prompt an error
 export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authorId = getState().firebase.auth.uid;
+  const uid = getState().firebase.auth.uid;
   const author = getState().firebase.profile.username;
   const name = getState().firebase.profile.unsavedSet;
-  let fixedTerms = [];
 
-  const notificationRef = firestore.doc(`users/${authorId}`);
-  const unsavedRef = firestore.collection(`users/${authorId}/unsaved`);
+  const userRef = firestore.doc(`users/${uid}`);
+  const unsavedRef = firestore.collection(`users/${uid}/unsaved`);
   const createRef = firestore.collection('sets').doc();
 
   if (!name || name === " ") {
-    notificationRef.update({
+    userRef.update({
       notification: 'You must enter a title to save your set'
     })
     .then(() => {
@@ -181,7 +170,7 @@ export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
     })
 
   } else if (terms.length < 2) {
-    notificationRef.update({
+    userRef.update({
       notification: "You have to create at least 2 terms"
     })
     .then(() => {
@@ -197,50 +186,35 @@ export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
   } else {
     unsavedRef.get().then(querySnapshot => {
 
-      firestore.doc(`users/${authorId}`).update({ unsavedSet: '' });
+      userRef.update({ unsavedSet: '' });
 
       querySnapshot.docs.forEach(doc => {
-        const documentId = doc.data().id;
-        const term = doc.data().term;
-        const definition = doc.data().definition;
-
-        if (/\S/.test(term) && /\S/.test(term) &&
-        /\S/.test(definition) && /\S/.test(definition)) {
-          fixedTerms.push(doc.data());
-
-        } else if (/\s/.test(term) || term.length === 0) {
-          fixedTerms.push(Object.assign({}, doc.data(), { term: '...' }));
-
-        } else if (/\s/.test(definition) || definition.length === 0) {
-          fixedTerms.push(Object.assign({}, doc.data(), { definition: '...' }));
-
-        // } else {
-        //   fixedTerms.push(Object.assign({}, doc.data(), { term: '...', definition: '...' }));
-        }
-
-        unsavedRef.doc(documentId).delete();
+        const termid = doc.data().id;
+        unsavedRef.doc(termid).delete();
       })
 
-      firestore.collection('sets').doc(createRef.id).set({
+      createRef.set({
         author,
-        authorId,
         name,
+        authorId: uid,
         id: createRef.id,
-        amount: fixedTerms.length
+        amount: terms.length
       })
 
-      firestore.collection(`users/${authorId}/learn`).doc(createRef.id).set({
+    // user learning set
+      firestore.collection(`users/${uid}/learn`).doc(createRef.id).set({
         author,
-        authorId,
         name,
+        authorId: uid,
         id: createRef.id,
-        amount: fixedTerms.length
+        amount: terms.length
       })
 
-      fixedTerms.forEach(element => {
+      terms.forEach(element => {
         const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
-        const flashcardsRef = firestore.collection(`users/${authorId}/learn/${createRef.id}/flashcards/`).doc();
-        const gameRef = firestore.collection(`users/${authorId}/learn/${createRef.id}/game/`).doc();
+        const keyid = termsRef.id;
+        const flashcardsRef = firestore.collection(`users/${uid}/learn/${createRef.id}/flashcards/`).doc(keyid);
+        const gameRef = firestore.collection(`users/${uid}/learn/${createRef.id}/game/`).doc(keyid);
 
         termsRef.set({
           term: element.term,
@@ -282,24 +256,3 @@ export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
 export const removeNewKey = () => ({
   type: 'REMOVE_KEY'
 })
-
-export const deleteUnsavedSet = termID => (dispatch, getState, { getFirestore }) => {
-  const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
-
-  const docRef = firestore.doc(`users/${authId}/unsaved/`);
-
-  docRef.get().then(() => {
-    docRef.delete()
-  }).then(() => {
-    dispatch({
-      type: 'DELETE_UNSAVED_SET',
-      message: 'term removed'
-    })
-  }).catch(error => {
-    dispatch({
-      type: 'DELETE_UNSAVED_SET_ERROR',
-      error
-    })
-  })
-}
