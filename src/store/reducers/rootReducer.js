@@ -1,24 +1,40 @@
 import { authReducer } from './authReducer';
-import { createdSetReducer, isSubmitedEditReducer, setDeletedReducer } from './setsReducer';
+import { createdSetReducer, setDeletedReducer } from './setsReducer';
 import { locationReducer, lastLocationReducer, setIdReducer } from './locationReducer';
-import { choiceMethodReducer, cancelSesionReducer } from './overlayReducers';
+import { choiceMethodReducer, cancelSesionReducer, deleteSetReducer } from './overlayReducers';
+import { setChangesReducer } from './editSetReducers';
 import { shuffleCardReducer } from './learnSetReducer';
 import { combineReducers } from 'redux';
 import { firestoreReducer } from 'redux-firestore';
 import { firebaseReducer } from 'react-redux-firebase';
 
+const correctAnswer = (state = {}, action) => {
+  switch (action.type) {
+    case 'CHOOSE_BETWEEN_TWO_CORRECT':
+    console.log(action);
+      return { ...action };
+
+    case 'CHOOSE_BETWEEN_TWO_WROMG':
+      return { ...action };
+
+    default:
+      return state;
+  }
+};
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  setId: setIdReducer,
+  setid: setIdReducer,
   newSetKey: createdSetReducer,
-  isEditSubmited: isSubmitedEditReducer,
+  isEditSubmited: setChangesReducer,
   isSetDeleted: setDeletedReducer,
   terms: shuffleCardReducer,
   isChoiceOverlayOpen: choiceMethodReducer,
   isCancelOverlayOpen: cancelSesionReducer,
+  isSetDeletedOverlayOpen: deleteSetReducer,
   location: locationReducer,
   lastLocation: lastLocationReducer,
+  correctAnswer: correctAnswer,
   firestore: firestoreReducer,
   firebase: firebaseReducer
 });

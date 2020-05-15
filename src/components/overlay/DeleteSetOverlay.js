@@ -1,23 +1,94 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 
-class Password extends React.Component {
+import styled from 'styled-components';
+import { LinkButton, Button, colors } from '../../assets/styles/GlobalStyles';
+
+
+class DeleteSetOverlay extends React.Component {
+  state = {
+    isDeleted: false
+  }
+
   handleDecline = event => {
-    // close overlay
+    this.props.askForDeleting(false);
   }
 
   handleDelete = event => {
-    // this.props.deleteSet()
+    this.props.askForDeleting(false);
+    this.props.deleteSet();
+
+    if (this.props.isEdited) {
+      this.props.deleteSetChanges();
+    }
+
+    this.setState({
+      isDeleted: true
+    })
   }
 
   render() {
+    if (this.state.isDeleted) return <Redirect to="/" />;
+
     return (
-      <div role="alertdialog" aria-describedby="info">
-        <p id="info">Are you sure you want to delete this set? The action will be irreversible.</p>
-        <button onClick={this.handleDecline} type="button">no</button>
-        <button onClick={this.handleDelete} type="button">yes</button>
-      </div>
+      <Background>
+        <Dialog role="alertdialog" aria-describedby="info">
+          <Alert id="info">Are you sure you want to delete this set? The action will be irreversible.</Alert>
+          <Buttons>
+            <Button
+              color={colors.navy}
+              center="true"
+              onClick={this.handleDecline}
+            >
+              go back
+            </Button>
+            <Button
+              color={colors.warming}
+              center="true"
+              onClick={this.handleDelete}
+            >
+              delete
+            </Button>
+          </Buttons>
+        </Dialog>
+      </Background>
     );
   }
 }
 
-export default Password
+
+const Background = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+`;
+
+const Dialog = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  height: 300px;
+  background: ${colors.white};
+  color: ${colors.navy};
+  border-radius: 15px;
+  box-shadow: 10px 10px 20px ${colors.shadow};
+  transform: translate(-50%, -50%);
+`;
+
+const Alert = styled.p`
+  font-size: 1.6rem;
+  margin: 3rem;
+  text-align: center;
+`;
+
+const Buttons = styled.div`
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between
+`;
+
+export default DeleteSetOverlay

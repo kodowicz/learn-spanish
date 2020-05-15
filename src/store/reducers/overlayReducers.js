@@ -1,7 +1,7 @@
 const initState = {
   choice: false,
   cancel: false,
-
+  delete: false
 };
 
 export const choiceMethodReducer = (state = initState.choice, action) => {
@@ -22,4 +22,13 @@ export const cancelSesionReducer = (state = initState.cancel, action) => {
     default:
       return state;
   }
-}
+};
+
+export const deleteSetReducer = (state = initState.delete, action) => {
+  switch (action.type) {
+    case 'ASKING_TO_DELETE_SET':
+      return action.payload;
+    default:
+      return state;
+  }
+};
