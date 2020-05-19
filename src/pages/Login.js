@@ -3,114 +3,141 @@ import { Redirect } from 'react-router-dom';
 
 import SignIn from '../components/login/SignIn';
 import SignUp from '../components/login/SignUp';
+import Notification from '../components/navbar/Notification';
 
-import { Main, Button, BasicInput, colors } from '../assets/styles/GlobalStyles';
+import { Main, Button, BasicInput, colors, fonts } from '../assets/styles/GlobalStyles';
 import styled from 'styled-components';
 
 
-const TabList = styled.div`
-  height: 60px;
-  display: flex;
-  position: relative;
-`;
-
-const Switch = styled.button`
-  background: none;
-  border: none;
-  font-family: 'Open Sans', sans-serif;
-  color: ${colors.black};
-  font-size: 1.6rem;
-  width: 50%;
-  outline-color: ${colors.blue}
-`;
-
-const Border = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50%;
-  height: 2px;
-  background: ${colors.blue};
-  transform: ${props => props.toggle ? 'translateX(100%)' : 'translateX(0)'};
-  transition: transform 0.4s ease-out
-`;
-
-
-
 class Login extends Component {
-  state = { toggle: false }
-
-  componentDidMount() {
-    // this.props.changeLocation('log in');
-    // this.props.changeLastLocation("/");
+  state = {
+    toggle: false
   }
 
-  handleClick = (toggle) => {
-    // this.props.cleanError();
+  componentDidMount() {
+    this.props.changeLocation('login');
+    this.props.changeLastLocation("/");
+  }
+
+  handleSwitch = (toggle) => {
     this.setState({
       toggle: toggle
     })
   }
 
+  handleKeySwitch = (event) => {
+    if (event.keyCode === 39 || event.keyCode === 37) {
+      this.setState({
+        toggle: !this.state.toggle
+      })
+    }
+  }
+
   render() {
-    const { auth, authError, signIn, signUp, signUpError } = this.props;
+    const { auth, authError, signIn, signUp, signUpError, removeNotification } = this.props;
     const { toggle } = this.state;
 
     if (auth.uid) return <Redirect to={`/profile/${auth.uid}`} />;
 
     return (
-      <Main>
-        <div>
+      <>
+        {(authError) &&
+          <Notification
+            message={authError}
+            removeNotification={removeNotification}
+          />
+        }
 
-          <TabList role="tablist" aria-label="login">
-            <Switch
-              onClick={() => this.handleClick(false)}
-              role="tab"
-              aria-selected="true"
-              aria-controls="signin-tab"
-              id="signin"
+        <Main width={75} maxWidth={450}>
+            <TabList role="tablist" aria-label="login">
+              <Switch
+                role="tab"
+                id="signin"
+                aria-controls="signin-tab"
+                tabIndex={toggle ? "0" : "-1"}
+                aria-selected={toggle ? "false" : "true"}
+                onKeyDown={this.handleKeySwitch}
+                onClick={() => this.handleSwitch(false)}
+              >
+                sign up
+              </Switch>
+              <Switch
+                role="tab"
+                id="signup"
+                aria-controls="signup-tab"
+                aria-selected={toggle ? "true" : "false"}
+                tabIndex={toggle ? "-1" : "0"}
+                onKeyDown={this.handleKeySwitch}
+                onClick={() => this.handleSwitch(true)}
+              >
+                sign in
+              </Switch>
+              <Border toggle={toggle} />
+            </TabList>
+
+            <div
+              hidden={toggle ? "" : "hidden"}
+              role="tabpanel"
+              id="signin-tab"
+              tabIndex="0"
+              aria-labelledby="signin"
             >
-              sign up
-            </Switch>
-            <Switch
-              onClick={() => this.handleClick(true)}
-              role="tab"
-              aria-selected="false"
-              aria-controls="signup-tab"
-              id="signup"
-              data-deletable=""
-              tabIndex="-1"
+              {toggle &&
+                <SignIn
+                  auth={auth}
+                  signIn={signIn}
+                />
+              }
+            </div>
+
+            <div
+              hidden={toggle ? "hidden": ""}
+              role="tabpanel"
+              id="signup-tab"
+              tabIndex="0"
+              aria-labelledby="signup"
             >
-              sign in
-            </Switch>
-            <Border toggle={toggle} />
-          </TabList>
-
-          <div tabIndex="0" role="tabpanel" id="signin-tab" aria-labelledby="signin" hidden={!toggle ? "hidden": ""}>
-            {toggle &&
-              <SignIn
-                auth={auth}
-                error={authError}
-                signIn={signIn}
-              />
-            }
-          </div>
-
-          <div tabIndex="0" role="tabpanel" id="signup-tab" aria-labelledby="signup" hidden={toggle ? "hidden": ""}>
-            {!toggle &&
-              <SignUp
-                auth={auth}
-                error={authError}
-                signUp={signUp}
-                signUpError={signUpError}
-              />
-            }
-          </div>
-
-        </div>
-      </Main>
+              {!toggle &&
+                <SignUp
+                  auth={auth}
+                  signUp={signUp}
+                  signUpError={signUpError}
+                />
+              }
+            </div>
+        </Main>
+      </>
     );
   }
 }
+
+
+const TabList = styled.div`
+  height: 7rem;
+  display: flex;
+  position: relative;
+`;
+
+const Switch = styled.button`
+  font-family: ${fonts.family};
+  color: ${colors.white};
+  outline: none;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  width: 50%;
+`;
+
+const Border = styled.div`
+  background: ${colors.white};
+  transform: ${props => props.toggle ? 'translateX(100%)' : 'translateX(0)'};
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  transition: transform 0.4s ease-out
+`;
+
 
 export default Login;

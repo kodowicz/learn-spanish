@@ -23,10 +23,12 @@ export const signUp = newUser => (dispatch, getState, { getFirebase, getFirestor
     newUser.password
   )
   .then((resp) => {
-    return firestore.collection('users').doc(resp.uid).set({
+    return firestore.collection('users').doc(resp.user.uid).set({
       email: newUser.email,
       username: newUser.username,
-      unsavedSet: ""
+      unsavedSet: "",
+      notification: "",
+      editedSet: ""
     })
   })
   .then(() => dispatch({ type: 'SIGNUP_SUCCESS' }))
@@ -46,7 +48,7 @@ export const logOut = () => (dispatch, getState, { getFirebase }) => {
 
 }
 
-export const cleanError = () => ({
+export const cleanErrorNotification = () => ({
   type: 'CLEAN_UP'
 })
 

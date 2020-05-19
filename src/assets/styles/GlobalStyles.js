@@ -55,12 +55,15 @@ export const GlobalStyle = createGlobalStyle`
 
 
 export const Main = styled.main`
-  padding: 85px 10vw;
+  padding-top: 85px;
+  margin: 0 auto;
+  width: ${props => `${props.width}vw`};
+  max-width: ${props => `${props.maxWidth}px`};
 `;
 
 export const BlockElement = styled.div`
-    border-radius: 15px;
-    background: rgba(247, 244, 255, 0.2);
+  border-radius: 15px;
+  background: rgba(247, 244, 255, 0.2);
 `
 
 export const Title = styled.h1`
@@ -70,7 +73,6 @@ export const Title = styled.h1`
   font-weight: ${fonts.bold};
   margin: 0;
 `;
-
 
 export const Button = styled.button`
   margin: ${props => props.center ? '0 auto' : 0 };
@@ -87,7 +89,7 @@ export const Button = styled.button`
   transition: transform .2s;
 
   &:hover {
-    color: ${colors.blue};
+    color: ${colors.navy};
     background: ${colors.white};
   }
 
@@ -143,5 +145,33 @@ export const BasicInput = styled.input`
   box-sizing: border-box;
   font-size: 1.4rem;
   font-family: ${fonts.family};
-  color: ${colors.black};
 `
+
+/* login styles */
+export const Form = styled.form`
+  margin: 60px 0;
+`;
+
+export const Wrapper = styled.div`
+  position: relative;
+  border-radius: 30px;
+  box-shadow: 0 10px 15px -5px ${colors.shadow};
+  margin: 3.2rem 0;
+`;
+
+export const Label = styled.label`
+  position: absolute;
+  top: -2rem;
+  left: 0;
+  font-size: 1.2rem;
+  color: ${colors.white}
+`;
+
+export const Input = styled(BasicInput)`
+  color: ${colors.navy};
+  background: ${colors.white};
+  outline: none;
+  border-radius: 30px;
+  padding: 1rem 1.6rem;
+  width: 100%;
+`;

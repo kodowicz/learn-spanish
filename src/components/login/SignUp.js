@@ -1,41 +1,5 @@
 import React, { Component } from 'react';
-import { Main, Button, BasicInput, colors } from '../../assets/styles/GlobalStyles';
-import styled from 'styled-components';
-
-
-const Form = styled.form`
-  margin: 60px 0;
-`;
-
-const ErrorMessage = styled.p`
-  color: ${colors.warming};
-  font-size: 1.4rem;
-  text-align: center;
-`;
-
-const Wrapper = styled.div`
-  position: relative;
-  border-radius: 5px;
-  box-shadow: 0 7px 15px -5px ${colors.navyBoxShadow};
-  margin: 40px 0;
-`;
-
-const Label = styled.label`
-  position: absolute;
-  top: -1.6rem;
-  left: 0;
-  font-size: 1.2rem;
-  color: ${colors.gray}
-`;
-
-const Input = styled(BasicInput)`
-  background: none;
-  border-radius: 5px;
-  padding: 1rem 1rem;
-  width: 100%;
-  outline-color: ${colors.blue};
-`;
-
+import { Form, Wrapper, Label, Input, Button, colors } from '../../assets/styles/GlobalStyles';
 
 
 class SignUp extends Component {
@@ -53,20 +17,23 @@ class SignUp extends Component {
   }
 
   handleSubmit = event => {
+    const { signUp, signUpError } = this.props;
+    const { username, password, confirm } = this.state;
+
     event.preventDefault();
-    if (this.state.username.length < 4) {
-      this.props.signUpError("Username should be at least 4 characters.")
-    } else if (this.state.password !== this.state.confirm) {
-      this.props.signUpError("The password hasn't been confirmed properly.")
+    if (username.length < 4) {
+      signUpError("Username should be at least 4 characters.")
+    } else if (password !== confirm) {
+      signUpError("The password hasn't been confirmed properly.")
     } else {
-      this.props.signUp(this.state)
+      signUp(this.state)
     }
   }
 
   render() {
     return (
       <Form onSubmit={this.handleSubmit}>
-        <ErrorMessage>{ this.props.error }</ErrorMessage>
+
         <Wrapper>
           <Label htmlFor="email">email</Label>
           <Input id="email" name="email" type="email" onChange={this.handleChange} required/>
@@ -83,10 +50,18 @@ class SignUp extends Component {
           <Label htmlFor="confirm">confirm</Label>
           <Input id="confirm" name="confirm" type="password" onChange={this.handleChange} required/>
         </Wrapper>
-        <Button>sign up</Button>
+
+        <Button
+          color={colors.white}
+          center="true"
+        >
+          sign up
+        </Button>
+
       </Form>
     )
   }
 }
+
 
 export default SignUp
