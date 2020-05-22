@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
-import { BlockElement, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { BlockElement, colors, fonts } from '../../assets/styles/GlobalStyles';
 import remove from '../../assets/images/remove.svg';
 
 
@@ -18,23 +18,25 @@ class Term extends Component {
     termFocused: false,
     definitionFocused: false,
     termLabelVisible: false,
-    definitionLabelVisible: false
+    definitionLabelVisible: false,
+    termRows: 1,
+    definitionRows: 1,
+    minRows: 1,
+    lineHeight: 18
   }
 
   componentDidMount () {
-    const { termDetails } = this.props;
+    const { definition, term, id, termRows, definitionRows } = this.props.termDetails;
 
-    if (termDetails) {
-      const { definition, term, id } = termDetails;
-
-      this.setState({
-        term,
-        definition,
-        id,
-        termLabelVisible: Boolean(term),
-        definitionLabelVisible: Boolean(definition),
-      })
-    }
+    this.setState({
+      id,
+      termRows,
+      definitionRows,
+      term: /^\.\.\.$/g.test(term) ? '' : term,
+      definition: /^\.\.\.$/g.test(definition) ? '' : definition,
+      termLabelVisible: Boolean(term),
+      definitionLabelVisible: Boolean(definition)
+    })
   }
 
   handleFocus = event => {
@@ -54,9 +56,14 @@ class Term extends Component {
   }
 
   handleChange = event => {
+    const rows = this.resizeTextarea(event, this.state);
+
     this.setState({
+      [`${event.target.id}Rows`]: rows,
       [event.target.id]: event.target.value
-    }, () => this.props.updateTerm(this.state));
+    },
+      () => this.props.updateTerm(this.state)
+    );
   }
 
   handleTouchStart = event => {
@@ -120,6 +127,20 @@ class Term extends Component {
     this.props.removeTerm(this.state.id);
   }
 
+  resizeTextarea = (event, state) => {
+    const previousRows = event.target.rows;
+		const { minRows, lineHeight } = state;
+    event.target.rows = minRows;
+
+    const currentRows = ~~(event.target.scrollHeight / lineHeight);
+
+    if (currentRows === previousRows) {
+    	event.target.rows = currentRows;
+    }
+
+    return currentRows
+  }
+
   render() {
     const {
       term,
@@ -140,9 +161,11 @@ class Term extends Component {
           onTouchEnd={this.handleTouchEnd}
         >
           <DefineTerm>
-            <Input
+            <Textarea
               id="term"
+              lang="es"
               value={term}
+              rows={this.state.termRows}
               onChange={this.handleChange}
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
@@ -156,9 +179,10 @@ class Term extends Component {
             <Border focused={termFocused} />
           </DefineTerm>
           <DefineTerm>
-            <Input
+            <Textarea
               id="definition"
               value={definition}
+              rows={this.state.definitionRows}
               onChange={this.handleChange}
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
@@ -191,7 +215,8 @@ const Wrapper = styled.div`
 
 const TermWrapper = styled(BlockElement)`
   transform: ${props => `translateX(${props.isMoved}px)`};
-  height: 9rem;
+  height: auto;
+  padding: 2.2rem 0;
   display: grid;
   grid-template-columns: 80%;
   grid-template-rows: repeat(2, min-content);
@@ -204,6 +229,8 @@ const TermWrapper = styled(BlockElement)`
 
 const DefineTerm = styled.div`
   position: relative;
+  display: flex;
+  align-items: center;
 `;
 
 const Label = styled.label`
@@ -211,18 +238,43 @@ const Label = styled.label`
   font-size: ${(props) => props.htmlFor === 'term' ? '1.6rem' : '1.4rem'};
   color: ${colors.darkGray};
   position: absolute;
-  bottom: 0px;
+  bottom: -2px;
   left: 0;
   z-index: -1;
 `;
 
-const Input = styled(BasicInput)`
+
+const Textarea = styled.textarea`
+  font-family: ${fonts.family};
   font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
   color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+  background: none;
+  line-height: 1.8rem;
+  border: none;
   width: 100%;
   border: none;
   outline: none;
+  overflow: auto;
+  height: auto;
+  resize: none
 `;
+// const Textarea = styled.textarea`
+//   font-family: ${fonts.family};
+//   font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
+//   color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+//   background: ${colors.blue};
+//   border: none;
+//   box-sizing: border-box;
+//   font-size: 1.4rem;
+//   width: 100%;
+//   border: none;
+//   outline: none;
+//
+//   overflow: auto;
+//   height: auto;
+//
+//   resize: none;
+// `;
 
 const Border = styled.div`
   background: ${props => props.focused && `${colors.white}`};

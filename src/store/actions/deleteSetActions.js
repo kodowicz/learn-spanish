@@ -1,4 +1,4 @@
-export const deleteUnsavedSet = () => (dispatch, getState, { getFirestore }) => {
+export const deleteCreateSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -16,19 +16,19 @@ export const deleteUnsavedSet = () => (dispatch, getState, { getFirestore }) => 
   })
   .then(() => {
     dispatch({
-      type: 'DELETE_UNSAVED_TERM',
+      type: 'DELETE_CREATE_SET',
       payload: true
     })
   }).catch(error => {
     dispatch({
-      type: 'DELETE_UNSAVED_TERM_ERROR',
+      type: 'DELETE_CREATE_SET_ERROR',
       error
     })
   })
 };
 
 // delete existing set from available sets list
-export const deleteCreatedSet = () => (dispatch, getState, { getFirestore }) => {
+export const deleteEditSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const setid = getState().setid;
@@ -67,35 +67,15 @@ export const deleteCreatedSet = () => (dispatch, getState, { getFirestore }) => 
     userSetRef.delete()
     setRef.delete();
   })
-  .then(() => console.log('deleted'))
   .then(() => {
     dispatch({
-      type: 'DELETE_CREATED_SET',
+      type: 'DELETE_EDIT_SET',
       payload: true
     })
   }).catch(error => {
     dispatch({
-      type: 'DELETE_CREATED_SET_ERROR',
+      type: 'DELETE_EDIT_SET_ERROR',
       error
     })
   })
 }
-// deleting set from sets list
-// export const deleteSet = () => (dispatch, getState, { getFirestore }) => {
-//   const firestore = getFirestore();
-//   const setid = getState().setid;
-//
-//   const docRef = firestore.doc(`sets/${setid}`);
-//
-//   docRef.delete().then(() => {
-//     dispatch({
-//       type: 'DELETE_SET',
-//       isDeleted: true
-//     })
-//   }).catch(error => {
-//     dispatch({
-//       type: 'DELETE_SET_ERROR',
-//       isDeleted: false
-//     })
-//   })
-// }

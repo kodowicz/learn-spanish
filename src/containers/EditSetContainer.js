@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import { askForDeleting } from '../store/actions/overlayActions';
-import { deleteCreatedSet } from '../store/actions/deleteSetActions';
+import { deleteEditSet } from '../store/actions/deleteSetActions';
 import { createSetError } from '../store/actions/notificationActions';
 import {
   changeLocation,
@@ -17,7 +17,7 @@ import {
   updateTerm,
   removeTerm,
   addNewTerm,
-  submitEditedSet,
+  submitEditSet,
   deleteSetChanges
 } from '../store/actions/editSetActions';
 
@@ -33,8 +33,8 @@ const EditSetContainer = (props) => {
       setid={props.setid}
       location={props.location}
       lastLocation={props.lastLocation}
-      isTermDeleted={props.isTermDeleted}
       isEditSubmited={props.isEditSubmited}
+      isDeletingOverlay={props.isDeletingOverlay}
       isSetDeleted={props.isSetDeleted}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
@@ -45,9 +45,8 @@ const EditSetContainer = (props) => {
       updateTerm={props.updateTerm}
       removeTerm={props.removeTerm}
       addNewTerm={props.addNewTerm}
-      submitEditedSet={props.submitEditedSet}
-      removeNewKey={props.removeNewKey}
-      deleteCreatedSet={props.deleteCreatedSet}
+      submitEditSet={props.submitEditSet}
+      deleteEditSet={props.deleteEditSet}
       createSetError={props.createSetError}
       deleteSetChanges={props.deleteSetChanges}
     />
@@ -66,10 +65,10 @@ const mapStateToProps = (state, ownProps) => {
     setName,
     uid: state.firebase.auth.uid,
     setid: ownProps.match.params.id,
-    isSetDeleted: state.isSetDeletedOverlayOpen,
-    isNewTerm: state.isNewTerm,
-    isTermDeleted: state.isTermDeleted,
+    isDeletingOverlay: state.isDeletingSetOverlayOpen,
+    isSetDeleted: state.isSetDeleted,
     isEditSubmited: state.isEditSubmited,
+    isNewTerm: state.isNewTerm,
     location: state.location,
     lastLocation: state.lastLocation,
     isLoaded: isLoaded(terms, editSetDetails)
@@ -85,8 +84,8 @@ export default compose(
       updateTerm,
       removeTerm,
       addNewTerm,
-      submitEditedSet,
-      deleteCreatedSet,
+      submitEditSet,
+      deleteEditSet,
       createSetError,
       deleteSetChanges,
       changeLocation,

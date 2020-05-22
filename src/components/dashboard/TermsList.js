@@ -41,7 +41,6 @@ class TermsList extends Component {
 
 const ListItem = styled.li`
   margin-bottom: 2rem;
-  height: 9rem;
   list-style: none;
   position: relative;
 `;
@@ -63,11 +62,12 @@ const SetWrapper = styled.div`
 
 const Counter = styled.span`
   left: ${props => props.isLessThanTen ? '-8vw' : '-10vw' };
-  color: ${colors.lightGray};
+  color: ${colors.azure};
   font-weight: ${fonts.bold};
   position: absolute;
-  top: 30%;
+  top: 50%;
   font-size: 2.5rem;
+  transform: translateY(-50%);
 
   @media (min-width: 768px) {
     left: -50px

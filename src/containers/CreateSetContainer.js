@@ -4,7 +4,7 @@ import { firestoreConnect, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 
 import { askForDeleting } from '../store/actions/overlayActions';
-import { deleteUnsavedSet } from '../store/actions/deleteSetActions';
+import { deleteCreateSet } from '../store/actions/deleteSetActions';
 import { createSetError } from '../store/actions/notificationActions';
 import {
   changeLocation,
@@ -16,7 +16,7 @@ import {
   updateUnsavedTerm,
   addNewUnsavedTerm,
   removeUnsavedTerm,
-  submitSet
+  submitCreateSet
 } from '../store/actions/createSetActions';
 
 import CreateSet from '../pages/CreateSet';
@@ -25,11 +25,12 @@ import CreateSet from '../pages/CreateSet';
 const CreateSetContainer = (props) => {
   return props.isLoaded ?
     <CreateSet
-      auth={props.auth}
+      uid={props.uid}
       location={props.location}
       lastLocation={props.lastLocation}
-      isSetDeleted={props.isSetDeleted} // is overlay opened
-      isEditSubmited={props.isEditSubmited} //
+      isDeletingOverlay={props.isDeletingOverlay}
+      isSetDeleted={props.isSetDeleted}
+      isEditSubmited={props.isEditSubmited}
       unsavedSetName={props.unsavedSetName}
       unsavedSetTerms={props.unsavedSetTerms}
       isTermAdded={props.isTermAdded}
@@ -43,8 +44,8 @@ const CreateSetContainer = (props) => {
       updateUnsavedTerm={props.updateUnsavedTerm}
       addNewUnsavedTerm={props.addNewUnsavedTerm}
       removeUnsavedTerm={props.removeUnsavedTerm}
-      submitSet={props.submitSet}
-      deleteUnsavedSet={props.deleteUnsavedSet}
+      submitCreateSet={props.submitCreateSet}
+      deleteCreateSet={props.deleteCreateSet}
       createSetError={props.createSetError}
     />
   :
@@ -59,8 +60,9 @@ const mapStateToProps = state => {
   return ({
     unsavedSetTerms,
     unsavedSetName,
-    auth: state.firebase.auth,
-    isSetDeleted: state.isSetDeletedOverlayOpen,
+    uid: state.firebase.auth.uid,
+    isDeletingOverlay: state.isDeletingSetOverlayOpen,
+    isSetDeleted: state.isSetDeleted,
     isEditSubmited: state.isEditSubmited,
     isTermAdded: state.isTermAdded,
     isNewTerm: state.isNewTerm,
@@ -80,8 +82,8 @@ export default compose(
       updateUnsavedTerm,
       addNewUnsavedTerm,
       removeUnsavedTerm,
-      submitSet,
-      deleteUnsavedSet,
+      submitCreateSet,
+      deleteCreateSet,
       changeLocation,
       changeLastLocation,
       askForDeleting,
@@ -89,10 +91,10 @@ export default compose(
     }
   ),
   firestoreConnect(props => {
-    return props.auth.uid ?
+    return props.uid ?
       [{
         collection: 'users',
-        doc: props.auth.uid,
+        doc: props.uid,
         subcollections: [{ collection: 'unsaved' }],
         storeAs: 'unsavedTerms',
         orderBy: ["time"]

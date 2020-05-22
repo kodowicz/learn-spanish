@@ -9,7 +9,7 @@ import { Button, Main, BasicInput, colors } from '../assets/styles/GlobalStyles'
 
 class CreateSet extends Component {
   state = {
-    setName: ""
+    setName: "",
   }
 
   componentDidMount() {
@@ -27,8 +27,11 @@ class CreateSet extends Component {
   setName = event => {
     const setName = event.target.value;
 
-    this.setState({ setName });
-    this.props.setUnsavedName(setName)
+    this.setState({
+      setName
+    },
+      this.props.setUnsavedName(setName)
+    );
   }
 
   addTerm = event => {
@@ -40,33 +43,33 @@ class CreateSet extends Component {
     const { setName } = this.state;
     const isFilled = setName ? true : false;
     const {
-      auth,
+      uid,
       unsavedSetTerms,
       newSetKey,
       isSetDeleted,
+      isDeletingOverlay,
       updateUnsavedTerm,
       removeUnsavedTerm,
+      submitCreateSet,
       askForDeleting,
-      submitSet,
+      deleteCreateSet,
       createSetError,
-      deleteUnsavedSet,
     } = this.props;
 
-
-    if (!auth.uid) return <Redirect to="/signup" />;
+    if (!uid) return <Redirect to="/signup" />;
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
-    if (this.props.isEditSubmited) return <Redirect to="/" />
+    if (isSetDeleted) return <Redirect to="/" />
 
-    if (isSetDeleted) {
+    if (isDeletingOverlay) {
       return (
         <DeleteSetOverlay
-          deleteSet={deleteUnsavedSet}
+          deleteSet={deleteCreateSet}
           askForDeleting={askForDeleting}
          />
        )
     } else {
       return (
-        <Main width={30} minWidth={350} maxWidth={450}>
+        <Main width={80} maxWidth={450}>
           <Form>
             <SetName>
               <NameInput
@@ -87,7 +90,7 @@ class CreateSet extends Component {
               setName={setName}
               terms={unsavedSetTerms}
               askForDeleting={askForDeleting}
-              submitSet={submitSet}
+              submitSet={submitCreateSet}
               createSetError={createSetError}
             />
 
@@ -120,18 +123,25 @@ const Buttons = ({
   const reduceTerms = terms => {
     return terms
       .map(element => {
+        return {
+          ...element,
+          term: element.term.trim(),
+          definition: element.definition.trim()
+        }
+      })
+      .map(element => {
         const { term, definition } = element;
 
         if (
-          (/\s/.test(term) || term.length === 0) &&
-          (/\s/.test(definition) || definition.length === 0)
+          (/^\s$/.test(term) || term.length === 0) &&
+          (/^\s$/.test(definition) || definition.length === 0)
         ) {
           return null
 
-        } else if (/\s/.test(term) || term.length === 0) {
+        } else if (/^\s$/.test(term) || term.length === 0) {
           return {...element, term: '...' };
 
-        } else if (/\s/.test(definition) || definition.length === 0) {
+        } else if (/^\s$/.test(definition) || definition.length === 0) {
           return {...element, definition: '...' };
 
         } else {
@@ -145,7 +155,7 @@ const Buttons = ({
     const reducedTerms = reduceTerms(terms);
     event.preventDefault();
 
-    if (!setName || /\s/.test(setName)) {
+    if (!setName || /^\s$/.test(setName)) {
       createSetError('You must enter a title to save your set');
 
     } else if (reducedTerms.length < 2) {

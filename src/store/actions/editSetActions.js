@@ -22,12 +22,14 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
     setTermsRef.get().then(snapshot => {
       if (snap.empty) {
         snapshot.forEach(doc => {
-          const { id, term, definition, time } = doc.data();
+          const { id, term, definition, time, termRows, definitionRows } = doc.data();
           const termRef = editTermsRef.doc(id);
 
           termRef.set({
             id,
             time,
+            termRows,
+            definitionRows,
             term: /^\.\.\.$/g.test(term) ? '' : term,
             definition: /^\.\.\.$/g.test(definition) ? '' : definition
           })
@@ -82,7 +84,9 @@ export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
     if (thisDoc.exists) {
       docRef.update({
         term: element.term,
-        definition: element.definition
+        definition: element.definition,
+        termRows: element.termRows,
+        definitionRows: element.definitionRows
       })
     }
   })
@@ -130,7 +134,9 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
     id: termRef.id,
     term: "",
     definition: "",
-    time: new Date()
+    time: new Date(),
+    termRows: 1,
+    definitionRows: 1
   })
   .then(() => {
     dispatch({
@@ -145,7 +151,7 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
 }
 
 // submit changes swapping editSet with sets/setid
-export const submitEditedSet = (terms) => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const submitEditSet = (terms) => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const setid = getState().setid;

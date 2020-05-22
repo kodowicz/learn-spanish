@@ -90,10 +90,15 @@ export const removedTermReducer = (state = '', action) => {
 
 export const setDeletedReducer = (state = false, action) => {
   switch (action.type) {
-    case 'DELETE_SET':
-    return action.isDeleted;
-    case 'DELETE_SET_ERROR':
-      return action.isDeleted;
+    case 'DELETE_CREATE_SET':
+      return action.payload;
+
+    case 'DELETE_EDIT_SET':
+      return action.payload;
+
+    case 'ENABLE_CREATE_SET':
+      return action.payload;
+
     default:
       return state;
   }

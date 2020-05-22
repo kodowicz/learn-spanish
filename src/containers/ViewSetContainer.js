@@ -6,6 +6,7 @@ import { chooseMethod } from '../store/actions/overlayActions';
 import { createLearnSet } from '../store/actions/learnSetActions';
 import { createPlaySet } from '../store/actions/playSetActions';
 import { removeNewKey } from '../store/actions/createSetActions';
+import { deleteSetChanges } from '../store/actions/editSetActions';
 import {
   changeLocation,
   changeLastLocation,
@@ -31,6 +32,7 @@ const ViewSetContainer = (props) => {
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
       setCurrentSetId={props.setCurrentSetId}
+      deleteSetChanges={props.deleteSetChanges}
       removeNewKey={props.removeNewKey}
       chooseMethod={props.chooseMethod}
       createLearnSet={props.createLearnSet}
@@ -43,7 +45,7 @@ const ViewSetContainer = (props) => {
 
 const mapStateToProps = (state) => {
   const setDetails = state.firestore.data.setDetails;
-  const authorId = setDetails ? setDetails.authorId : null;
+  const author = setDetails ? setDetails.authorId : null;
   const terms = state.firestore.ordered.terms;
   const userProgress = state.firestore.data.userProgress;
   const knowledge = userProgress && userProgress.knowledge;
@@ -51,16 +53,16 @@ const mapStateToProps = (state) => {
   return {
     knowledge,
     terms,
-    setDetails: setDetails,
+    author,
+    setDetails,
     signedUser: state.firebase.auth.uid,
-    author: authorId,
     lastLocation: state.lastLocation,
     isEditSubmited: state.isEditSubmited,
     isOverlayOpen: state.isChoiceOverlayOpen,
     isLoaded: isLoaded(                         // doesn't word properly when updating
       state.firestore.data.terms,
       state.firestore.data.setDetails,
-      state.firestore.data.userProgress
+      // state.firestore.data.userProgress
     )
   }
 }
@@ -76,36 +78,50 @@ export default compose(
       chooseMethod,
       createLearnSet,
       createPlaySet,
-      enableEditSet
+      enableEditSet,
+      deleteSetChanges
     }
   ),
   firestoreConnect(props => {
     return props.signedUser ? [
-    {
-      collection: 'sets',
-      doc: props.match.params.id,
-      storeAs: 'setDetails'
-    },
-    {
-      collection: 'sets',
-      doc: props.match.params.id,
-      subcollections: [{ collection: 'terms' }],
-      storeAs: 'terms',
-      orderBy: ["time"]
-    },
-    {
-      collection: 'users',
-      doc: props.signedUser,
-      subcollections: [
-        {
-          collection: 'learn',
-          doc: props.match.params.id
-        }
-      ],
-      storeAs: 'userProgress'
-    }
-  ]
+      {
+        collection: 'sets',
+        doc: props.match.params.id,
+        storeAs: 'setDetails'
+      },
+      {
+        collection: 'sets',
+        doc: props.match.params.id,
+        subcollections: [{ collection: 'terms' }],
+        storeAs: 'terms',
+        orderBy: ["time"]
+      },
+      {
+        collection: 'users',
+        doc: props.signedUser,
+        subcollections: [
+          {
+            collection: 'learn',
+            doc: props.match.params.id
+          }
+        ],
+        storeAs: 'userProgress'
+      }
+    ]
   :
-  []
+    [
+      {
+        collection: 'sets',
+        doc: props.match.params.id,
+        storeAs: 'setDetails'
+      },
+      {
+        collection: 'sets',
+        doc: props.match.params.id,
+        subcollections: [{ collection: 'terms' }],
+        storeAs: 'terms',
+        orderBy: ["time"]
+      }
+    ]
 })
 )(ViewSetContainer);

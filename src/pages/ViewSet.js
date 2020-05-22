@@ -1,124 +1,47 @@
 import React, { Component } from 'react';
-// import { Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import MethodChoiceOverlay from '../components/overlay/MethodChoiceOverlay';
+import ProgressBar from '../components/ProgressBar';
 
 import styled from 'styled-components';
-import { LinkButton, Button, Main, BlockShadow, Title, colors } from '../assets/styles/GlobalStyles';
+import { LinkButton, Button, Main, BlockElement, colors, fonts } from '../assets/styles/GlobalStyles';
 
-
-const SetName = styled(Title)`
-  text-align: left;
-`
-
-const Details = styled.div`
-  height: 20px;
-  display: grid;
-  grid-template: 1fr / repeat(3, max-content);
-  grid-column-gap: 10px;
-  color: #7B91C3
-`;
-
-const Border = styled.div`
-  height: 100%;
-  width: 1.5px;
-  background: #7B91C3
-`;
-
-const ButtonsWrapper = styled.div`
-  margin: ${props => props.iseditable ? '40px 0 60px 0' : '30px 0 60px 0' };
-  display: ${props => props.iseditable ? 'flex' : 'block' };
-  ${props => props.iseditable ? 'justify-content: space-evenly' : false };
-  max-width: 300px;
-
-  @media (min-width: 768px) {
-    ${props => props.iseditable ? 'justify-content: space-between' : false };
-  }
-`;
-
-const ButtonLink = styled(LinkButton)`
-  margin: 0;
-  display: ${props => props.iseditable ? 'block' : 'inline' };
-`;
-
-const TermListWrapper = styled.div`
-  @media (min-width: 786px) {
-    margin: 0 40px
-  }
-`;
-
-const SubTitle = styled.h2`
-  text-transform: uppercase;
-  color: ${colors.gray};
-  font-size: 14px;
-`;
-
-const List = styled.ul`
-  margin: 0 0 40px 0;
-  padding: 0;
-`;
-
-const ListItem = styled.li`
-  margin-bottom: 25px;
-  list-style: none
-  position: relative;
-`;
-
-const SetWrapper = styled(BlockShadow)`
-  padding: 10px 20px;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 20px 1px 20px;
-
-  @media (min-width: 768px) {
-    padding: 20px 0;
-    grid-template-columns: 1fr 1px 1fr;
-    grid-template-rows: 1fr
-  }
-`;
-
-const Counter = styled.span`
-  position: absolute;
-  top: 30%;
-  left: -8vw;
-  color: #E5E5E5;
-  font-weight: 700;
-  font-size: 25px;
-
-  @media (min-width: 768px) {
-    left: -50px
-  }
-`;
-
-const Term = styled.p`
-  font-weight: ${({ weight }) => weight};
-  font-size: 16px;
-  margin: 0;
-
-  @media (min-width: 768px) {
-    padding-left: 40px
-  }
-`;
-
-const Line = styled.div`
-  @media (min-width: 768px) {
-    width: 1.5px;
-    height: 20px;
-    background: ${colors.gray};
-  }
-`;
 
 class ViewSet extends Component {
+  state = {
+    redirect: false
+  }
+
   componentDidMount() {
     this.props.changeLocation('set');
     this.props.changeLastLocation("/");
     this.props.removeNewKey();
-    this.props.submitEditedSet(false)
+    this.props.enableEditSet();
+    this.props.deleteSetChanges()  // if user changes location by searchbar
+  }
+
+  componentWillMount() {
+    this.props.setCurrentSetId(this.props.match.params.id);
   }
 
   render() {
-    const { match, setDetails, author, terms, signedUser, isOverlayOpen, chooseMethod, createLearnSet, createPlaySet } = this.props;
+    const {
+      match,
+      setDetails,
+      author,
+      knowledge,
+      terms,
+      signedUser,
+      isOverlayOpen,
+      chooseMethod,
+      createLearnSet,
+      createPlaySet
+    } = this.props;
+
     const iseditable = author === signedUser ? true : false;
-    // if (this.props.isEditSubmited) return <Redirect to={`/sets/${this.props.match.params.id}`} />
+
+    // handle if set doesn't exist
+    if (this.props.redirect) return <Redirect to='/404' />; //?
 
     if (isOverlayOpen) {
       return (
@@ -132,8 +55,8 @@ class ViewSet extends Component {
       )
     } else {
       return (
-        <Main width={50} maxWidth={650}>
-          <Description setDetails={setDetails} />
+        <Main width={80} maxWidth={650}>
+          <Description setDetails={setDetails} knowledge={knowledge} />
           <Buttons setid={match.params.id} iseditable={iseditable} chooseMethod={chooseMethod} />
           <TermsList terms={terms} />
         </Main>
@@ -142,14 +65,23 @@ class ViewSet extends Component {
   }
 }
 
-const Description = ({ setDetails }) => (
+const Description = ({ setDetails, knowledge }) => (
   <>
-    <SetName>{setDetails.name}</SetName>
-    <Details>
-      <span>{setDetails.amount} terms</span>
-      <Border />
-      <span>by {setDetails.author}</span>
-    </Details>
+    <DetailsWrapper>
+      <SetName>{setDetails.name}</SetName>
+        <Info>{setDetails.amount} terms</Info>
+        <Border />
+        <Info>by {setDetails.author}</Info>
+        { (knowledge !== undefined && knowledge !== null) &&
+          <Progress>
+            <ProgressBar
+              percentage={knowledge}
+              width='6rem'
+              bgColor={colors.progress}
+            />
+          </Progress>
+        }
+    </DetailsWrapper>
   </>
 );
 
@@ -162,30 +94,163 @@ const Buttons = ({ setid, iseditable, chooseMethod }) => {
   return (
     <ButtonsWrapper iseditable={iseditable.toString()}>
       { iseditable &&
-        <ButtonLink to={`/edit/${setid}`}>edit set</ButtonLink>
+        <LinkButton isCentre={true} to={`/edit/${setid}`}>
+          edit set
+        </LinkButton>
       }
-      <Button onClick={handleChoice} iseditable={iseditable.toString()}>learn set</Button>
+      <Button onClick={handleChoice}>
+        learn set
+      </Button>
     </ButtonsWrapper>
   );
 };
 
-const TermsList = ({ terms }) => {
-  return(
+const TermsList = ({ terms }) => (
   <TermListWrapper>
     <SubTitle>terms</SubTitle>
     <List>
-      {terms.map((term, index) =>
+      {terms.map((term, index) => (
         <ListItem key={ term.id }>
-          <Counter>{ index + 1 }</Counter>
+          <Counter
+            isLessThanTen={((index + 1) < 10) ? true : false}
+          >
+            { index + 1 }
+          </Counter>
           <SetWrapper>
-            <Term weight={700}>{ term.term }</Term>
+            <Term id="term">{ term.term }</Term>
             <Line />
-            <Term weight={600}>{ term.definition }</Term>
+            <Term id="definition">{ term.definition }</Term>
           </SetWrapper>
         </ListItem>
-      )}
+      ))}
     </List>
   </TermListWrapper>
-)};
+);
+
+
+const DetailsWrapper = styled.div`
+  display: grid;
+  grid-template-columns: max-content 15px max-content 1fr 90px;
+  grid-template-rows: repeat(2, min-content);
+  grid-row-gap: 0.7rem
+`;
+
+const SetName = styled.h1`
+  grid-column: span 4;
+  font-size: 3.2rem;
+  font-weight: ${fonts.bold};
+  margin: 0;
+`;
+
+const Info = styled.span`
+  color: ${colors.azure};
+  grid-row: 2 / 3;
+`;
+
+const Border = styled.div`
+  height: 1.8rem;
+  width: 1.5px;
+  background: ${colors.azure};
+  grid-column: 2 / 3;
+  grid-row: 2 /3;
+  place-self: center;
+`;
+
+const Progress = styled.figure`
+  height: 6rem;
+  margin: 0;
+  grid-row: 1 / 3;
+  grid-column: 5 / 6;
+  align-self: center;
+`;
+
+const ButtonsWrapper = styled.div`
+  margin: 40px auto 60px auto;
+  display: flex;
+  justify-content: space-evenly;
+  max-width: 300px;
+
+  ${'' /* @media (min-width: 768px) {
+    ${props => props.iseditable ? 'justify-content: space-between' : false };
+  } */}
+`;
+
+const TermListWrapper = styled.div`
+  width: 76vw;
+  margin: 0 auto;
+
+  @media (min-width: 786px) {
+    margin: 0 40px
+  }
+`;
+
+const SubTitle = styled.h2`
+  color: ${colors.white};
+  font-size: 1.6rem;
+  margin-bottom: 0.8rem;
+`;
+
+const List = styled.ul`
+  margin: 0 0 40px 0;
+  padding: 0;
+`;
+
+const ListItem = styled.li`
+  margin-bottom: 1.6rem;
+  height: 7.7rem;
+  height: auto;
+  list-style: none
+  position: relative;
+`;
+
+const SetWrapper = styled(BlockElement)`
+  padding: 1.6rem 2rem;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, min-content);
+  grid-row-gap: 2px;
+  align-content: center;
+
+  @media (min-width: 768px) {
+    padding: 20px 0;
+    grid-template-columns: 1fr 1px 1fr;
+    grid-template-rows: 1fr
+  }
+`;
+
+const Counter = styled.span`
+  left: ${props => props.isLessThanTen ? '-8vw' : '-10vw' };
+  color: ${colors.azure};
+  font-weight: ${fonts.bold};
+  position: absolute;
+  top: 50%;
+  font-size: 2.5rem;
+  transform: translateY(-50%);
+
+  @media (min-width: 768px) {
+    left: -50px
+  }
+`;
+
+const Term = styled.p`
+  font-weight: ${(props) => props.id === 'term' ? `${fonts.bold}` : `${fonts.semiBold}`};
+  font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
+  color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+  margin: 0;
+  white-space: pre-line;
+
+  @media (min-width: 768px) {
+    padding-left: 40px
+  }
+`;
+
+const Line = styled.div`
+  @media (min-width: 768px) {
+    width: 1.5px;
+    height: 20px;
+    background: ${colors.gray};
+  }
+`;
 
 export default ViewSet

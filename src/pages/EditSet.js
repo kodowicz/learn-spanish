@@ -44,18 +44,7 @@ class EditSet extends Component {
   addTerm = event => {
     event.preventDefault();
     this.props.addNewTerm();
-    this.setState({ state: this.state }); // ???
   }
-
-  // submitSet = event => {
-  //   event.preventDefault();
-  //   this.props.submitEditedSet(true)
-  // }
-
-  // handleDeleteSet = () => {
-  //   // this.props.deleteSet()
-  // }
-
 
   render() {
     const { setName } = this.state;
@@ -66,30 +55,32 @@ class EditSet extends Component {
       setid,
       isEditSubmited,
       isSetDeleted,
+      isDeletingOverlay,
       updateTerm,
       removeTerm,
-      submitEditedSet,
-      deleteCreatedSet,
-      deleteSetChanges,
+      submitEditSet,
       askForDeleting,
+      deleteEditSet,
+      deleteSetChanges,
       createSetError
     } = this.props;
 
     if (!uid) return <Redirect to={`/sets/${setid}`} />;
     if (isEditSubmited) return <Redirect to={`/sets/${setid}`} />
+    if (isSetDeleted) return <Redirect to="/" />
 
-    if (isSetDeleted) {
+    if (isDeletingOverlay) {
       return (
         <DeleteSetOverlay
           isEdited
-          deleteSet={deleteCreatedSet}
+          deleteSet={deleteEditSet}
           deleteSetChanges={deleteSetChanges}
           askForDeleting={askForDeleting}
          />
       )
     } else {
       return (
-        <Main width={30} minWidth={350} maxWidth={450}>
+        <Main width={80} maxWidth={450}>
           <Form>
             <SetName>
               <NameInput
@@ -110,7 +101,7 @@ class EditSet extends Component {
               setName={setName}
               terms={terms}
               askForDeleting={askForDeleting}
-              submitSet={submitEditedSet}
+              submitSet={submitEditSet}
               createSetError={createSetError}
             />
 
@@ -142,18 +133,25 @@ const Buttons = ({
   const reduceTerms = terms => {
     return terms
       .map(element => {
+        return {
+          ...element,
+          term: element.term.trim(),
+          definition: element.definition.trim()
+        }
+      })
+      .map(element => {
         const { term, definition } = element;
 
         if (
-          (/\s/.test(term) || term.length === 0) &&
-          (/\s/.test(definition) || definition.length === 0)
+          (/^\s$/.test(term) || term.length === 0) &&
+          (/^\s$/.test(definition) || definition.length === 0)
         ) {
           return null
 
-        } else if (/\s/.test(term) || term.length === 0) {
+        } else if (/^\s$/.test(term) || term.length === 0) {
           return {...element, term: '...' };
 
-        } else if (/\s/.test(definition) || definition.length === 0) {
+        } else if (/^\s$/.test(definition) || definition.length === 0) {
           return {...element, definition: '...' };
 
         } else {
@@ -167,7 +165,7 @@ const Buttons = ({
     const reducedTerms = reduceTerms(terms);
     event.preventDefault();
 
-    if (!setName || /\s/.test(setName)) {
+    if (!setName || /^\s$/.test(setName)) {
       createSetError('You must enter a title to save your set');
 
     } else if (reducedTerms.length < 2) {

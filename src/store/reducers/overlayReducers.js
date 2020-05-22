@@ -24,7 +24,7 @@ export const cancelSesionReducer = (state = initState.cancel, action) => {
   }
 };
 
-export const deleteSetReducer = (state = initState.delete, action) => {
+export const deletingSetReducer = (state = initState.delete, action) => {
   switch (action.type) {
     case 'ASKING_TO_DELETE_SET':
       return action.payload;

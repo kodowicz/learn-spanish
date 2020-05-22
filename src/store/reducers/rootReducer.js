@@ -1,12 +1,23 @@
-import { authReducer } from './authReducer';
-import { createdSetReducer, setDeletedReducer } from './setsReducer';
-import { locationReducer, lastLocationReducer, setIdReducer } from './locationReducer';
-import { choiceMethodReducer, cancelSesionReducer, deleteSetReducer } from './overlayReducers';
-import { setChangesReducer } from './editSetReducers';
-import { shuffleCardReducer } from './learnSetReducer';
 import { combineReducers } from 'redux';
 import { firestoreReducer } from 'redux-firestore';
 import { firebaseReducer } from 'react-redux-firebase';
+import { setChangesReducer } from './editSetReducers';
+import { shuffleCardReducer } from './learnSetReducer';
+import { authReducer } from './authReducer';
+import {
+  createdSetReducer,
+  setDeletedReducer
+} from './setsReducer';
+import {
+  locationReducer,
+  lastLocationReducer,
+  setIdReducer
+} from './locationReducer';
+import {
+  choiceMethodReducer,
+  cancelSesionReducer,
+  deletingSetReducer
+} from './overlayReducers';
 
 const correctAnswer = (state = {}, action) => {
   switch (action.type) {
@@ -31,7 +42,7 @@ const rootReducer = combineReducers({
   terms: shuffleCardReducer,
   isChoiceOverlayOpen: choiceMethodReducer,
   isCancelOverlayOpen: cancelSesionReducer,
-  isSetDeletedOverlayOpen: deleteSetReducer,
+  isDeletingSetOverlayOpen: deletingSetReducer,
   location: locationReducer,
   lastLocation: lastLocationReducer,
   correctAnswer: correctAnswer,

@@ -41,6 +41,8 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
           id: keyId,
           term: "",
           definition: "",
+          termRows: 1,
+          definitionRows: 1,
           time: new Date()
         })
       }
@@ -82,7 +84,9 @@ export const updateUnsavedTerm = element => (dispatch, getState, { getFirestore 
     if (thisDoc.exists) {
       docRef.update({
         term: element.term,
-        definition: element.definition
+        definition: element.definition,
+        termRows: element.termRows,
+        definitionRows: element.definitionRows
       })
     }
   })
@@ -109,11 +113,11 @@ export const removeUnsavedTerm = termid => (dispatch, getState, { getFirestore }
     docRef.delete()
   }).then(() => {
     dispatch({
-      type: 'DELETE_CREATED_TERM'
+      type: 'DELETE_CREATE_TERM'
     })
   }).catch(error => {
     dispatch({
-      type: 'DELETE_CREATED_TERM_ERROR',
+      type: 'DELETE_CREATE_TERM_ERROR',
       error
     })
   })
@@ -129,6 +133,8 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
     id: termRef.id,
     term: "",
     definition: "",
+    termRows: 1,
+    definitionRows: 1,
     time: new Date()
   })
   .then(() => {
@@ -144,7 +150,7 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
 }
 
 // submit set of prompt an error
-export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
+export const submitCreateSet = (terms) => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const author = getState().firebase.profile.username;
@@ -220,14 +226,18 @@ export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
           term: element.term,
           definition: element.definition,
           id: termsRef.id,
-          time: element.time
+          time: element.time,
+          termRows: element.termRows,
+          definitionRows: element.definitionRows
         })
 
         flashcardsRef.set({
           term: element.term,
           definition: element.definition,
           id: termsRef.id,
-          time: element.time
+          time: element.time,
+          termRows: element.termRows,
+          definitionRows: element.definitionRows
         })
 
         gameRef.set({
@@ -235,7 +245,9 @@ export const submitSet = (terms) => (dispatch, getState, { getFirestore }) => {
           definition: element.definition,
           id: termsRef.id,
           time: element.time,
-          knowledge: 0
+          knowledge: 0,
+          termRows: element.termRows,
+          definitionRows: element.definitionRows
         })
       })
     })
