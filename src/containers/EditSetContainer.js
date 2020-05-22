@@ -5,7 +5,7 @@ import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import { askForDeleting } from '../store/actions/overlayActions';
 import { deleteEditSet } from '../store/actions/deleteSetActions';
-import { createSetError } from '../store/actions/notificationActions';
+import { notificationError } from '../store/actions/notificationActions';
 import {
   changeLocation,
   changeLastLocation,
@@ -47,7 +47,7 @@ const EditSetContainer = (props) => {
       addNewTerm={props.addNewTerm}
       submitEditSet={props.submitEditSet}
       deleteEditSet={props.deleteEditSet}
-      createSetError={props.createSetError}
+      notificationError={props.notificationError}
       deleteSetChanges={props.deleteSetChanges}
     />
   :
@@ -86,7 +86,7 @@ export default compose(
       addNewTerm,
       submitEditSet,
       deleteEditSet,
-      createSetError,
+      notificationError,
       deleteSetChanges,
       changeLocation,
       changeLastLocation,

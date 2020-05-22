@@ -53,7 +53,7 @@ class CreateSet extends Component {
       submitCreateSet,
       askForDeleting,
       deleteCreateSet,
-      createSetError,
+      notificationError,
     } = this.props;
 
     if (!uid) return <Redirect to="/signup" />;
@@ -91,7 +91,7 @@ class CreateSet extends Component {
               terms={unsavedSetTerms}
               askForDeleting={askForDeleting}
               submitSet={submitCreateSet}
-              createSetError={createSetError}
+              notificationError={notificationError}
             />
 
             <TermsListWrapper>
@@ -117,7 +117,7 @@ const Buttons = ({
   terms,
   askForDeleting,
   submitSet,
-  createSetError
+  notificationError
 }) => {
 
   const reduceTerms = terms => {
@@ -156,10 +156,10 @@ const Buttons = ({
     event.preventDefault();
 
     if (!setName || /^\s$/.test(setName)) {
-      createSetError('You must enter a title to save your set');
+      notificationError('You must enter a title to save your set');
 
     } else if (reducedTerms.length < 2) {
-      createSetError('You have to create at least 2 terms');
+      notificationError('You have to create at least 2 terms');
 
     } else {
       submitSet(reducedTerms);

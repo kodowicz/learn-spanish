@@ -44,9 +44,39 @@ export const logOut = () => (dispatch, getState, { getFirebase }) => {
   const firebase = getFirebase();
 
   firebase.auth().signOut()
-  .then(() => dispatch({ type: 'SIGNOUT_SUCCESS'}))
+  .then(() => {
+    dispatch({
+      type: 'LOGOUT_SUCCESS'
+    })
+  })
 
 }
+
+export const changePassword = (data) => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firebase = getFirebase();
+  const user = firebase.auth().currentUser;
+
+  const credential = firebase.auth.EmailAuthProvider.credential(
+    user.email,
+    data.password
+  );
+
+  user.reauthenticateWithCredential(credential)
+  .then(() => {
+    firebase.auth().currentUser.updatePassword(data.newpassword);
+    dispatch({
+      type: 'CHANGE_PASSWORD',
+      payload: false
+    })
+  })
+  .catch(error => {
+    dispatch({
+      type: 'CHANGE_PASSWORD_ERROR'
+    })
+  })
+
+}
+
 
 export const cleanErrorNotification = () => ({
   type: 'CLEAN_UP'

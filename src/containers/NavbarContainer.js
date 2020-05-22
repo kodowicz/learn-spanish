@@ -4,7 +4,8 @@ import { deleteSetChanges } from '../store/actions/editSetActions';
 import {
   cancelSesion,
   chooseMethod,
-  askForDeleting
+  askForDeleting,
+  closeChangePassword
 } from '../store/actions/overlayActions';
 
 import NavBar from '../components/navbar/Navbar';
@@ -20,6 +21,7 @@ const NavbarContainer = (props) => (
     chooseMethod={props.chooseMethod}
     askForDeleting={props.askForDeleting}
     deleteSetChanges={props.deleteSetChanges}
+    closeChangePassword={props.closeChangePassword}
   />
 );
 
@@ -35,6 +37,7 @@ export default connect(
     cancelSesion,
     chooseMethod,
     askForDeleting,
-    deleteSetChanges
+    deleteSetChanges,
+    closeChangePassword
   }
 )(NavbarContainer)
