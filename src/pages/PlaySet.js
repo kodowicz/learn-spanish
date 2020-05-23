@@ -10,8 +10,17 @@ class PlaySet extends Component {
     this.props.changeLastLocation(`/sets/${this.props.setid}`);
   }
 
+  componentWillMount() {
+    this.props.setCurrentSetId(this.props.setid);
+    this.props.createPlaySet(this.props.setid)
+  }
+
   render() {
-    const { setid, isOverlayOpen, cancelSesion } = this.props;
+    const {
+      setid,
+      isOverlayOpen,
+      cancelSesion
+    } = this.props;
 
     if (isOverlayOpen) {
       return <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />

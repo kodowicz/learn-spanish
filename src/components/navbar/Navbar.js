@@ -23,6 +23,7 @@ const Navbar = ({
 
     } else if (location === 'profile') {
       closeChangePassword(false);
+      goBack();
 
     } else if (location === 'set') {
       chooseMethod(false);

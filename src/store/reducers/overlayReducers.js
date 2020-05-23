@@ -1,34 +1,49 @@
 const initState = {
-  choice: false,
-  cancel: false,
-  delete: false
+  isChosen: false,
+  isCancelled: false,
+  isDeleted: false,
+  isPassword: false
 };
 
-export const choiceMethodReducer = (state = initState.choice, action) => {
+export const overlayReducer = (state = initState, action) => {
   switch (action.type) {
+    case 'OPEN_PASSWORD':
+      return {
+        ...state,
+        isPassword: action.payload
+      }
+
+    case 'CLOSE_PASSWORD':
+      return {
+        ...state,
+        isPassword: action.payload
+      }
+
+    case 'CHANGE_PASSWORD':
+      return {
+        ...state,
+        isPassword: action.payload
+      }
+
     case 'SWITCH_CHOICE_METHOD':
-      return action.isOpen;
+      return {
+        ...state,
+        isChosen: action.payload
+      }
 
-    default:
-      return state;
-  }
-};
-
-
-export const cancelSesionReducer = (state = initState.cancel, action) => {
-  switch (action.type) {
     case 'CANCEL_SESION':
-      return action.isCancelled;
-    default:
-      return state;
-  }
-};
+      return {
+        ...state,
+        isCancelled: action.payload
+      }
 
-export const deletingSetReducer = (state = initState.delete, action) => {
-  switch (action.type) {
     case 'ASKING_TO_DELETE_SET':
-      return action.payload;
+      return {
+        ...state,
+        isDeleted: action.payload
+      }
+
     default:
       return state;
   }
-};
+}

@@ -58,7 +58,7 @@ const mapStateToProps = (state) => {
     signedUser: state.firebase.auth.uid,
     lastLocation: state.lastLocation,
     isEditSubmited: state.isEditSubmited,
-    isOverlayOpen: state.isChoiceOverlayOpen,
+    isOverlayOpen: state.isOverlayOpen.isChosen,
     isLoaded: isLoaded(                         // doesn't word properly when updating
       state.firestore.data.terms,
       state.firestore.data.setDetails,

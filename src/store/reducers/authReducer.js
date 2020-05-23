@@ -3,31 +3,6 @@ const initState = {
   isChanged: false
 };
 
-export const passwordReducer = (state = initState, action) => {
-  switch (action.type) {
-    case 'OPEN_PASSWORD':
-      return {
-        ...state,
-        isChanged: action.payload
-      }
-
-    case 'CLOSE_PASSWORD':
-      return {
-        ...state,
-        isChanged: action.payload
-      }
-
-    case 'CHANGE_PASSWORD':
-      return {
-        ...state,
-        isChanged: action.payload
-      }
-
-    default:
-      return state
-  }
-};
-
 export const authReducer = (state = initState, action) => {
   switch (action.type) {
     case 'LOGIN_SUCCESS':

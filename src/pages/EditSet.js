@@ -55,7 +55,7 @@ class EditSet extends Component {
       setid,
       isEditSubmited,
       isSetDeleted,
-      isDeletingOverlay,
+      isOverlayOpen,
       updateTerm,
       removeTerm,
       submitEditSet,
@@ -69,7 +69,7 @@ class EditSet extends Component {
     if (isEditSubmited) return <Redirect to={`/sets/${setid}`} />
     if (isSetDeleted) return <Redirect to="/" />
 
-    if (isDeletingOverlay) {
+    if (isOverlayOpen) {
       return (
         <DeleteSetOverlay
           isEdited

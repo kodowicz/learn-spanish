@@ -47,7 +47,7 @@ class CreateSet extends Component {
       unsavedSetTerms,
       newSetKey,
       isSetDeleted,
-      isDeletingOverlay,
+      isOverlayOpen,
       updateUnsavedTerm,
       removeUnsavedTerm,
       submitCreateSet,
@@ -60,7 +60,7 @@ class CreateSet extends Component {
     if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
     if (isSetDeleted) return <Redirect to="/" />
 
-    if (isDeletingOverlay) {
+    if (isOverlayOpen) {
       return (
         <DeleteSetOverlay
           deleteSet={deleteCreateSet}

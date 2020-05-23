@@ -3,10 +3,8 @@ import { firestoreReducer } from 'redux-firestore';
 import { firebaseReducer } from 'react-redux-firebase';
 import { setChangesReducer } from './editSetReducers';
 import { shuffleCardReducer } from './learnSetReducer';
-import {
-  passwordReducer,
-  authReducer
-} from './authReducer';
+import { authReducer } from './authReducer';
+import { overlayReducer } from './overlayReducers';
 import {
   createdSetReducer,
   setDeletedReducer
@@ -16,11 +14,6 @@ import {
   lastLocationReducer,
   setIdReducer
 } from './locationReducer';
-import {
-  choiceMethodReducer,
-  cancelSesionReducer,
-  deletingSetReducer
-} from './overlayReducers';
 
 
 const correctAnswer = (state = {}, action) => {
@@ -44,10 +37,7 @@ const rootReducer = combineReducers({
   isEditSubmited: setChangesReducer,
   isSetDeleted: setDeletedReducer,
   terms: shuffleCardReducer,
-  isPasswordOverlayOpen: passwordReducer,
-  isChoiceOverlayOpen: choiceMethodReducer,
-  isCancelOverlayOpen: cancelSesionReducer,
-  isDeletingSetOverlayOpen: deletingSetReducer,
+  isOverlayOpen: overlayReducer,
   location: locationReducer,
   lastLocation: lastLocationReducer,
   correctAnswer: correctAnswer,

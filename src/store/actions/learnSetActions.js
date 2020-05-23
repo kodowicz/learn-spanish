@@ -1,14 +1,28 @@
-export const createLearnSet = setId => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createLearnSet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
-  const userId = getState().firebase.auth.uid;
+  const uid = getState().firebase.auth.uid;
 
-  const setRef = firestore.collection(`sets/${setId}/terms`);
-  const learnSetRef = firestore.collection(`users/${userId}/learn/${setId}/basic`);
+  const setRef = firestore.doc(`sets/${setid}`);
+  const setTermsRef = firestore.collection(`sets/${setid}/terms`);
+  const learnDetailsRef = firestore.doc(`users/${uid}/learn/${setid}/`);
+  const learnSetRef = firestore.collection(`users/${uid}/learn/${setid}/flashcards`);
+
 
   learnSetRef.get().then(snap => {
     if (!snap.size) {
-      setRef.get().then(snapshot => {
 
+      setRef.get().then(doc => {
+        const { amount, name } = doc.data();
+
+        learnDetailsRef.set({
+          name,
+          amount,
+          knowledge: 0,
+          id: learnDetailsRef.id,
+        })
+      })
+
+      setTermsRef.get().then(snapshot => {
         snapshot.forEach(doc => {
           const { term, definition, time } = doc.data();
           const termRef = learnSetRef.doc();
@@ -23,17 +37,26 @@ export const createLearnSet = setId => (dispatch, getState, { getFirebase, getFi
         })
       })
     }
-  })
+  }).then(() => {
+    dispatch({
+      type: 'CREATE_LEARN_SET'
 
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'CREATE_LEARN_SET_ERROR',
+      error
+    })
+  })
 }
 
 export const shuffleCard = term => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
-  const user = getState().firebase.auth.uid;
-  const set = getState().setId;
+  const uid = getState().firebase.auth.uid;
+  const set = getState().setid;
   const time = new Date();
 
-  const docRef = firestore.doc(`users/${user}/learn/${set}/basic/${term.id}`);
+  const docRef = firestore.doc(`users/${uid}/learn/${set}/flashcards/${term.id}`);
 
   docRef.update({
     time
@@ -52,10 +75,10 @@ export const shuffleCard = term => (dispatch, getState, { getFirebase, getFirest
 
 export const throwoutCard = term => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
-  const user = getState().firebase.auth.uid;
-  const set = getState().setId;
+  const uid = getState().firebase.auth.uid;
+  const set = getState().setid;
 
-  const docRef = firestore.doc(`users/${user}/learn/${set}/basic/${term}`);
+  const docRef = firestore.doc(`users/${uid}/learn/${set}/flashcards/${term}`);
 
   docRef.delete()
   .then(() => {

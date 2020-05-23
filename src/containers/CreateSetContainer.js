@@ -28,7 +28,7 @@ const CreateSetContainer = (props) => {
       uid={props.uid}
       location={props.location}
       lastLocation={props.lastLocation}
-      isDeletingOverlay={props.isDeletingOverlay}
+      isOverlayOpen={props.isOverlayOpen}
       isSetDeleted={props.isSetDeleted}
       isEditSubmited={props.isEditSubmited}
       unsavedSetName={props.unsavedSetName}
@@ -61,7 +61,7 @@ const mapStateToProps = state => {
     unsavedSetTerms,
     unsavedSetName,
     uid: state.firebase.auth.uid,
-    isDeletingOverlay: state.isDeletingSetOverlayOpen,
+    isOverlayOpen: state.isOverlayOpen.isDeleted,
     isSetDeleted: state.isSetDeleted,
     isEditSubmited: state.isEditSubmited,
     isTermAdded: state.isTermAdded,

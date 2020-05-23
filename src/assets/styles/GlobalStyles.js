@@ -48,6 +48,16 @@ export const GlobalStyle = createGlobalStyle`
     -moz-osx-font-smoothing: grayscale;
   }
 
+  *::selection {
+    background: ${colors.white};
+    color: ${colors.blue}
+  }
+
+  *::-moz-selection {
+    background: ${colors.white};
+    color: ${colors.blue}
+  }
+
   #root {
     height: 100%
   }
@@ -55,7 +65,7 @@ export const GlobalStyle = createGlobalStyle`
 
 
 export const Main = styled.main`
-  padding-top: 85px;
+  padding: 85px 0;
   margin: 0 auto;
   width: ${props => `${props.width}vw`};
   max-width: ${props => `${props.maxWidth}px`};
@@ -89,7 +99,7 @@ export const Button = styled.button`
   transition: transform .2s;
 
   &:hover {
-    color: ${colors.navy};
+    color: ${({ color }) => color === '#F65D5D' ? `${colors.warming}` : `${colors.navy}`};
     background: ${colors.white};
   }
 

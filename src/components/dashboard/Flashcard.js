@@ -1,226 +1,6 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { Button } from '../../assets/styles/GlobalStyles';
-
-
-const Wrapper = styled.div`
-  grid-column: 1 / 1;
-  grid-row: 1 / 1;
-  width: 220px;
-  height: 300px;
-  background: transparent;
-  -webkit-user-select: none;
-  transition: transform .2s;
-`;
-
-const Front = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  background: white;
-  box-shadow: 0 0 10px #d8d8d8;
-  transition: transform .6s, opacity 0s;
-  transform: ${props => `rotateY(${props.rotate}deg)`};
-  opacity: 1
-`;
-
-const Back = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  background: white;
-  box-shadow: 0 0 10px #d8d8d8;
-  transition: transform .6s, opacity 0s .2s;
-  transform: ${props => `rotateY(${props.rotate}deg)`};
-  opacity: 0
-`;
-
-const FrontWrapper = styled(Wrapper)`
-  perspective: 1000px;
-  z-index: 1;
-
-  /*flipping a card */
-  ${ ({ flip }) => flip && css`
-    ${Front} {
-      transition: transform .6s, opacity 0s .5s;
-      opacity: 0;
-    }
-
-    ${Back} {
-      transition: transform .6s, opacity 0s .15s;
-      opacity: 1
-    }
-  `};
-
-  /* move card */
-  ${ ({ transform }) => transform.rotate !== 0 && css`
-    transform: translate(${transform.x}px, ${transform.y}px) rotate(${transform.rotate}deg)
-  `};
-
-  ${ ({ moveLeft, transform }) => moveLeft && css`
-    animation: ${shuffle(transform)} 0.8s ease-out forwards
-  `};
-
-  ${ ({ moveRight, transform }) => moveRight && css`
-    animation: ${throwOut} 1s ease-out forwards
-  `};
-`;
-
-const BackWrapper = styled(Wrapper)`
-  z-index: -1
-  transform: translate(-2px, -5px) rotate(5deg);
-  box-shadow: 0 0 20px #d8d8d8;
-
-  &::before, &::after {
-    content: "";
-    position: absolute;
-    background: #f7f7f7;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    box-shadow: 0 0 5px #d8d8d8;
-  }
-
-  &::before {
-    transform: translate(-2px, 0px) rotate(-7deg)
-  }
-
-  &::after {
-    transform: translate(-5px, 5px) rotate(-2deg);
-    z-index: -1
-  }
-`;
-
-const CongratsWrapper = styled(Wrapper)`
-  box-shadow: 0 0 20px #d8d8d8;
-  position: relative;
-  background: white;
-
-  div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-
-    &::before, &::after {
-      content: "";
-      position: absolute;
-      background: #f7f7f7;
-      background: white;
-      height: 100%;
-      width: 100%;
-      top: 0;
-      left: 0;
-      box-shadow: 0 0 5px #d8d8d8;
-    }
-
-    &::before {
-      z-index: -3;
-      transform: translate(7px, -7px) rotate(3deg)
-    }
-
-    &::after {
-      transform: translate(-5px, 5px) rotate(-2deg);
-      z-index: -2
-    }
-  }
-`;
-
-const Title = styled.h2`
-  text-align: center;
-  font-weight: 700;
-  font-size: 2rem;
-  margin: 0
-`;
-
-const Text = styled.p`
-  font-size: 1.4rem;
-  margin: 0 0 40px
-`;
-
-const Restart = styled(Button)`
-  font-size: 1.4rem;
-  padding: 1rem 4rem;
-`;
-
-const shuffle = (transform) => keyframes`
-  0% {
-   z-index: 1
-  }
-
-  50% {
-    transform: translate(-200px, ${transform.y}px) rotate(-15deg);
-  }
-
-  70% {
-    z-index: -1
-  }
-
-  100% {
-    transform: rotate(0deg);
-    z-index: -1
-  }
-`;
-
-const throwOut = keyframes`
-  0% {
-    opacity: 1
-  }
-
-  30% {
-    opacity: 0.5
-  }
-
-  50% {
-    transform: translateX(300px) rotate(15deg);
-    opacity: 0.5
-  }
-
-  100% {
-    transform: translateX(300px) rotate(15deg);
-    opacity: 0
-  }
-`;
-
-const Top = styled.div`
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Bottom = styled.div`
-  height: 3.5rem;
-  margin: 0 0.7rem;
-  border-top: 0.5px solid #C6C6C6;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Term = styled.div`
-  font-size: 1.8rem;
-`;
-
-const Tap = styled.button`
-  text-transform: uppercase;
-  background: none;
-  border: none;
-  font-size: 12px;
-  font-family: 'Open Sans', sans-serif;
-`;
+import { Button, colors, fonts } from '../../assets/styles/GlobalStyles';
 
 
 export class FrontCard extends Component {
@@ -393,7 +173,7 @@ export class FrontCard extends Component {
         ref={this.cardRef}
         flip={toggle}
         layerIndex={layerIndex}
-        transform={transformCard}
+        transformation={transformCard}
         moveLeft={moveLeft}
         moveRight={moveRight}
         onClick={this.flipCard}
@@ -453,7 +233,229 @@ export const Congratulations = ({ setid, layerIndex, createLearnSet }) => (
     <div>
       <Title>Congratulations!</Title>
       <Text>You've learnt everything!</Text>
-      <Restart onClick={() => createLearnSet(setid)}>restart</Restart>
+      <Button
+        color={colors.navy}
+        onClick={() => createLearnSet(setid)}
+      >
+        restart
+      </Button>
     </div>
   </CongratsWrapper>
-)
+);
+
+
+const Wrapper = styled.div`
+  color: ${colors.navy};
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+  width: 220px;
+  height: 300px;
+  background: white;
+  -webkit-user-select: none;
+  transition: transform .2s;
+`;
+
+const Card = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-shadow: 0 0 20px rgba(88, 38, 235, 0.53);
+  transition: transform .6s, opacity 0s;
+  transform: ${props => `rotateY(${props.rotate}deg)`};
+`;
+
+const Front = styled(Card)`
+  opacity: 1
+`;
+
+const Back = styled(Card)`
+  opacity: 0
+`;
+
+const FrontWrapper = styled(Wrapper)`
+  perspective: 1000px;
+  z-index: 5;
+
+  /*flipping a card */
+  ${ ({ flip }) => flip && css`
+    ${Front} {
+      transition: transform .6s, opacity 0s .5s;
+      opacity: 0;
+    }
+
+    ${Back} {
+      transition: transform .6s, opacity 0s .15s;
+      opacity: 1;
+    }
+  `};
+
+  /* move card */
+  ${ ({ transformation }) => transformation.rotate !== 0 && css`
+    transform: translate(${transformation.x}px, ${transformation.y}px) rotate(${transformation.rotate}deg)
+  `};
+
+  ${ ({ moveLeft, transformation }) => moveLeft && css`
+    animation: ${shuffle(transformation)} 0.8s ease-out forwards
+  `};
+
+  ${ ({ moveRight, transformation }) => moveRight && css`
+    animation: ${throwOut} 1s ease-out forwards
+  `};
+`;
+
+const BackWrapper = styled(Wrapper)`
+  background: white;
+  z-index: 3;
+  transform: translate(-2px, -5px) rotate(5deg);
+  box-shadow: 0 0 20px rgba(88, 38, 235, 0.53);
+
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    background: #f7f7f7;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  &::before {
+    transform: translate(-2px, 0px) rotate(-7deg);
+    z-index: -2;
+  }
+
+  &::after {
+    transform: translate(-5px, 5px) rotate(-2deg);
+    z-index: -1
+  }
+`;
+
+const CongratsWrapper = styled(Wrapper)`
+  position: relative;
+  background: white;
+  z-index: 0;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 20px #83838378;
+    background: white;
+
+    &::before, &::after {
+      content: "";
+      position: absolute;
+      background: white;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      box-shadow: 0 0 5px #20193c91;
+    }
+
+    &::before {
+      z-index: -1;
+      transform: translate(7px, -2px) rotate(3deg)
+    }
+
+    &::after {
+      transform: translate(-3px, 6px) rotate(-2deg);
+      z-index: -2
+    }
+  }
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0
+`;
+
+const Text = styled.p`
+  font-size: 1.4rem;
+  margin: 0 0 40px
+`;
+
+// const Restart = styled(Button)`
+//   font-size: 1.4rem;
+//   padding: 1rem 4rem;
+// `;
+
+const shuffle = (transform) => keyframes`
+  0% {
+   z-index: 5
+  }
+
+  50% {
+    transform: translate(-200px, ${transform.y}px) rotate(-15deg);
+  }
+
+  70% {
+    z-index: 3
+  }
+
+  100% {
+    transform: rotate(0deg);
+    z-index: 3
+  }
+`;
+
+const throwOut = keyframes`
+  0% {
+    opacity: 1
+  }
+
+  30% {
+    opacity: 0.5
+  }
+
+  50% {
+    transform: translateX(300px) rotate(15deg);
+    opacity: 0.5
+  }
+
+  100% {
+    transform: translateX(300px) rotate(15deg);
+    opacity: 0
+  }
+`;
+
+const Top = styled.div`
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Bottom = styled.div`
+  height: 4rem;
+  border-top: 2px solid #BAACE0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Term = styled.div`
+  font-size: 2rem;
+  text-align: center;
+`;
+
+const Tap = styled.button`
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: ${colors.navy};
+  font-size: 1.2rem;
+  font-family: ${fonts.family}
+`;

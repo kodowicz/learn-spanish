@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 
-import { Main, Button, LinkButton, BlockElement, colors, fonts } from '../assets/styles/GlobalStyles';
+import { Main, Button, LinkButton, fonts } from '../assets/styles/GlobalStyles';
 import styled from 'styled-components';
 import arrow from '../assets/images/arrow.svg';
 import Password from '../components/overlay/Password';
@@ -33,14 +32,14 @@ class ViewProfile extends Component {
       uid,
       user,
       userSets,
-      isPasswordOverlay,
+      isOverlayOpen,
       openPasswordOverlay,
       changePassword,
       notificationError
     } = this.props;
 
     if (uid) {
-      if (isPasswordOverlay) {
+      if (isOverlayOpen) {
         return (
           <Password
             notificationError={notificationError}
@@ -92,29 +91,27 @@ class ViewProfile extends Component {
 }
 
 
-const UserDetails = ({ user, openPasswordOverlay }) => {
+const UserDetails = ({ user, openPasswordOverlay }) => (
+  <UserWrapper>
+    <UserItem>
+      <span>email</span>
+      <span>{ user.email }</span>
+    </UserItem>
+    <UserItem>
+      <span>username</span>
+      <span>{ user.username }</span>
+    </UserItem>
+    <UserItem>
+      <span>change password</span>
+      <ArrowButton
+        onClick={() => openPasswordOverlay(true)}
+      >
+        <Img src={arrow} alt="change password" />
+      </ArrowButton>
+    </UserItem>
+  </UserWrapper>
+);
 
-  return (
-    <UserWrapper>
-      <UserItem>
-        <span>email</span>
-        <span>{ user.email }</span>
-      </UserItem>
-      <UserItem>
-        <span>username</span>
-        <span>{ user.username }</span>
-      </UserItem>
-      <UserItem>
-        <span>change password</span>
-        <ArrowButton
-          onClick={() => openPasswordOverlay(true)}
-        >
-          <Img src={arrow} alt="change password" />
-        </ArrowButton>
-      </UserItem>
-    </UserWrapper>
-  )
-};
 
 
 const Title = styled.h1`

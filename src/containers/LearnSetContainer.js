@@ -2,9 +2,18 @@ import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase';
-import { changeLocation, changeLastLocation, currentSetId } from '../store/actions/locationActions';
-import { createLearnSet, shuffleCard, throwoutCard } from '../store/actions/learnSetActions';
+
 import { cancelSesion } from '../store/actions/overlayActions';
+import {
+  createLearnSet,
+  shuffleCard,
+  throwoutCard
+} from '../store/actions/learnSetActions';
+import {
+  changeLocation,
+  changeLastLocation,
+  setCurrentSetId
+} from '../store/actions/locationActions';
 
 import LearnSet from '../pages/LearnSet';
 
@@ -17,7 +26,7 @@ const LearnSetContainer = (props) => {
       isOverlayOpen={props.isOverlayOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
-      currentSetId={props.currentSetId}
+      setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
       shuffleCard={props.shuffleCard}
       throwoutCard={props.throwoutCard}
@@ -48,7 +57,7 @@ const mapStateToProps = (state, ownProps) => {
     uid: state.firebase.auth.uid,
     location: state.location,
     lastLocation: state.lastLocation,
-    isOverlayOpen: state.isCancelOverlayOpen,
+    isOverlayOpen: state.isOverlayOpen.isCancelled,
     terms: terms ? layerCards(terms) : undefined,
     isLoaded: isLoaded(terms)
   }
@@ -57,7 +66,15 @@ const mapStateToProps = (state, ownProps) => {
 export default compose(
   connect(
     mapStateToProps,
-    { changeLocation, changeLastLocation, currentSetId, cancelSesion, shuffleCard, throwoutCard, createLearnSet }
+    {
+      changeLocation,
+      changeLastLocation,
+      setCurrentSetId,
+      cancelSesion,
+      shuffleCard,
+      throwoutCard,
+      createLearnSet
+    }
   ),
   firestoreConnect(props => {
     return props.uid ?
@@ -67,7 +84,7 @@ export default compose(
         subcollections: [{
           collection: 'learn',
           doc: props.match.params.id,
-          subcollections: [{ collection: 'basic' }]
+          subcollections: [{ collection: 'flashcards' }]
         }],
         storeAs: 'learnTerms',
         orderBy: ["time"]

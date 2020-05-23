@@ -160,109 +160,77 @@ export const submitCreateSet = (terms) => (dispatch, getState, { getFirestore })
   const unsavedRef = firestore.collection(`users/${uid}/unsaved`);
   const createRef = firestore.collection('sets').doc();
 
-  if (!name || name === " ") {
-    userRef.update({
-      notification: 'You must enter a title to save your set'
-    })
-    .then(() => {
-      dispatch({
-        type: 'INVALID_SET_NAME'
-      })
-    }).catch(error => {
-      dispatch({
-        type: 'INVALID_SET_NAME_ERROR',
-        error
-      })
+  unsavedRef.get().then(querySnapshot => {
+
+    userRef.update({ unsavedSet: '' });
+
+    querySnapshot.docs.forEach(doc => {
+      const termid = doc.data().id;
+      unsavedRef.doc(termid).delete();
     })
 
-  } else if (terms.length < 2) {
-    userRef.update({
-      notification: "You have to create at least 2 terms"
+    createRef.set({
+      author,
+      name,
+      authorId: uid,
+      id: createRef.id,
+      amount: terms.length
     })
-    .then(() => {
-      dispatch({
-        type: 'INVALID_SET_TERMS'
-      })
-    }).catch(error => {
-      dispatch({
-        type: 'INVALID_SET_TERMS_ERROR',
-        error
-      })
-    })
-  } else {
-    unsavedRef.get().then(querySnapshot => {
-
-      userRef.update({ unsavedSet: '' });
-
-      querySnapshot.docs.forEach(doc => {
-        const termid = doc.data().id;
-        unsavedRef.doc(termid).delete();
-      })
-
-      createRef.set({
-        author,
-        name,
-        authorId: uid,
-        id: createRef.id,
-        amount: terms.length
-      })
 
     // user learning set
-      firestore.collection(`users/${uid}/learn`).doc(createRef.id).set({
-        author,
-        name,
-        authorId: uid,
-        id: createRef.id,
-        amount: terms.length
+    firestore.collection(`users/${uid}/learn`).doc(createRef.id).set({
+      name,
+      knowledge: 0,
+      id: createRef.id,
+      amount: terms.length
+    })
+
+    terms.forEach(element => {
+      const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
+      const keyid = termsRef.id;
+      const flashcardsRef = firestore.collection(`users/${uid}/learn/${createRef.id}/flashcards/`).doc(keyid);
+      const gameRef = firestore.collection(`users/${uid}/learn/${createRef.id}/game/`).doc(keyid);
+
+      termsRef.set({
+        term: element.term,
+        definition: element.definition,
+        id: termsRef.id,
+        time: element.time,
+        termRows: element.termRows,
+        definitionRows: element.definitionRows
       })
 
-      terms.forEach(element => {
-        const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
-        const keyid = termsRef.id;
-        const flashcardsRef = firestore.collection(`users/${uid}/learn/${createRef.id}/flashcards/`).doc(keyid);
-        const gameRef = firestore.collection(`users/${uid}/learn/${createRef.id}/game/`).doc(keyid);
+      flashcardsRef.set({
+        term: element.term,
+        definition: element.definition,
+        id: termsRef.id,
+        time: element.time,
+        termRows: element.termRows,
+        definitionRows: element.definitionRows
+      })
 
-        termsRef.set({
-          term: element.term,
-          definition: element.definition,
-          id: termsRef.id,
-          time: element.time,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
-        })
-
-        flashcardsRef.set({
-          term: element.term,
-          definition: element.definition,
-          id: termsRef.id,
-          time: element.time,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
-        })
-
-        gameRef.set({
-          term: element.term,
-          definition: element.definition,
-          id: termsRef.id,
-          time: element.time,
-          knowledge: 0,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
-        })
+      gameRef.set({
+        term: element.term,
+        definition: element.definition,
+        id: termsRef.id,
+        time: element.time,
+        knowledge: 0,
+        termRows: element.termRows,
+        definitionRows: element.definitionRows
       })
     })
-    .then(() => {
-      dispatch({
-        type: 'CREATE_SET',
-        newSetKey: createRef.id
-      })
-    }).catch(error => {
-      dispatch({
-        type: 'CREATE_SET_ERROR',
-        error
-      })
+  })
+  .then(() => {
+    dispatch({
+      type: 'CREATE_SET',
+      newSetKey: createRef.id
     })
-  }
+  }).catch(error => {
+    dispatch({
+      type: 'CREATE_SET_ERROR',
+      error
+    })
+  })
 }
 
 export const removeNewKey = () => ({

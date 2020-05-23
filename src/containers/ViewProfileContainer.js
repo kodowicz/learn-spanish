@@ -26,7 +26,7 @@ const ViewProfileContainer = (props) => {
         user={props.user}
         uid={props.uid}
         authError={props.authError}
-        isPasswordOverlay={props.isPasswordOverlay}
+        isOverlayOpen={props.isOverlayOpen}
         logOut={props.logOut}
         openPasswordOverlay={props.openPasswordOverlay}
         changePassword={props.changePassword}
@@ -59,7 +59,7 @@ const mapStateToProps = state => {
     userSets,
     user: state.firebase.profile,
     authError: state.auth.authError,
-    isPasswordOverlay: state.isPasswordOverlayOpen.isChanged,
+    isOverlayOpen: state.isOverlayOpen.isPassword,
     isLoaded: isLoaded(userSets)
   }
 }

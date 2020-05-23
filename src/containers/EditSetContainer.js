@@ -34,7 +34,7 @@ const EditSetContainer = (props) => {
       location={props.location}
       lastLocation={props.lastLocation}
       isEditSubmited={props.isEditSubmited}
-      isDeletingOverlay={props.isDeletingOverlay}
+      isOverlayOpen={props.isOverlayOpen}
       isSetDeleted={props.isSetDeleted}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
@@ -65,7 +65,7 @@ const mapStateToProps = (state, ownProps) => {
     setName,
     uid: state.firebase.auth.uid,
     setid: ownProps.match.params.id,
-    isDeletingOverlay: state.isDeletingSetOverlayOpen,
+    isOverlayOpen: state.isOverlayOpen.isDeleted,
     isSetDeleted: state.isSetDeleted,
     isEditSubmited: state.isEditSubmited,
     isNewTerm: state.isNewTerm,

@@ -1,9 +1,9 @@
-export const createPlaySet = setId => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
-  const userId = getState().firebase.auth.uid;
+  const user = getState().firebase.auth.uid;
 
-  const setRef = firestore.collection(`sets/${setId}/terms`);
-  const playSetRef = firestore.collection(`users/${userId}/learn/${setId}/play`);
+  const setRef = firestore.collection(`sets/${setid}/terms`);
+  const playSetRef = firestore.collection(`users/${user}/learn/${setid}/game`);
 
   playSetRef.get().then(snap => {
     if (!snap.size) {

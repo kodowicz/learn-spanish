@@ -2,21 +2,28 @@ import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase';
-import { changeLocation, changeLastLocation, currentSetId } from '../store/actions/locationActions';
-import { cancelSesion } from '../store/actions/overlayActions';
 
+import { cancelSesion } from '../store/actions/overlayActions';
+import { createPlaySet } from '../store/actions/playSetActions';
+import {
+  changeLocation,
+  changeLastLocation,
+  setCurrentSetId
+} from '../store/actions/locationActions';
 
 import PlaySet from '../pages/PlaySet';
 
 
 const PlaySetContainer = (props) => {
-  return isLoaded ?
+  return props.isLoaded ?
     <PlaySet
       setid={props.setid}
       terms={props.terms}
       isOverlayOpen={props.isOverlayOpen}
+      createPlaySet={props.createPlaySet}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
     />
     :
@@ -33,7 +40,7 @@ const mapStateToProps = (state, ownProps) => {
     uid: state.firebase.auth.uid,
     location: state.location,
     lastLocation: state.lastLocation,
-    isOverlayOpen: state.isCancelOverlayOpen,
+    isOverlayOpen: state.isOverlayOpen.isCancelled,
     isLoaded: isLoaded(terms)
   }
 }
@@ -54,7 +61,16 @@ const shuffleTerms = (array) => {
 }
 
 export default compose(
-  connect(mapStateToProps, { changeLocation, changeLastLocation, cancelSesion }),
+  connect(
+    mapStateToProps,
+    {
+      createPlaySet,
+      changeLocation,
+      changeLastLocation,
+      setCurrentSetId,
+      cancelSesion
+    }
+  ),
   firestoreConnect(props => {
     return props.uid ?
       [{
@@ -63,7 +79,7 @@ export default compose(
         subcollections: [{
           collection: 'learn',
           doc: props.match.params.id,
-          subcollections: [{ collection: 'basic' }]
+          subcollections: [{ collection: 'game' }]
         }],
         storeAs: 'learnTerms'
       }]

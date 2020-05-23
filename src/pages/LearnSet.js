@@ -1,35 +1,38 @@
 import React, { Component } from 'react';
-import { FrontCard, BackCard, Congratulations } from '../components/dashboard/Flashcard';
-import StopLearningOverlay from '../components/overlay/StopLearningOverlay';
-
 import styled from 'styled-components';
-
-
-const Cards = styled.div`
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 1fr;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  place-items: center;
-`
+import StopLearningOverlay from '../components/overlay/StopLearningOverlay';
+import {
+  FrontCard,
+  BackCard,
+  Congratulations
+} from '../components/dashboard/Flashcard';
 
 
 class LearnSet extends Component {
   componentDidMount() {
     this.props.changeLocation('learn');
     this.props.changeLastLocation(`/sets/${this.props.setid}`);
-    this.props.currentSetId(this.props.setid);
+  }
+
+  componentWillMount() {
+    this.props.setCurrentSetId(this.props.setid);
+    this.props.createLearnSet(this.props.setid)
   }
 
   render() {
-    const { setid, terms, isOverlayOpen, cancelSesion, shuffleCard, throwoutCard, createLearnSet } = this.props;
+    const {
+      setid,
+      terms,
+      isOverlayOpen,
+      cancelSesion,
+      shuffleCard,
+      throwoutCard,
+      createLearnSet
+    } = this.props;
 
     if (isOverlayOpen) {
       return <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
     } else {
-
       return (
         <Cards>
           { (terms.length > 1) ?
@@ -78,5 +81,18 @@ class LearnSet extends Component {
     }
   }
 }
+
+const Cards = styled.div`
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  place-content: center;
+  grid-template-rows: 300px;
+  grid-template-columns: 220px;
+  width:
+`
 
 export default LearnSet
