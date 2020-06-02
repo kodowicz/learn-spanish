@@ -4,27 +4,35 @@ import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import { cancelSesion } from '../store/actions/overlayActions';
-import { createPlaySet } from '../store/actions/playSetActions';
 import {
   changeLocation,
   changeLastLocation,
   setCurrentSetId
 } from '../store/actions/locationActions';
+import {
+  createPlaySet,
+  clearGameAnswer,
+  chooseOption
+} from '../store/actions/playSetActions';
 
 import PlaySet from '../pages/PlaySet';
 
 
 const PlaySetContainer = (props) => {
-  return props.isLoaded ?
+
+  return (props.isLoaded && props.terms.length !== 0) ?
     <PlaySet
       setid={props.setid}
       terms={props.terms}
+      answer={props.answer}
       isOverlayOpen={props.isOverlayOpen}
-      createPlaySet={props.createPlaySet}
+      // createPlaySet={props.createPlaySet}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
       setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
+      clearGameAnswer={props.clearGameAnswer}
+      chooseOption={props.chooseOption}
     />
     :
     <></>
@@ -35,29 +43,15 @@ const mapStateToProps = (state, ownProps) => {
   const terms = state.firestore.ordered.learnTerms;
 
   return {
+    terms,
     setid: ownProps.match.params.id,
-    terms: terms && shuffleTerms(terms),
     uid: state.firebase.auth.uid,
+    answer: state.gameAnswer,
     location: state.location,
     lastLocation: state.lastLocation,
     isOverlayOpen: state.isOverlayOpen.isCancelled,
     isLoaded: isLoaded(terms)
   }
-}
-
-const shuffleTerms = (array) => {
-  let counter = array.length - 1;
-  let newOrder = [...array];
-
-  while (counter > 0) {
-    let index = Math.floor(Math.random() * counter);
-    let temp = newOrder[counter];
-    newOrder[counter] = newOrder[index];
-    newOrder[index] = temp;
-    counter--;
-  }
-
-  return newOrder;
 }
 
 export default compose(
@@ -68,7 +62,9 @@ export default compose(
       changeLocation,
       changeLastLocation,
       setCurrentSetId,
-      cancelSesion
+      cancelSesion,
+      clearGameAnswer,
+      chooseOption
     }
   ),
   firestoreConnect(props => {
