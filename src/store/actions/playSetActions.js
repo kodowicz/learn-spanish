@@ -38,13 +38,36 @@ export const chooseOption = (term, isCorrect) => (dispatch, getState, { getFireb
   const user = getState().firebase.auth.uid;
   const set = getState().setid;
   const time = new Date();
-  const ratio = isCorrect ? term.ratio + 1 : term.ratio - 1;
+  const newRatio = isCorrect ? term.ratio + 1 : term.ratio - 1;
+  const minRatio = 0;
+  const maxRatio = 5;
+  let knowledge;
 
   const docRef = firestore.doc(`users/${user}/learn/${set}/game/${term.id}`);
+  const knowledgeRef = firestore.doc(`users/${user}/learn/${set}`);
+
+  // cloud functions
+  knowledgeRef.get().then(doc => {
+    if (newRatio >= minRatio && newRatio <= maxRatio) {
+      knowledge = doc.data().knowledge + (isCorrect ? 1 : -1);
+    } else {
+      knowledge = doc.data().knowledge;
+    }
+
+    knowledgeRef.update({
+      knowledge
+    })
+  })
 
   docRef.update({
-    ratio,
-    time
+    time,
+    ratio: maxRatio < newRatio ?
+      maxRatio
+      :
+      newRatio < minRatio ?
+        minRatio
+        :
+        newRatio
   })
   .then(() => {
     dispatch({
@@ -58,3 +81,39 @@ export const chooseOption = (term, isCorrect) => (dispatch, getState, { getFireb
     })
   })
 }
+
+
+export const changeKnowledge = () => (dispatch, getState, { getFirebase, getFirestore }) => {
+  const firestore = getFirestore();
+  const user = getState().firebase.auth.uid;
+
+  const docRef = firestore.doc(`users/${user}/learn/`);
+
+  docRef.get().then((doc) => {
+    console.log(doc.data());
+  })
+}
+/*
+// 1 - 5 => 100%
+// 2 - 0 => 0%
+// -----------
+//         50%
+
+
+4
+4
+2
+5
+0
+4
+4
+5
+5
+5
+5
+----------
+11*5 = 55 => 100%
+39  => 71%
+
+
+*/

@@ -7,6 +7,14 @@ import ProgressBar from '../ProgressBar';
 
 
 const SetsList = ({ sets, title, margin, isPercentage }) => {
+  const calculatePercentage = (set) => {
+    const knowledge = set.knowledge;
+    const amount = set.amount;
+    const percentage = Math.floor((knowledge * 100) / (amount * 5));
+
+    return percentage
+  }
+
   return(
     <ListWrapper margin={margin}>
       <ListTitle>{ title }</ListTitle>
@@ -21,7 +29,7 @@ const SetsList = ({ sets, title, margin, isPercentage }) => {
                 { isPercentage ?
                   <Progress>
                     <ProgressBar
-                      percentage={set.knowledge}
+                      percentage={calculatePercentage(set)}
                       width='4.6rem'
                       bgColor={colors.blue}
                       progressColor={colors.white}

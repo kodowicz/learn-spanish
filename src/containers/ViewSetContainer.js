@@ -24,7 +24,7 @@ const ViewSetContainer = (props) => {
       setDetails={props.setDetails}
       signedUser={props.signedUser}
       author={props.author}
-      knowledge={props.knowledge}
+      percentage={props.percentage}
       terms={props.terms}
       lastLocation={props.lastLocation}
       isEditSubmited={props.isEditSubmited}
@@ -49,9 +49,11 @@ const mapStateToProps = (state) => {
   const terms = state.firestore.ordered.terms;
   const userProgress = state.firestore.data.userProgress;
   const knowledge = userProgress && userProgress.knowledge;
+  const amount = userProgress && userProgress.amount;
+  const percentage = Math.floor((knowledge * 100) / (amount * 5));
 
   return {
-    knowledge,
+    percentage,
     terms,
     author,
     setDetails,

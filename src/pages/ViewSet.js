@@ -29,7 +29,7 @@ class ViewSet extends Component {
       match,
       setDetails,
       author,
-      knowledge,
+      percentage,
       terms,
       signedUser,
       isOverlayOpen,
@@ -55,8 +55,8 @@ class ViewSet extends Component {
       )
     } else {
       return (
-        <Main width={80} maxWidth={650}>
-          <Description setDetails={setDetails} knowledge={knowledge} />
+        <Main width={80} maxWidth={650} desktop={600}>
+          <Description setDetails={setDetails} percentage={percentage} />
           <Buttons setid={match.params.id} iseditable={iseditable} chooseMethod={chooseMethod} />
           <TermsList terms={terms} />
         </Main>
@@ -65,17 +65,17 @@ class ViewSet extends Component {
   }
 }
 
-const Description = ({ setDetails, knowledge }) => (
+const Description = ({ setDetails, percentage }) => (
   <>
     <DetailsWrapper>
       <SetName>{setDetails.name}</SetName>
         <Info>{setDetails.amount} terms</Info>
         <Border />
         <Info>by {setDetails.author}</Info>
-        { (knowledge !== undefined && knowledge !== null) &&
+        { (percentage !== undefined && percentage !== null) &&
           <Progress>
             <ProgressBar
-              percentage={knowledge}
+              percentage={percentage}
               width='6rem'
               bgColor={colors.progress}
             />
