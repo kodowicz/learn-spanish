@@ -7,6 +7,7 @@ import { createLearnSet } from '../store/actions/learnSetActions';
 import { createPlaySet } from '../store/actions/playSetActions';
 import { removeNewKey } from '../store/actions/createSetActions';
 import { deleteSetChanges } from '../store/actions/editSetActions';
+import { sortTerms } from '../store/actions/setActions';
 import {
   changeLocation,
   changeLastLocation,
@@ -25,6 +26,7 @@ const ViewSetContainer = (props) => {
       signedUser={props.signedUser}
       author={props.author}
       percentage={props.percentage}
+      sortedBy={props.sortedBy}
       terms={props.terms}
       lastLocation={props.lastLocation}
       isEditSubmited={props.isEditSubmited}
@@ -32,6 +34,7 @@ const ViewSetContainer = (props) => {
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
       setCurrentSetId={props.setCurrentSetId}
+      sortTerms={props.sortTerms}
       deleteSetChanges={props.deleteSetChanges}
       removeNewKey={props.removeNewKey}
       chooseMethod={props.chooseMethod}
@@ -43,29 +46,36 @@ const ViewSetContainer = (props) => {
     <></>
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   const setDetails = state.firestore.data.setDetails;
   const author = setDetails ? setDetails.authorId : null;
   const terms = state.firestore.ordered.terms;
   const userProgress = state.firestore.data.userProgress;
   const knowledge = userProgress && userProgress.knowledge;
   const amount = userProgress && userProgress.amount;
-  const percentage = Math.floor((knowledge * 100) / (amount * 5));
+  const percentage = userProgress ? Math.floor((knowledge * 100) / (amount * 5)) : undefined;
 
   return {
     percentage,
     terms,
     author,
     setDetails,
+    sortedBy: state.sortedBy,
     signedUser: state.firebase.auth.uid,
     lastLocation: state.lastLocation,
     isEditSubmited: state.isEditSubmited,
     isOverlayOpen: state.isOverlayOpen.isChosen,
-    isLoaded: isLoaded(                         // doesn't word properly when updating
-      state.firestore.data.terms,
-      state.firestore.data.setDetails,
-      // state.firestore.data.userProgress
-    )
+    isLoaded: userProgress ?
+      isLoaded(
+        terms,
+        setDetails
+      )
+      :
+      isLoaded(
+        terms,
+        setDetails,
+        userProgress
+      )
   }
 }
 
@@ -77,6 +87,7 @@ export default compose(
       changeLocation,
       changeLastLocation,
       setCurrentSetId,
+      sortTerms,
       chooseMethod,
       createLearnSet,
       createPlaySet,
@@ -85,6 +96,8 @@ export default compose(
     }
   ),
   firestoreConnect(props => {
+    const sortedBy = props.sortedBy ? 'term' : 'time';
+
     return props.signedUser ? [
       {
         collection: 'sets',
@@ -96,7 +109,7 @@ export default compose(
         doc: props.match.params.id,
         subcollections: [{ collection: 'terms' }],
         storeAs: 'terms',
-        orderBy: ["time"]
+        orderBy: [sortedBy]
       },
       {
         collection: 'users',

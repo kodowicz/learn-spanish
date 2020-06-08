@@ -7,7 +7,8 @@ import { authReducer } from './authReducer';
 import { overlayReducer } from './overlayReducers';
 import {
   createdSetReducer,
-  setDeletedReducer
+  setDeletedReducer,
+  sortedTermsReducer
 } from './setsReducer';
 import {
   locationReducer,
@@ -15,20 +16,7 @@ import {
   setIdReducer
 } from './locationReducer';
 
-
-const correctAnswer = (state = {}, action) => {
-  switch (action.type) {
-    case 'CHOOSE_BETWEEN_TWO_CORRECT':
-    console.log(action);
-      return { ...action };
-
-    case 'CHOOSE_BETWEEN_TWO_WROMG':
-      return { ...action };
-
-    default:
-      return state;
-  }
-};
+import { gameAnswer } from './playSetReducers';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -36,11 +24,12 @@ const rootReducer = combineReducers({
   newSetKey: createdSetReducer,
   isEditSubmited: setChangesReducer,
   isSetDeleted: setDeletedReducer,
+  sortedBy: sortedTermsReducer,
   terms: shuffleCardReducer,
   isOverlayOpen: overlayReducer,
   location: locationReducer,
   lastLocation: lastLocationReducer,
-  correctAnswer: correctAnswer,
+  gameAnswer: gameAnswer,
   firestore: firestoreReducer,
   firebase: firebaseReducer
 });

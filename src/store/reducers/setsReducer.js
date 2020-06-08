@@ -103,3 +103,13 @@ export const setDeletedReducer = (state = false, action) => {
       return state;
   }
 };
+
+export const sortedTermsReducer = (state = false, action) => {
+  switch (action.type) {
+    case 'SORT_TERMS':
+      return !state;
+
+    default:
+      return state;
+  }
+};

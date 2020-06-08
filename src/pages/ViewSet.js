@@ -30,9 +30,11 @@ class ViewSet extends Component {
       setDetails,
       author,
       percentage,
+      sortedBy,
       terms,
       signedUser,
       isOverlayOpen,
+      sortTerms,
       chooseMethod,
       createLearnSet,
       createPlaySet
@@ -55,10 +57,10 @@ class ViewSet extends Component {
       )
     } else {
       return (
-        <Main width={80} maxWidth={650} desktop={600}>
+        <Main width={76} maxWidth={650} desktop={600}>
           <Description setDetails={setDetails} percentage={percentage} />
           <Buttons setid={match.params.id} iseditable={iseditable} chooseMethod={chooseMethod} />
-          <TermsList terms={terms} />
+          <TermsList terms={terms} sortedBy={sortedBy} sortTerms={sortTerms} />
         </Main>
       )
     }
@@ -72,7 +74,7 @@ const Description = ({ setDetails, percentage }) => (
         <Info>{setDetails.amount} terms</Info>
         <Border />
         <Info>by {setDetails.author}</Info>
-        { (percentage !== undefined && percentage !== null) &&
+        { (percentage !== undefined) &&
           <Progress>
             <ProgressBar
               percentage={percentage}
@@ -105,46 +107,64 @@ const Buttons = ({ setid, iseditable, chooseMethod }) => {
   );
 };
 
-const TermsList = ({ terms }) => (
-  <TermListWrapper>
-    <SubTitle>terms</SubTitle>
-    <List>
-      {terms.map((term, index) => (
-        <ListItem key={ term.id }>
-          <Counter
-            isLessThanTen={((index + 1) < 10) ? true : false}
-          >
-            { index + 1 }
-          </Counter>
-          <SetWrapper>
-            <Term id="term">{ term.term }</Term>
-            <Line />
-            <Term id="definition">{ term.definition }</Term>
-          </SetWrapper>
-        </ListItem>
-      ))}
-    </List>
-  </TermListWrapper>
-);
+const TermsList = ({ terms, sortedBy, sortTerms }) => {
+
+  return (
+    <TermListWrapper>
+      <ListLable>
+        <SubTitle>terms</SubTitle>
+        <SortButton
+          onClick={() => sortTerms()}>
+          <span>
+            {sortedBy ? 'alphabetical' : 'original'}
+          </span>
+          <SortImg src={sort} alt="" />
+        </SortButton>
+      </ListLable>
+      <List>
+        {terms.map((term, index) => (
+          <ListItem key={ term.id }>
+            <Counter
+              isLessThanTen={((index + 1) < 10) ? true : false}
+            >
+              { index + 1 }
+            </Counter>
+            <SetWrapper>
+              <Term id="term">{ term.term }</Term>
+              <Line />
+              <Term id="definition">{ term.definition }</Term>
+            </SetWrapper>
+          </ListItem>
+        ))}
+      </List>
+    </TermListWrapper>
+  )
+};
 
 
 const DetailsWrapper = styled.div`
-  display: grid;
-  grid-template-columns: max-content 15px max-content 1fr 90px;
+  display: inline-grid;
+  grid-template-columns: min-content 15px min-content 20% 90px;
   grid-template-rows: repeat(2, min-content);
-  grid-row-gap: 0.7rem
+  grid-row-gap: 0.7rem;
 `;
 
 const SetName = styled.h1`
   grid-column: span 4;
   font-size: 3.2rem;
   font-weight: ${fonts.bold};
+  max-width: 50vw;
   margin: 0;
+
+  @media (min-width: 768px) {
+    max-width: 35rem
+  }
 `;
 
 const Info = styled.span`
   color: ${colors.azure};
   grid-row: 2 / 3;
+  white-space: nowrap;
 `;
 
 const Border = styled.div`
@@ -184,11 +204,36 @@ const TermListWrapper = styled.div`
   }
 `;
 
+const ListLable = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+`;
+
 const SubTitle = styled.h2`
   color: ${colors.white};
   font-size: 1.6rem;
-  margin-bottom: 0.8rem;
+  margin: 0
 `;
+
+const SortButton = styled.button`
+  color: ${colors.white};
+  font-size: 1.4rem;
+  font-family: ${fonts.family};
+  background: none;
+  height: min-content;
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+`;
+
+const SortImg = styled.img`
+  width: 2rem;
+  height: 2rem;
+  padding-left: 3px
+`
 
 const List = styled.ul`
   margin: 0 0 40px 0;
