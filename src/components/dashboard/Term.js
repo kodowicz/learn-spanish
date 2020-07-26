@@ -1,28 +1,34 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
-import { BlockElement, colors, fonts } from '../../assets/styles/GlobalStyles';
+import { colors, fonts } from '../../assets/styles/GlobalStyles';
 import remove from '../../assets/images/remove.svg';
 
 
 class Term extends Component {
-  state = {
-    term: "",
-    definition: "",
-    id: null,
-    firstTouch: null,
-    lastTouch: null,
-    currentTouch: null,
-    isDeleted: false,
-    isMoved: 0,
-    termFocused: false,
-    definitionFocused: false,
-    termLabelVisible: false,
-    definitionLabelVisible: false,
-    termRows: 1,
-    definitionRows: 1,
-    minRows: 1,
-    lineHeight: 18
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      term: "",
+      definition: "",
+      id: undefined,
+      firstTouch: undefined,
+      lastTouch: undefined,
+      currentTouch: undefined,
+      isBlockFocused: false,
+      termFocused: false,
+      definitionFocused: false,
+      termLabelVisible: false,
+      definitionLabelVisible: false,
+      translation: 0,
+      termRows: 1,
+      definitionRows: 1,
+      minRows: 1,
+      lineHeight: 18
+    }
+
+    this.buttonRef = React.createRef()
   }
 
   componentDidMount () {
@@ -39,19 +45,29 @@ class Term extends Component {
     })
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.isVisible !== this.props.isVisible) {
+      this.setState({
+        translation: 0
+      })
+    }
+  }
+
   handleFocus = event => {
+    const id = event.target.id;
     this.setState({
-      [`${event.target.id}Focused`]: true,
-      [`${event.target.id}LabelVisible`]: true
+      [`${id}Focused`]: true,
+      [`${id}LabelVisible`]: true
     })
   }
 
   handleBlur = event => {
     const hasValue = event.target.value ? true : false;
+    const id = event.target.id;
 
     this.setState({
-      [`${event.target.id}Focused`]: false,
-      [`${event.target.id}LabelVisible`]: hasValue
+      [`${id}Focused`]: false,
+      [`${id}LabelVisible`]: hasValue
     })
   }
 
@@ -79,47 +95,56 @@ class Term extends Component {
     this.setState(() => ({
       currentTouch
     }), () => {
-      let isDeleted = null;
-      let isMoved = 0;
+      let translation = 0;
 
-      isMoved = -(this.state.firstTouch - this.state.currentTouch);
+      translation = -(this.state.firstTouch - this.state.currentTouch);
 
       if (this.state.lastTouch > this.state.currentTouch) {
-        isDeleted = true;
-        if (isMoved <= -80) {
-          isMoved = -80
-        } else if (isMoved > 0) {
-          isMoved = 0
+        this.props.onMove(true, this.props.element);
+
+        if (translation <= -80) {
+          translation = -80
+        } else if (translation > 0) {
+          translation = 0
         }
 
       } else if (this.state.lastTouch < this.state.currentTouch) {
-        isDeleted = false;
-        if (isMoved >= 0) {
-          isMoved = 0
-          // TODO: moving back too fast
-        } else if (isMoved < -80) {
-          isMoved = -80
+        if (translation >= 0) {
+          translation = 0
+        } else if (translation < -80) {
+          translation = -80
         }
       }
 
       this.setState({
-        isDeleted,
-        isMoved,
+        translation,
         lastTouch: currentTouch
       })
     })
   }
 
   handleTouchEnd = event => {
-    if (this.state.isMoved < -40) {
+    if (this.state.translation < -40) {
       this.setState({
-        isMoved: -80
+        translation: -80
       })
     } else {
+      this.props.onMove(false, this.props.element);
       this.setState({
-        isMoved: 0
+        translation: 0
       })
     }
+  }
+
+  handleBlockFocus = (event) => {
+    const buttonRef = this.buttonRef;
+    let isBlockFocused = true;
+
+    if (event.type === 'blur' && event.relatedTarget !== buttonRef) {
+      isBlockFocused = false
+    }
+
+    this.setState({ isBlockFocused });
   }
 
   removeElement = event => {
@@ -145,7 +170,10 @@ class Term extends Component {
     const {
       term,
       definition,
-      isMoved,
+      termRows,
+      definitionRows,
+      translation,
+      isBlockFocused,
       termFocused,
       definitionFocused,
       termLabelVisible,
@@ -153,9 +181,9 @@ class Term extends Component {
     } = this.state;
 
     return (
-      <Wrapper>
+      <Wrapper onBlur={this.handleBlockFocus} onFocus={this.handleBlockFocus}>
         <TermWrapper
-          isMoved={isMoved}
+          translation={translation}
           onTouchStart={this.handleTouchStart}
           onTouchMove={this.handleTouchMove}
           onTouchEnd={this.handleTouchEnd}
@@ -165,7 +193,7 @@ class Term extends Component {
               id="term"
               lang="es"
               value={term}
-              rows={this.state.termRows}
+              rows={termRows}
               onChange={this.handleChange}
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
@@ -182,7 +210,7 @@ class Term extends Component {
             <Textarea
               id="definition"
               value={definition}
-              rows={this.state.definitionRows}
+              rows={definitionRows}
               onChange={this.handleChange}
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
@@ -197,7 +225,9 @@ class Term extends Component {
           </DefineTerm>
         </TermWrapper>
         <DeleteButton
-          isMoved={isMoved}
+          ref={this.buttonRef}
+          isVisible={translation < -55 ? true : false}
+          isFocused={isBlockFocused}
           onClick={this.removeElement}
         >
           <img src={remove} alt="remove" />
@@ -211,10 +241,18 @@ class Term extends Component {
 const Wrapper = styled.div`
   display: grid;
   grid-template: 1fr / 1fr 80px;
+
+  @media (min-width: 768px) {
+    grid-template: 1fr / 10% 80% 10%;
+    border-radius: 15px;
+    background: ${colors.bluish};
+  }
 `;
 
-const TermWrapper = styled(BlockElement)`
-  transform: ${props => `translateX(${props.isMoved}px)`};
+const TermWrapper = styled.div`
+  transform: ${props => `translateX(${props.translation}px)`};
+  background: ${colors.bluish};
+  border-radius: 15px;
   height: auto;
   padding: 2.2rem 0;
   display: grid;
@@ -225,6 +263,12 @@ const TermWrapper = styled(BlockElement)`
   grid-column: 1 / 3;
   grid-row: 1 / 2;
   transition: transform 0.1s ease-out;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 100%;
+    grid-column: 2 / 3;
+    background: none
+  }
 `;
 
 const DefineTerm = styled.div`
@@ -243,38 +287,19 @@ const Label = styled.label`
   z-index: -1;
 `;
 
-
 const Textarea = styled.textarea`
   font-family: ${fonts.family};
   font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
   color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
   background: none;
-  line-height: 1.8rem;
+  line-height: 18px;
   border: none;
   width: 100%;
-  border: none;
   outline: none;
   overflow: auto;
   height: auto;
   resize: none
 `;
-// const Textarea = styled.textarea`
-//   font-family: ${fonts.family};
-//   font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
-//   color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
-//   background: ${colors.blue};
-//   border: none;
-//   box-sizing: border-box;
-//   font-size: 1.4rem;
-//   width: 100%;
-//   border: none;
-//   outline: none;
-//
-//   overflow: auto;
-//   height: auto;
-//
-//   resize: none;
-// `;
 
 const Border = styled.div`
   background: ${props => props.focused && `${colors.white}`};
@@ -283,16 +308,29 @@ const Border = styled.div`
   position: absolute;
   bottom: -2px;
   left: 0;
-
 `;
 
 const DeleteButton = styled.button`
-  display: ${ props => props.isMoved ? 'block' : 'none' };
+  display: ${ props => props.isVisible ? 'block' : 'none' };
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   background: none;
   border: none;
   padding: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-self: center;
+
+  @media (min-width: 768px) {
+    grid-column: 3 / 4;
+    display: block;
+    opacity: ${ props => props.isFocused ? 1 : 0 };
+
+    img {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
 `;
 
 

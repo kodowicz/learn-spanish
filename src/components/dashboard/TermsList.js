@@ -6,10 +6,22 @@ import { colors, fonts } from '../../assets/styles/GlobalStyles';
 
 
 class TermsList extends Component {
+  state = {
+    isMoved: false,
+    movedElement: null
+  }
+
   componentDidMount () {
     if (this.props.terms.length < 2 && this.props.basicTwoTerms) {
       this.props.basicTwoTerms(2);
     }
+  }
+
+  onElementMove = (isMoved, element) => {
+    this.setState({
+      isMoved: isMoved,
+      movedElement: element
+    })
   }
 
   render() {
@@ -17,22 +29,30 @@ class TermsList extends Component {
 
     return (
       <>
-        {terms.map((term, index) => (
+        {terms.map((term, index) => {
+          let isVisible = (this.state.movedElement === index && this.state.isMoved) ? false : true;
+
+          return (
           <ListItem key={term.id}>
             <Counter
+              isVisible={isVisible}
               isLessThanTen={((index + 1) < 10) ? true : false}
             >
               {index + 1}
             </Counter>
             <SetWrapper>
               <Term
+                isVisible={isVisible}
+                element={index}
                 termDetails={term}
                 updateTerm={updateTerm}
                 removeTerm={removeTerm}
+                onMove={this.onElementMove}
               />
             </SetWrapper>
           </ListItem>
-        ))}
+        )
+      })}
       </>
     );
   }
@@ -52,15 +72,10 @@ const SetWrapper = styled.div`
   grid-template-rows: repeat(2, min-content);
   grid-row-gap: 2px;
   align-content: center;
-
-  @media (min-width: 768px) {
-    padding: 20px 0;
-    grid-template-columns: 1fr 1px 1fr;
-    grid-template-rows: 1fr
-  }
 `;
 
 const Counter = styled.span`
+  opacity: ${props => props.isVisible ? 1 : 0 };
   left: ${props => props.isLessThanTen ? '-8vw' : '-10vw' };
   color: ${colors.azure};
   font-weight: ${fonts.bold};
@@ -68,6 +83,7 @@ const Counter = styled.span`
   top: 50%;
   font-size: 2.5rem;
   transform: translateY(-50%);
+  user-select: none;
 
   @media (min-width: 768px) {
     left: -50px

@@ -14,6 +14,7 @@ class EditSet extends Component {
   }
 
   componentDidMount() {
+    this.props.setCurrentSetId(this.props.setid);
     this.props.changeLocation('edit');
     this.props.changeLastLocation("/");
     this.setState({
@@ -22,8 +23,8 @@ class EditSet extends Component {
   }
 
   componentWillMount() {
-    this.props.setCurrentSetId(this.props.setid);
-    this.props.createEditSet();
+    // this.props.setCurrentSetId(this.props.setid);
+    // this.props.createEditSet();
   }
 
   componentDidUpdate(prevProps) {
@@ -50,9 +51,9 @@ class EditSet extends Component {
     const { setName } = this.state;
     const isFilled = setName ? true : false;
     const {
-      terms,
       uid,
       setid,
+      terms,
       isEditSubmited,
       isSetDeleted,
       isOverlayOpen,
@@ -80,12 +81,12 @@ class EditSet extends Component {
       )
     } else {
       return (
-        <Main width={80} maxWidth={450}>
+        <Main width={80} maxWidth={450} desktop={500}>
           <Form>
             <SetName>
               <NameInput
                 value={setName}
-                maxLength="40"
+                maxLength="30"
                 onChange={this.setName}
               />
               <NameLabel
@@ -199,7 +200,7 @@ const NameLabel = styled.label`
   position: absolute;
   bottom: 2px;
   left: 2px;
-  font-size: 20px;
+  font-size: 2rem;
   color: ${colors.azure};
   transition: opacity 0.1s;
   z-index: -1;
@@ -207,6 +208,10 @@ const NameLabel = styled.label`
   ${props => props.isFilled && css `
     opacity: 0;
   `}
+
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const NameInput = styled(BasicInput)`
@@ -218,6 +223,10 @@ const NameInput = styled(BasicInput)`
 
   &:focus + ${NameLabel} {
     opacity: 0;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
   }
 `;
 
@@ -249,7 +258,7 @@ const TermsListWrapper = styled.div`
   margin: 0 auto;
 
   @media (min-width: 786px) {
-    margin: 0 40px
+    width: 100%
   }
 `;
 
