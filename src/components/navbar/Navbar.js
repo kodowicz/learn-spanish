@@ -1,15 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Menu from './Menu';
+import Navigation from './Navigation';
 
 import styled from 'styled-components';
-import menu from '../../assets/images/menu.svg';
-import back from '../../assets/images/back.svg';
-
+import { colors } from '../../assets/styles/GlobalStyles';
 
 const Navbar = ({
   uid,
+  isMobile,
+  isOpen,
   location,
   goBack,
+  handleMenu,
   cancelSesion,
   chooseMethod,
   askForDeleting,
@@ -17,60 +19,32 @@ const Navbar = ({
   closeChangePassword
 }) => {
 
-  const handleBackButton = () => {
-    if (location === 'learn') {
-      cancelSesion(true);
-
-    } else if (location === 'profile') {
-      closeChangePassword(false);
-      goBack();
-
-    } else if (location === 'set') {
-      chooseMethod(false);
-      goBack();
-
-    } else if (location === 'create') {
-      askForDeleting(false);
-      goBack();
-
-    } else if (location === 'edit') {
-      deleteSetChanges();
-      askForDeleting(false);
-      goBack();
-
-    } else {
-      goBack()
-    }
-  }
-
-  const handleMenuButton = () => {
-    chooseMethod(false);
-    askForDeleting(false)
-  }
-
   return (
     <>
       { location &&
-        <Nav>
+        <Nav isOpen={isMobile ? isOpen : false}>
 
-          <BackButton
-            tabIndex='2'
-            visible={location === 'home' ? 0 : 1}
-            onClick={handleBackButton}
-          >
-            <img src={back} alt='go back' />
-          </BackButton>
+          <Navigation
+            isMobile={isMobile}
+            isOpen={isOpen}
+            location={location}
+            goBack={goBack}
+            handleMenu={handleMenu}
+            cancelSesion={cancelSesion}
+            chooseMethod={chooseMethod}
+            askForDeleting={askForDeleting}
+            deleteSetChanges={deleteSetChanges}
+            closeChangePassword={closeChangePassword}
+          />
 
-          <Title>{ location }</Title>
-
-          <Button
-            tabIndex='2'
-            visible={true.toString()}
-            onClick={handleMenuButton}
-            to={`/profile/${uid}`}
-          >
-            <img src={menu} alt='menu' />
-          </Button>
+          { isOpen &&
+            <Menu
+              uid={uid}
+              handleMenu={handleMenu}
+              chooseMethod={chooseMethod}
+              askForDeleting={askForDeleting}
+            />
+          }
 
         </Nav>
       }
@@ -80,42 +54,20 @@ const Navbar = ({
 
 
 const Nav = styled.nav`
+  height: ${({ isOpen }) => isOpen ? '100vh' : '6rem'};
+  background: ${({ isOpen }) => isOpen && colors.navy };
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  box-sizing: border-box;
-  height: 60px;
-  padding: 0 7vw;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 2;
-`;
+  z-index: 4;
 
-const BackButton = styled.button`
-  width: 24px;
-  height: 24px;
-  background: none;
-  border: none;
-  padding: 0;
-  visibility: ${props =>
-    props.visible ? "visible" : "hidden"
+  @media (min-width: 768px) {
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-`;
-
-const Button = styled(Link)`
-  width: 24px;
-  height: 24px;
-  text-decoration: none;
-  visibility: ${(props) => props.visible ? "visible" : "hidden" }
-`;
-
-const Title = styled.p`
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 18px;
-  margin: 0
 `;
 
 export default Navbar;

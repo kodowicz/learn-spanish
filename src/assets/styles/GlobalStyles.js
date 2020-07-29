@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 export const colors = {
   white: "#FFFFFF",
-  navy: "#21066F",
+  navy: "#30066f",
   blue: "#6F40FC",
   bluish: "rgba(247, 244, 255, 20)",
   shadow: "rgba(66, 49, 119, 0.5)",
