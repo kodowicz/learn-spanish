@@ -23,12 +23,15 @@ const Menu = ({
     <Wrapper>
       <LinkAnchor
         onClick={handleMenuButton}
+<<<<<<< HEAD
         to="/">
         home
       </LinkAnchor>
 
       <LinkAnchor
         onClick={handleMenuButton}
+=======
+>>>>>>> 5809b27ae5f778d3a401fd0ecf3e5c0dee092ab4
         to="/search/">
         search
       </LinkAnchor>
