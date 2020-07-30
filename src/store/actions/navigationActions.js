@@ -1,16 +1,21 @@
+export const handleMenu = (isOpen) => ({
+  type: 'OPEN_MENU',
+  payload: isOpen
+});
+
 export const changeLocation = location => ({
   type: 'CHANGE_LOCATION',
-  location
+  payload: location
 });
 
 export const changeLastLocation = location => ({
   type: 'LAST_LOCATION',
-  location
+  payload: location
 });
 
 export const setCurrentSetId = id => ({
   type: 'CURRENT_SET_ID',
-  id
+  payload: id
 });
 
 
