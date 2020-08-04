@@ -3,7 +3,7 @@ import Menu from './Menu';
 import Navigation from './Navigation';
 
 import styled from 'styled-components';
-import { colors } from '../../assets/styles/GlobalStyles';
+import Background from '../Background';
 
 const Navbar = ({
   uid,
@@ -19,10 +19,17 @@ const Navbar = ({
   closeChangePassword
 }) => {
 
+  const isVisible = isMobile ? isOpen : false;
+
   return (
     <>
       { location &&
-        <Nav isOpen={isMobile ? isOpen : false}>
+        <Nav isVisible={isVisible}>
+          { isVisible &&
+            <BackgroundWrapper>
+              <Background />
+            </BackgroundWrapper>
+          }
 
           <Navigation
             isMobile={isMobile}
@@ -54,8 +61,7 @@ const Navbar = ({
 
 
 const Nav = styled.nav`
-  height: ${({ isOpen }) => isOpen ? '100vh' : '6rem'};
-  background: ${({ isOpen }) => isOpen && colors.navy };
+  height: ${({ isVisible }) => isVisible ? '100vh' : '6rem'};
   position: fixed;
   top: 0;
   left: 0;
@@ -69,5 +75,14 @@ const Nav = styled.nav`
     align-items: center;
   }
 `;
+
+const BackgroundWrapper = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: rgba(16, 6, 54, 0.6)
+`
 
 export default Navbar;

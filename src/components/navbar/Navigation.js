@@ -82,6 +82,7 @@ const Navigation = ({
 
 
 const Nav = styled.div`
+  position: relative;
   height: 6rem;
   padding: 0 7vw;
   display: flex;

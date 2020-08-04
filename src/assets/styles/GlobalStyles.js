@@ -38,7 +38,6 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     font-size: 1.6rem;
     font-weight: ${fonts.semiBold};
-    height: 100vh;
     overflow-x: hidden;
   }
 
@@ -56,10 +55,6 @@ export const GlobalStyle = createGlobalStyle`
   *::-moz-selection {
     background: ${colors.white};
     color: ${colors.blue}
-  }
-
-  #root {
-    height: 100%
   }
 `
 

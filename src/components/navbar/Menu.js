@@ -50,6 +50,7 @@ const Menu = ({
 
 
 const Wrapper = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
