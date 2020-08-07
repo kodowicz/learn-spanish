@@ -1,12 +1,20 @@
 const initState = ""
 
-export const gameAnswer = (state = initState, action) => {
+export const gameAnswerReducer = (state = initState, action) => {
   switch (action.type) {
     case 'CHOOSE_OPTION':
-      return action.payload;
+      return {
+        ...state,
+        answer: action.answer,
+        item: action.item
+      };
 
     case 'CLEAR_ANSWER':
-      return action.payload
+      return {
+        ...state,
+        answer: '',
+        item: {}
+      }
 
     default:
       return state;

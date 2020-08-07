@@ -28,7 +28,7 @@ export const navigationReducer = (state = initState, action) => {
     case 'CURRENT_SET_ID':
       return {
         ...state,
-        lastLocation: action.payload
+        setid: action.payload
       };
 
     default:

@@ -8,7 +8,7 @@ import {
   changeLocation,
   changeLastLocation,
   setCurrentSetId
-} from '../store/actions/locationActions';
+} from '../store/actions/navigationActions';
 import {
   createPlaySet,
   clearGameAnswer,
@@ -19,12 +19,12 @@ import PlaySet from '../pages/PlaySet';
 
 
 const PlaySetContainer = (props) => {
-
-  return (props.isLoaded && props.terms.length !== 0) ?
+  return props.isLoaded ?
     <PlaySet
       setid={props.setid}
       terms={props.terms}
       answer={props.answer}
+      correctItem={props.correctItem}
       isOverlayOpen={props.isOverlayOpen}
       // createPlaySet={props.createPlaySet}
       changeLocation={props.changeLocation}
@@ -33,24 +33,28 @@ const PlaySetContainer = (props) => {
       cancelSesion={props.cancelSesion}
       clearGameAnswer={props.clearGameAnswer}
       chooseOption={props.chooseOption}
+      changeKnowledge={props.changeKnowledge}
     />
-    :
+  :
     <></>
 };
 
 
 const mapStateToProps = (state, ownProps) => {
-  const terms = state.firestore.ordered.learnTerms;
+  const ordered = state.firestore.ordered;
+  const terms = ordered.playTerms;
+  const details = ordered.playDetails && ordered.playDetails[0];
 
   return {
     terms,
+    isLoaded: isLoaded(terms, details),
     setid: ownProps.match.params.id,
     uid: state.firebase.auth.uid,
-    answer: state.gameAnswer,
-    location: state.location,
-    lastLocation: state.lastLocation,
-    isOverlayOpen: state.isOverlayOpen.isCancelled,
-    isLoaded: isLoaded(terms)
+    answer: state.gameAnswer.answer,
+    correctItem: state.gameAnswer.item,
+    location: state.navigation.location,
+    lastLocation: state.navigation.lastLocation,
+    isOverlayOpen: state.isOverlayOpen.isCancelled
   }
 }
 
@@ -69,16 +73,29 @@ export default compose(
   ),
   firestoreConnect(props => {
     return props.uid ?
-      [{
-        collection: 'users',
-        doc: props.uid,
-        subcollections: [{
-          collection: 'learn',
-          doc: props.match.params.id,
-          subcollections: [{ collection: 'game' }]
-        }],
-        storeAs: 'learnTerms'
-      }]
+      [
+        {
+          collection: 'users',
+          doc: props.uid,
+          subcollections: [{
+            collection: 'learn',
+            doc: props.match.params.id,
+            subcollections: [{ collection: 'game' }]
+          }],
+          storeAs: 'playTerms'
+        },
+        {
+          collection: 'users',
+          doc: props.uid,
+          subcollections: [
+            {
+              collection: 'learn',
+              doc: props.match.params.id
+            }
+          ],
+          storeAs: 'playDetails'
+        }
+      ]
       :
       []
   })

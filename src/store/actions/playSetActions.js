@@ -1,49 +1,68 @@
 export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
-  const user = getState().firebase.auth.uid;
+  const uid = getState().firebase.auth.uid;
 
-  const setRef = firestore.collection(`sets/${setid}/terms`);
-  const playSetRef = firestore.collection(`users/${user}/learn/${setid}/game`);
+  const setRef = firestore.doc(`sets/${setid}`);
+  const setTermsRef = firestore.collection(`sets/${setid}/terms`);
+  const learnDetailsRef = firestore.doc(`users/${uid}/learn/${setid}`);
 
-  playSetRef.get().then(snap => {
+  learnDetailsRef.get().then(snap => {
     if (!snap.size) {
-      setRef.get().then(snapshot => {
 
-        snapshot.forEach(doc => {
-          const { term, definition, time } = doc.data();
-          const termRef = playSetRef.doc();
-          const id = termRef.id;
-          const ratio = 0;
+      setRef.get().then(doc => {
+        const { amount, name } = doc.data();
 
-          termRef.set({
+        learnDetailsRef.set({
+          name,
+          amount,
+          knowledge: 0,
+          id: learnDetailsRef.id,
+        })
+      })
+
+      setTermsRef.get().then(snap => {
+        snap.docs.forEach(doc => {
+          const {id, term, definition, time } = doc.data();
+
+          const playSetRef = firestore.doc(`users/${uid}/learn/${setid}/game/${id}`);
+
+          playSetRef.set({
             id,
             term,
             definition,
             time,
-            ratio
+            ratio: 0
           })
         })
       })
     }
+  }).then(() => {
+    dispatch({
+      type: 'CREATE_PLAY_SET'
+    })
+  }).catch(error => {
+    dispatch({
+      type: 'CREATE_PLAY_SET_ERROR',
+      error
+    })
   })
 }
 
 export const clearGameAnswer = () => ({
-  type: 'CLEAR_ANSWER',
-  payload: ''
+  type: 'CLEAR_ANSWER'
 });
 
-export const chooseOption = (term, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const chooseOption = (item, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
-  const set = getState().setid;
+  const set = getState().navigation.setid;
   const time = new Date();
-  const newRatio = isCorrect ? term.ratio + 1 : term.ratio - 1;
+  const newRatio = isCorrect ? item.ratio + 1 : item.ratio - 1;
   const minRatio = 0;
   const maxRatio = 5;
   let knowledge;
 
-  const docRef = firestore.doc(`users/${user}/learn/${set}/game/${term.id}`);
+  const docRef = firestore.doc(`users/${user}/learn/${set}/game/${item.id}`);
   const knowledgeRef = firestore.doc(`users/${user}/learn/${set}`);
 
   // cloud functions
@@ -72,7 +91,8 @@ export const chooseOption = (term, isCorrect) => (dispatch, getState, { getFireb
   .then(() => {
     dispatch({
       type: 'CHOOSE_OPTION',
-      payload: isCorrect ? 'correct' : 'wrong'
+      answer: isCorrect ? 'correct' : 'wrong',
+      item
     })
   }).catch(error => {
     dispatch({
@@ -81,39 +101,3 @@ export const chooseOption = (term, isCorrect) => (dispatch, getState, { getFireb
     })
   })
 }
-
-
-export const changeKnowledge = () => (dispatch, getState, { getFirebase, getFirestore }) => {
-  const firestore = getFirestore();
-  const user = getState().firebase.auth.uid;
-
-  const docRef = firestore.doc(`users/${user}/learn/`);
-
-  docRef.get().then((doc) => {
-    console.log(doc.data());
-  })
-}
-/*
-// 1 - 5 => 100%
-// 2 - 0 => 0%
-// -----------
-//         50%
-
-
-4
-4
-2
-5
-0
-4
-4
-5
-5
-5
-5
-----------
-11*5 = 55 => 100%
-39  => 71%
-
-
-*/
