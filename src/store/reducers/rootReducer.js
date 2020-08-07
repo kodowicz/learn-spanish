@@ -7,6 +7,7 @@ import { gameAnswerReducer } from './playSetReducers';
 import { authReducer } from './authReducer';
 import { overlayReducer } from './overlayReducers';
 import { navigationReducer } from './navigationReducer';
+import { searchReducer } from './searchReducer';
 import {
   createdSetReducer,
   setDeletedReducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   terms: shuffleCardReducer,
   isOverlayOpen: overlayReducer,
   navigation: navigationReducer,
+  search: searchReducer,
   gameAnswer: gameAnswerReducer,
   firestore: firestoreReducer,
   firebase: firebaseReducer
