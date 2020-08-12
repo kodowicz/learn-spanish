@@ -12,6 +12,7 @@ class ViewProfile extends Component {
   componentDidMount() {
     this.props.changeLocation('profile');
     this.props.changeLastLocation("");
+    window.scrollTo(0, 0);
   }
 
   handleClick = () => {

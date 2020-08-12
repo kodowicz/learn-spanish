@@ -1,6 +1,7 @@
 import React from 'react';
 import Menu from './Menu';
 import Navigation from './Navigation';
+import HomeNavigator from './HomeNavigator';
 
 import styled from 'styled-components';
 import Background from '../Background';
@@ -53,6 +54,9 @@ const Navbar = ({
             />
           }
 
+          { !isOpen &&
+            <HomeNavigator />
+          }
         </Nav>
       }
     </>

@@ -17,6 +17,8 @@ class EditSet extends Component {
     this.props.setCurrentSetId(this.props.setid);
     this.props.changeLocation('edit');
     this.props.changeLastLocation("/");
+    window.scrollTo(0, 0);
+    
     this.setState({
       setName: this.props.setName
     })

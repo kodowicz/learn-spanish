@@ -17,11 +17,9 @@ class ViewSet extends Component {
     this.props.changeLastLocation("/");
     this.props.removeNewKey();
     this.props.enableEditSet();
-    this.props.deleteSetChanges()  // if user changes location by searchbar
-  }
-
-  componentWillMount() {
     this.props.setCurrentSetId(this.props.match.params.id);
+
+    window.scrollTo(0, 0)
   }
 
   render() {

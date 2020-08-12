@@ -15,7 +15,7 @@ class CreateSet extends Component {
   componentDidMount() {
     this.props.changeLocation('create');
     this.props.changeLastLocation("/");
-
+    window.scrollTo(0, 0);
   }
 
   componentWillMount() {

@@ -9,6 +9,7 @@ class HomePage extends Component {
     this.props.changeLocation('home');
     this.props.changeLastLocation("/");
     this.props.enableEditSet();
+    window.scrollTo(0, 0)
   }
 
   render() {
