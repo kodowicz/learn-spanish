@@ -15,7 +15,6 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
         learnDetailsRef.set({
           name,
           amount,
-          knowledge: 0,
           id: learnDetailsRef.id,
         })
       })
@@ -48,11 +47,13 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
   })
 }
 
-export const clearGameAnswer = () => ({
-  type: 'CLEAR_ANSWER'
+export const showGameAnswer = (item, answer) => ({
+  type: 'SHOW_ANSWER',
+  item,
+  answer
 });
 
-export const chooseOption = (item, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
@@ -67,10 +68,17 @@ export const chooseOption = (item, isCorrect) => (dispatch, getState, { getFireb
 
   // cloud functions
   knowledgeRef.get().then(doc => {
-    if (newRatio >= minRatio && newRatio <= maxRatio) {
-      knowledge = doc.data().knowledge + (isCorrect ? 1 : -1);
+    const { knowledge: prevKnowledge } = doc.data();
+
+    if (prevKnowledge) {
+      if (newRatio >= minRatio && newRatio <= maxRatio) {
+        knowledge = prevKnowledge + (isCorrect ? 1 : -1);
+      } else {
+        knowledge = prevKnowledge;
+      }
+
     } else {
-      knowledge = doc.data().knowledge;
+      knowledge = isCorrect ? 1 : 0
     }
 
     knowledgeRef.update({
@@ -90,14 +98,7 @@ export const chooseOption = (item, isCorrect) => (dispatch, getState, { getFireb
   })
   .then(() => {
     dispatch({
-      type: 'CHOOSE_OPTION',
-      answer: isCorrect ? 'correct' : 'wrong',
-      item
-    })
-  }).catch(error => {
-    dispatch({
-      type: 'CHOOSE_OPTION_ERROR',
-      error
+      type: 'CLEAR_ANSWER'
     })
   })
 }

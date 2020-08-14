@@ -49,15 +49,15 @@ class SelectFalseOrTrue extends Component {
       this.setState({
         isFinished: true
       }, () => {
-        const { item, chooseOption } = this.props;
+        const { item, showGameAnswer } = this.props;
         const { answer, comparisonItem } = this.state;
         const correctAnswer = item.id === comparisonItem.id;
         const userAnswer = answer === 'correct' ? true : false;
 
         if (userAnswer === correctAnswer) {
-          chooseOption(item, true);
+          showGameAnswer(item, 'correct');
         } else {
-          chooseOption(item, false);
+          showGameAnswer(item, 'wrong');
         }
       })
     }
@@ -162,6 +162,7 @@ const Term = styled.p`
 `;
 
 const Definition = styled.p`
+  color: ${colors.lightGray};
   font-size: 2.2rem;
   margin: 0;
   text-align: center;

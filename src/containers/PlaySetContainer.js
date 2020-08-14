@@ -11,8 +11,8 @@ import {
 } from '../store/actions/navigationActions';
 import {
   createPlaySet,
-  clearGameAnswer,
-  chooseOption
+  showGameAnswer,
+  cleanGameAnswer
 } from '../store/actions/playSetActions';
 
 import PlaySet from '../pages/PlaySet';
@@ -26,13 +26,12 @@ const PlaySetContainer = (props) => {
       answer={props.answer}
       correctItem={props.correctItem}
       isOverlayOpen={props.isOverlayOpen}
-      // createPlaySet={props.createPlaySet}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
       setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
-      clearGameAnswer={props.clearGameAnswer}
-      chooseOption={props.chooseOption}
+      showGameAnswer={props.showGameAnswer}
+      cleanGameAnswer={props.cleanGameAnswer}
       changeKnowledge={props.changeKnowledge}
     />
   :
@@ -41,13 +40,13 @@ const PlaySetContainer = (props) => {
 
 
 const mapStateToProps = (state, ownProps) => {
-  const ordered = state.firestore.ordered;
-  const terms = ordered.playTerms;
-  const details = ordered.playDetails && ordered.playDetails[0];
+  const terms = state.firestore.ordered.playTerms;
+  const details = state.firestore.ordered.playDetails;
+  const isFullyFetched = (terms?.length == details?.[0]?.amount);
 
   return {
     terms,
-    isLoaded: isLoaded(terms, details),
+    isLoaded: isLoaded(terms, details) && (terms?.length == details?.[0]?.amount),
     setid: ownProps.match.params.id,
     uid: state.firebase.auth.uid,
     answer: state.gameAnswer.answer,
@@ -67,8 +66,8 @@ export default compose(
       changeLastLocation,
       setCurrentSetId,
       cancelSesion,
-      clearGameAnswer,
-      chooseOption
+      showGameAnswer,
+      cleanGameAnswer
     }
   ),
   firestoreConnect(props => {

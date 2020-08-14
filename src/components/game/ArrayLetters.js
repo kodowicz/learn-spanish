@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
-
+import { colors } from '../../assets/styles/GlobalStyles';
 
 class ArrayLetters extends Component {
   state = {
@@ -169,11 +169,11 @@ class ArrayLetters extends Component {
       }
 
     }, () => {
-      const { item, counter } = this.state;
-      const { chooseOption } = this.props;
+      const { counter } = this.state;
+      const { item, showGameAnswer } = this.props;
 
       if (counter === 3) {
-        chooseOption(item, false)
+        showGameAnswer(item, 'wrong');
       }
     })
   }
@@ -190,11 +190,11 @@ class ArrayLetters extends Component {
       }
 
     }, () => {
-      const { item, chooseOption } = this.props;
+      const { item, showGameAnswer } = this.props;
       const { isFinished } = this.state;
 
       if (isFinished) {
-        chooseOption(item, true);
+        showGameAnswer(item, 'correct');
       }
     })
   }
@@ -205,9 +205,7 @@ class ArrayLetters extends Component {
       letters.forEach(element => element.isWrong = false);
       letters.forEach(element => element.isScaled = false);
 
-      return {
-        letters
-      }
+      return { letters }
     })
   }
 
@@ -335,12 +333,12 @@ const GameWrapper = styled.div`
 `;
 
 const Term = styled.p`
+  animation: ${popIn} .3s linear 0.4s forwards;
   font-size: 3rem;
   margin: 0;
   margin-bottom: 1.5rem;
   text-align: center;
   opacity: 0;
-  animation: ${popIn} .3s linear 0.4s forwards;
 
   @media (min-width: 768px) {
     font-size: 4rem
@@ -348,18 +346,17 @@ const Term = styled.p`
 `;
 
 const AnswerWrapper = styled.div`
+  color: ${colors.lightGray};
   height: auto;
   width: max-content;
   margin: 10rem auto 5rem auto;
 
   @media (min-width: 768px) {
-    margin: 7rem auto 5rem auto;
+    margin: 7rem auto 8rem auto;
   }
 `;
 
 const AnswerLetter = styled.span`
-  font-size: 2.4rem;
-  display: inline-block;
   width: ${({ letter }) => letter === " " && "1rem"};
 
   ${({ isBlock }) => isBlock && css`
@@ -372,18 +369,21 @@ const AnswerLetter = styled.span`
     width: 1rem;
     margin: 0 0.2rem;
     border-bottom: 1px solid white;
-  `}
+  `};
 
   ${({ isFaded }) => isFaded && css`
-    animation: ${fadeUp} .3s linear
-  `}
+    animation: ${fadeUp} 0.3s linear
+  `};
+
+  font-size: 2.4rem;
+  display: inline-block;
 
   @media (min-width: 768px) {
-    font-size: 2.8rem;
+    font-size: 3rem;
 
     ${({ letter }) => !letter && css`
       height: calc(2.8rem * 1.333);
-      width: 1.5rem;
+      width: 2rem;
       margin: 0 0.3rem;
       border-bottom: 1px solid white
     `}
@@ -394,10 +394,22 @@ const PickWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 23rem;
-  margin: 0 auto
+  margin: 0 auto;
+
+  @media (min-width: 768px) {
+    width: 30rem
+  }
 `;
 
 const PickLetter = styled.span`
+  ${({ isScaled }) => isScaled && css`
+  animation: ${scale} 0.4s linear both;
+  `};
+
+  ${({ isWrong }) => isWrong && css`
+  animation: ${scale} 0.3s linear, ${shake} 0.5s linear;
+  `};
+
   padding: 0.5rem 0;
   width: 3.7rem;
   text-align: center;
@@ -406,13 +418,11 @@ const PickLetter = styled.span`
   font-size: 2.4rem;
   text-transform: capitalize;
 
-  ${({ isScaled }) => isScaled && css`
-    animation: ${scale} 0.4s linear both;
-  `};
-
-  ${({ isWrong }) => isWrong && css`
-    animation: ${scale} 0.3s linear, ${shake} 0.5s linear;
-  `}
+  @media (min-width: 768px) {
+    padding: 0.8rem 0;
+    width: 4.5rem;
+    font-size: 2.8rem;
+  }
 `;
 
 export default ArrayLetters

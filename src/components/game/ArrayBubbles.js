@@ -7,19 +7,56 @@ class ArrayBubbles extends Component {
     super(props);
 
     this.state = {
+      counter: 0,
       isChosen: false,
       boundary: {},
       bubbles: [],
       bubblesPositions: [
-        { left: 110, top: 74},
-        { left: 3, top: 98},
-        { left: 171, top: 129},
-        { left: 216, top: 56},
-        { left: 89, top: 144},
-        { left: 28, top: 27},
-        { left: 242, top: 143},
-        { left: 106, top: 8},
-        { left: 74, top: 121}
+        [
+          { left: 0.394, top: 0.615 },
+          { left: 0.59, top: 0.55 },
+          { left: 0.62, top: 0.23 },
+          { left: 0.81, top: 0 },
+          { left: 0.03, top: 0.675 },
+          { left: 0.78, top: 0.68 },
+          { left: 0.014, top: 0.33 },
+          { left: 0.344, top: 0.29 },
+          { left: 0.45, top: 0.035 },
+          { left: 0.217, top: 0 },
+          { left: 0.814, top: 0.36 },
+          { left: 0.194, top: 0.495 },
+          { left: 0, top: 0 }
+        ],
+        [
+          {left: 0.494, top: 0.535},
+          { left: 0.134, top: 0.42},
+          { left: 0.652, top: 0.36},
+          { left: 0.334, top: 0.37},
+          { left: 0.45, top: 0.115},
+          { left: 0.71, top: 0.68},
+          { left: 0.23, top: 0.06},
+          { left: 0.27, top: 0.68},
+          { left: 0.62, top: 0.03},
+          { left: 0.85, top: 0.4},
+          { left: 0, top: 0},
+          { left: 0.83, top: 0.06},
+          { left: 0, top: 0.68}
+        ],
+         [
+          { left: 0.206, top: 0.36 },
+          { left: 0.606, top: 0.66 },
+          { left: 0.434, top: 0.345 },
+          { left: 0.567, top: 0.11 },
+          { left: 0.228, top: 0.69 },
+          { left: 0.42, top: 0.68 },
+          { left: 0.79, top: 0.715 },
+          { left: 0.01, top: 0.315 },
+          { left: 0.72, top: 0.36 },
+          { left: 0.81, top: 0.04 },
+          { left: 0.11, top: 0.03 },
+          { left: 0.3, top: 0 },
+          { left: 0, top: 0.65 }
+        ]
       ],
       letters: []
     }
@@ -54,6 +91,7 @@ class ArrayBubbles extends Component {
       return {
         boundary,
         letters,
+        definition: item.definition,
         index: nextIndex,
         definition: item.definition,
         correctAnswer: item.term,
@@ -179,6 +217,7 @@ class ArrayBubbles extends Component {
 
       } else {
         const counter = state.counter + 1;
+
         return {
           counter,
           isWrong: true
@@ -205,14 +244,14 @@ class ArrayBubbles extends Component {
         }
       }
     }, () => {
-      const { item, chooseOption } = this.props;
+      const { item, showGameAnswer } = this.props;
       const { isFinished, counter } = this.state;
 
       if (isFinished) {
         if (counter === 3) {
-          chooseOption(item, false);
+          showGameAnswer(item, 'wrong');
         } else {
-          chooseOption(item, true);
+          showGameAnswer(item, 'correct');
         }
       }
     });
@@ -220,6 +259,7 @@ class ArrayBubbles extends Component {
 
   render() {
     const {
+      definition,
       boundary,
       bubbles,
       bubblesPositions,
@@ -228,11 +268,12 @@ class ArrayBubbles extends Component {
       isWrong,
       isCorrect
     } = this.state;
-    const { item } = this.props;
+
+    const randomIndex = Math.floor(Math.random() * bubblesPositions.length);
 
     return (
       <GameWrapper isChosen={isChosen}>
-        <Definition>{item.definition}</Definition>
+        <Definition>{definition}</Definition>
 
         <BubblesWrapper ref={this.boundaryRef}>
           {bubbles.map((bubble, index) => (
@@ -240,11 +281,10 @@ class ArrayBubbles extends Component {
               id={bubble}
               key={index}
               index={index}
-              position={bubblesPositions[index]}
+              position={bubblesPositions[randomIndex][index]}
               boundary={boundary}
               boundaryRef={this.boundaryRef.current}
-              handlePicking={this.handlePicking}
-              >
+              handlePicking={this.handlePicking}>
               {bubble}
             </BubbleComponent>
           ))}
@@ -289,16 +329,21 @@ class BubbleComponent extends React.Component {
     const { boundary, position } = this.props;
     const bubble = this.bubbleRef.current;
 
-    const offset = {
+    const startOffset = {
       left: Math.floor(boundary.width / 2 - bubble.offsetWidth / 2),
       top: Math.floor(boundary.height / 2  - bubble.offsetHeight / 2)
     }
 
+    const offset = {
+      left: boundary.width * position.left,
+      top: boundary.height * position.top
+    }
+
     this.setState({
-      offsetLeft: position.left,
-      offsetTop: position.top,
-      startOffsetLeft: offset.left,
-      startOffsetTop: offset.top
+      offsetLeft: offset.left,
+      offsetTop: offset.top,
+      startOffsetLeft: startOffset.left,
+      startOffsetTop: startOffset.top
     })
   }
 
@@ -399,12 +444,12 @@ const move = (
 const GameWrapper = styled.div`
   display: ${({ isChosen }) => (isChosen ? 'none' : 'block')};
   padding-top: 20vh;
-  width: 80vw;
+  width: 90vw;
   margin: 0 auto;
 `;
 
 const Definition = styled.p`
-  animation: ${popIn} .3s linear 0.4s forwards;
+  animation: ${popIn} .3s linear 0.5s forwards;
   font-size: 3rem;
   text-align: center;
   margin: 0 0 4rem;
@@ -416,13 +461,13 @@ const Definition = styled.p`
 `;
 
 const BubblesWrapper = styled.div`
-  width: 80vw;
+  width: 90vw;
   height: 20rem;
   margin: 0 auto;
   position: relative;
 
   @media (min-width: 768px) {
-    width: 50vw;
+    width: 50rem;
   }
 `;
 
@@ -443,14 +488,28 @@ const Bubble = styled.div`
   width: 5.5rem;
   height: 5.5rem;
   position: absolute;
-  border-radius: 3rem;
+  border-radius: 4rem;
   display: flex;
   justify-content: center;
   font-size: 2rem;
   align-items: center;
+
+  @media (min-width: 768px) {
+    width: 6.5rem;
+    height: 6.5rem;
+    font-size: 2.3rem;
+  }
 `;
 
 const AnswerWrapper = styled.div`
+  ${({ isWrong }) => isWrong && css`
+  animation: ${shake} 0.5s linear;
+  `};
+
+  ${({ isCorrect }) => isCorrect && css`
+  animation: ${pulse} 0.4s linear;
+  `};
+
   position: relative;
   border: 1px solid white;
   border-radius: 4rem;
@@ -465,19 +524,11 @@ const AnswerWrapper = styled.div`
   @media (min-width: 768px) {
     width: 50rem;
   }
-
-  ${({ isWrong }) => isWrong && css`
-    animation: ${shake} 0.5s linear;
-  `};
-
-  ${({ isCorrect }) => isCorrect && css`
-    animation: ${pulse} 0.4s linear;
-  `}
 `;
 
 const Letters = styled.div`
   margin: 0 auto;
-  padding: 5px 10px 15px;
+  padding: 0.5rem 1rem 1.5rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -486,11 +537,6 @@ const Letters = styled.div`
 const Letter = styled.span`
   width: ${({ letter }) => letter === ' ' && '1rem'};
 
-  font-size: 2.4rem;
-  height: calc(2.2rem * 1.345);
-  display: inline-block;
-  transition: transform 0.1s ease-out;
-
   ${({ isBlock }) => isBlock && css`
   display: block;
   height: 1rem;
@@ -498,10 +544,21 @@ const Letter = styled.span`
 
   ${({ letter }) => !letter && css`
   height: calc(2.4rem);
-  width: 1.5rem;
+  width: 1.2rem;
   margin: 0 0.3rem;
   border-bottom: 1px solid white;
   `};
+
+  font-size: 2.4rem;
+  height: calc(2.2rem * 1.345);
+  display: inline-block;
+  transition: transform 0.1s ease-out;
+
+  @media (min-width: 768px) {
+    ${({ letter }) => !letter && css`
+      width: 1.5rem;
+    `};
+  }
 `
 
 export default ArrayBubbles

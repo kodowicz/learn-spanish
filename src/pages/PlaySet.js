@@ -50,17 +50,21 @@ class PlaySet extends Component {
   }
 
   randomGame = (ratio) => {
-    const { terms, chooseOption } = this.props;
+    const { terms, isReady, showGameAnswer } = this.props;
     const { item, isDesktop } = this.state;
     const maxNumber = isDesktop ? 6 : 5;
     let number = Math.floor(Math.random() * maxNumber);
+
+    if (item.term.length > 20 && number === 3) {
+      number--
+    };
 
     switch (number) {
       case 5:
         return (
           <TypeMeaning
             item={item}
-            chooseOption={chooseOption}
+            showGameAnswer={showGameAnswer}
           />
         );
 
@@ -68,7 +72,7 @@ class PlaySet extends Component {
         return (
           <ArrayLetters
             item={item}
-            chooseOption={chooseOption}
+            showGameAnswer={showGameAnswer}
           />
         );
 
@@ -76,7 +80,7 @@ class PlaySet extends Component {
         return (
           <ArrayBubbles
             item={item}
-            chooseOption={chooseOption}
+            showGameAnswer={showGameAnswer}
           />
         );
 
@@ -85,7 +89,7 @@ class PlaySet extends Component {
           <ChooseBetweenFour
             item={item}
             terms={terms}
-            chooseOption={chooseOption}
+            showGameAnswer={showGameAnswer}
           />
         );
 
@@ -94,7 +98,7 @@ class PlaySet extends Component {
           <SelectFalseOrTrue
             item={item}
             terms={terms}
-            chooseOption={chooseOption}
+            showGameAnswer={showGameAnswer}
           />
         );
 
@@ -105,7 +109,7 @@ class PlaySet extends Component {
             item={item}
             terms={terms}
             isDesktop={isDesktop}
-            chooseOption={chooseOption}
+            showGameAnswer={showGameAnswer}
           />
         );
     }
@@ -118,7 +122,7 @@ class PlaySet extends Component {
       correctItem,
       isOverlayOpen,
       cancelSesion,
-      clearGameAnswer
+      cleanGameAnswer
     } = this.props;
     const { item } = this.state;
 
@@ -127,7 +131,7 @@ class PlaySet extends Component {
         <Solution
           answer={answer}
           correctItem={correctItem}
-          clearGameAnswer={clearGameAnswer} />
+          cleanGameAnswer={cleanGameAnswer} />
         )
 
     } else {
@@ -150,67 +154,10 @@ class PlaySet extends Component {
   }
 }
 
-// const Solution = ({ answer, clearGameAnswer }) => {
-//   const handleAnimation = (event) => {
-//     clearGameAnswer()
-//     // console.log(item);
-//   }
-//   return (
-//     <>
-//       {answer &&
-//         <SolutionWrapper
-//           onAnimationEnd={handleAnimation}
-//         >
-//           {answer}
-//         </SolutionWrapper>
-//       }
-//     </>
-//   );
-// }
-
 
 const GameWrapper = styled.div`
   display: ${({isHidden}) => isHidden && 'none'};
   cursor: pointer
 `;
-
-// const throwOut = keyframes`
-//   0% {
-//     opacity: 0;
-//     transform: translate(-50%, 30px);
-//   }
-//
-//   20% {
-//     opacity: 0.5
-//   }
-//
-//   40% {
-//     transform: translate(-50%, -30px);
-//     opacity: 1
-//   }
-//
-//   70% {
-//     transform: translate(-50%, -30px);
-//     opacity: 1
-//   }
-//
-//   80% {
-//     opacity: 0.5
-//   }
-//
-//   100% {
-//     transform: translate(-50%, 0px);
-//     opacity: 0
-//   }
-// `;
-//
-// const SolutionWrapper = styled.div`
-//   position: absolute;
-//   top: 50%;
-//   left: 50%
-//   transform: translateX(-50%);
-//   animation: ${throwOut} 2s ease-out forwards
-// `;
-
 
 export default PlaySet
