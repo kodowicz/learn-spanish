@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import home from '../../assets/images/home.png';
 
 
-const HomeNavigator = () => {
+const Scroller = () => {
 
   const handleNavigating = (event) => {
     window.scrollTo(0, 0);
@@ -38,4 +38,4 @@ const Img = styled.img`
   height: 100%
 `
 
-export default HomeNavigator
+export default Scroller

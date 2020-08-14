@@ -1,7 +1,7 @@
 import React from 'react';
 import Menu from './Menu';
 import Navigation from './Navigation';
-import HomeNavigator from './HomeNavigator';
+import Scroller from './Scroller';
 
 import styled from 'styled-components';
 import Background from '../Background';
@@ -21,6 +21,7 @@ const Navbar = ({
 }) => {
 
   const isVisible = isMobile ? isOpen : false;
+  const isScrollVisible = (location === 'learn' || location === 'play') ? true : false;
 
   return (
     <>
@@ -54,8 +55,8 @@ const Navbar = ({
             />
           }
 
-          { !isOpen &&
-            <HomeNavigator />
+          { !(isOpen || isScrollVisible) &&
+            <Scroller />
           }
         </Nav>
       }
