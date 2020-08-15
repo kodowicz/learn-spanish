@@ -8,12 +8,13 @@ import { createPlaySet } from '../store/actions/playSetActions';
 import { removeNewKey } from '../store/actions/createSetActions';
 import { deleteSetChanges } from '../store/actions/editSetActions';
 import { sortTerms } from '../store/actions/setActions';
+import { createEditSet } from '../store/actions/editSetActions';
 import {
   changeLocation,
   changeLastLocation,
   setCurrentSetId,
   enableEditSet
-} from '../store/actions/locationActions';
+} from '../store/actions/navigationActions';
 
 import ViewSet from '../pages/ViewSet';
 
@@ -26,6 +27,7 @@ const ViewSetContainer = (props) => {
       signedUser={props.signedUser}
       author={props.author}
       percentage={props.percentage}
+      isUserSet={props.isUserSet}
       sortedBy={props.sortedBy}
       terms={props.terms}
       lastLocation={props.lastLocation}
@@ -37,6 +39,7 @@ const ViewSetContainer = (props) => {
       sortTerms={props.sortTerms}
       deleteSetChanges={props.deleteSetChanges}
       removeNewKey={props.removeNewKey}
+      createEditSet={props.createEditSet}
       chooseMethod={props.chooseMethod}
       createLearnSet={props.createLearnSet}
       createPlaySet={props.createPlaySet}
@@ -49,32 +52,40 @@ const ViewSetContainer = (props) => {
 const mapStateToProps = (state, ownProps) => {
   const setDetails = state.firestore.data.setDetails;
   const author = setDetails ? setDetails.authorId : null;
-  const terms = state.firestore.ordered.terms;
+  const terms = state.firestore.ordered.viewTerms;
   const userProgress = state.firestore.data.userProgress;
-  const knowledge = userProgress && userProgress.knowledge;
-  const amount = userProgress && userProgress.amount;
-  const percentage = userProgress ? Math.floor((knowledge * 100) / (amount * 5)) : undefined;
-
+  const knowledge = userProgress?.knowledge;
+  const amount = userProgress?.amount;
+  const isUserSet = userProgress ? true : false;
+  const percentage = userProgress ?
+    knowledge ?
+      Math.round((knowledge * 100) / (amount * 5))
+      :
+      0
+    :
+    undefined;
+  
   return {
     percentage,
     terms,
     author,
     setDetails,
+    isUserSet,
     sortedBy: state.sortedBy,
     signedUser: state.firebase.auth.uid,
-    lastLocation: state.lastLocation,
+    lastLocation: state.navigation.lastLocation,
     isEditSubmited: state.isEditSubmited,
     isOverlayOpen: state.isOverlayOpen.isChosen,
     isLoaded: userProgress ?
       isLoaded(
         terms,
-        setDetails
+        setDetails,
+        userProgress
       )
       :
       isLoaded(
         terms,
-        setDetails,
-        userProgress
+        setDetails
       )
   }
 }
@@ -88,6 +99,7 @@ export default compose(
       changeLastLocation,
       setCurrentSetId,
       sortTerms,
+      createEditSet,
       chooseMethod,
       createLearnSet,
       createPlaySet,
@@ -98,45 +110,81 @@ export default compose(
   firestoreConnect(props => {
     const sortedBy = props.sortedBy ? 'term' : 'time';
 
-    return props.signedUser ? [
-      {
-        collection: 'sets',
-        doc: props.match.params.id,
-        storeAs: 'setDetails'
-      },
-      {
-        collection: 'sets',
-        doc: props.match.params.id,
-        subcollections: [{ collection: 'terms' }],
-        storeAs: 'terms',
-        orderBy: [sortedBy]
-      },
-      {
-        collection: 'users',
-        doc: props.signedUser,
-        subcollections: [
+    if (props.signedUser) {
+      if (props.isUserSet) {
+        return [
           {
-            collection: 'learn',
-            doc: props.match.params.id
+            collection: 'sets',
+            doc: props.match.params.id,
+            storeAs: 'setDetails'
+          },
+          {
+            collection: 'users',
+            doc: props.signedUser,
+            subcollections: [
+              {
+                collection: 'learn',
+                doc: props.match.params.id,
+                subcollections: [{ collection: 'game' }]
+              }
+            ],
+            storeAs: 'viewTerms',
+            orderBy: [sortedBy]
+          },
+          {
+            collection: 'users',
+            doc: props.signedUser,
+            subcollections: [
+              {
+                collection: 'learn',
+                doc: props.match.params.id
+              }
+            ],
+            storeAs: 'userProgress'
           }
-        ],
-        storeAs: 'userProgress'
+        ]
+      } else {
+        return [
+          {
+            collection: 'sets',
+            doc: props.match.params.id,
+            storeAs: 'setDetails'
+          },
+          {
+            collection: 'sets',
+            doc: props.match.params.id,
+            subcollections: [{ collection: 'terms' }],
+            storeAs: 'viewTerms',
+            orderBy: [sortedBy]
+          },
+          {
+            collection: 'users',
+            doc: props.signedUser,
+            subcollections: [
+              {
+                collection: 'learn',
+                doc: props.match.params.id
+              }
+            ],
+            storeAs: 'userProgress'
+          }
+        ]
       }
-    ]
-  :
-    [
-      {
-        collection: 'sets',
-        doc: props.match.params.id,
-        storeAs: 'setDetails'
-      },
-      {
-        collection: 'sets',
-        doc: props.match.params.id,
-        subcollections: [{ collection: 'terms' }],
-        storeAs: 'terms',
-        orderBy: ["time"]
-      }
-    ]
-})
+    } else {
+      return [
+        {
+          collection: 'sets',
+          doc: props.match.params.id,
+          storeAs: 'setDetails'
+        },
+        {
+          collection: 'sets',
+          doc: props.match.params.id,
+          subcollections: [{ collection: 'terms' }],
+          storeAs: 'viewTerms',
+          orderBy: ["time"]
+        }
+      ]
+    }
+  })
 )(ViewSetContainer);

@@ -7,6 +7,7 @@ import ArrayBubbles from '../components/game/ArrayBubbles';
 import TypeMeaning from '../components/game/TypeMeaning';
 import ArrayLetters from '../components/game/ArrayLetters';
 import Solution from '../components/game/Solution';
+import RatioDots from '../components/RatioDots';
 
 import styled from 'styled-components';
 
@@ -64,24 +65,21 @@ class PlaySet extends Component {
         return (
           <TypeMeaning
             item={item}
-            showGameAnswer={showGameAnswer}
-          />
+            showGameAnswer={showGameAnswer} />
         );
 
       case 4:
         return (
           <ArrayLetters
             item={item}
-            showGameAnswer={showGameAnswer}
-          />
+            showGameAnswer={showGameAnswer} />
         );
 
       case 3:
         return (
           <ArrayBubbles
             item={item}
-            showGameAnswer={showGameAnswer}
-          />
+            showGameAnswer={showGameAnswer} />
         );
 
       case 2:
@@ -89,8 +87,7 @@ class PlaySet extends Component {
           <ChooseBetweenFour
             item={item}
             terms={terms}
-            showGameAnswer={showGameAnswer}
-          />
+            showGameAnswer={showGameAnswer} />
         );
 
       case 1:
@@ -98,8 +95,7 @@ class PlaySet extends Component {
           <SelectFalseOrTrue
             item={item}
             terms={terms}
-            showGameAnswer={showGameAnswer}
-          />
+            showGameAnswer={showGameAnswer} />
         );
 
       case 0:
@@ -109,8 +105,7 @@ class PlaySet extends Component {
             item={item}
             terms={terms}
             isDesktop={isDesktop}
-            showGameAnswer={showGameAnswer}
-          />
+            showGameAnswer={showGameAnswer} />
         );
     }
   }
@@ -145,7 +140,10 @@ class PlaySet extends Component {
           { !answer &&
             <GameWrapper
               isHidden={isOverlayOpen}>
-              {item.term && this.randomGame(item.ratio)}
+              <RatioWrapper>
+                <RatioDots ratio={item.ratio} />
+              </RatioWrapper>
+              { item.term && this.randomGame(item.ratio) }
             </GameWrapper>
           }
         </>
@@ -156,8 +154,20 @@ class PlaySet extends Component {
 
 
 const GameWrapper = styled.div`
-  display: ${({isHidden}) => isHidden && 'none'};
+  display: ${({ isHidden }) => isHidden && 'none'};
   cursor: pointer
+`;
+
+const RatioWrapper = styled.div`
+  position: relative;
+  top: 10rem;
+  left: 10vw;
+  width: 5rem;
+
+  @media (min-width: 768px) {
+    left: 3rem;
+    width: 6rem
+  }
 `;
 
 export default PlaySet

@@ -2,16 +2,14 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import MethodChoiceOverlay from '../components/overlay/MethodChoiceOverlay';
 import ProgressBar from '../components/ProgressBar';
+import RatioDots from '../components/RatioDots';
 
 import styled from 'styled-components';
+import sort from '../assets/images/sort.svg';
 import { LinkButton, Button, Main, BlockElement, colors, fonts } from '../assets/styles/GlobalStyles';
 
 
 class ViewSet extends Component {
-  state = {
-    redirect: false
-  }
-
   componentDidMount() {
     this.props.changeLocation('set');
     this.props.changeLastLocation("/");
@@ -31,17 +29,20 @@ class ViewSet extends Component {
       sortedBy,
       terms,
       signedUser,
+      isUserSet,
       isOverlayOpen,
       sortTerms,
+      createEditSet,
       chooseMethod,
       createLearnSet,
       createPlaySet
     } = this.props;
 
     const iseditable = author === signedUser ? true : false;
+    const progressBarWidth = window.innerWidth < 768 ? 6 : 7;
 
     // handle if set doesn't exist
-    if (this.props.redirect) return <Redirect to='/404' />; //?
+    if (terms.length === 0 && !setDetails) return <Redirect to='/404' />;
 
     if (isOverlayOpen) {
       return (
@@ -50,53 +51,72 @@ class ViewSet extends Component {
           setid={match.params.id}
           chooseMethod={chooseMethod}
           createLearnSet={createLearnSet}
-          createPlaySet={createPlaySet}
-        />
+          createPlaySet={createPlaySet} />
       )
     } else {
+
       return (
-        <Main width={76} maxWidth={650} desktop={600}>
-          <Description setDetails={setDetails} percentage={percentage} />
-          <Buttons setid={match.params.id} iseditable={iseditable} chooseMethod={chooseMethod} />
-          <TermsList terms={terms} sortedBy={sortedBy} sortTerms={sortTerms} />
+        <Main width={76} maxWidth={650} desktop={700}>
+          <Description
+            setDetails={setDetails}
+            percentage={percentage}
+            width={progressBarWidth} />
+
+          <Buttons
+            setid={match.params.id}
+            iseditable={iseditable}
+            createEditSet={createEditSet}
+            chooseMethod={chooseMethod} />
+
+          <TermsList
+            terms={terms}
+            isUserSet={isUserSet}
+            sortedBy={sortedBy}
+            sortTerms={sortTerms} />
         </Main>
       )
     }
   }
 }
 
-const Description = ({ setDetails, percentage }) => (
+const Description = ({ setDetails, percentage, width }) => (
   <>
-    <DetailsWrapper>
-      <SetName>{setDetails.name}</SetName>
+    <DetailsWrapper isExtended={!isNaN(percentage)}>
+      <SetName isExtended={percentage}>{setDetails.name}</SetName>
         <Info>{setDetails.amount} terms</Info>
         <Border />
         <Info>by {setDetails.author}</Info>
-        { (percentage !== undefined) &&
+        { (!isNaN(percentage)) &&
           <Progress>
             <ProgressBar
               percentage={percentage}
-              width='6rem'
-              bgColor={colors.progress}
-            />
+              width={`${width}rem`}
+              bgColor={colors.progress} />
           </Progress>
         }
     </DetailsWrapper>
   </>
 );
 
-const Buttons = ({ setid, iseditable, chooseMethod }) => {
+const Buttons = ({ setid, iseditable, chooseMethod, createEditSet }) => {
   const handleChoice = () => {
     // open overlay then create
     chooseMethod(true)
   }
 
+  const handleEdit = () => {
+    createEditSet();
+  }
+
   return (
     <ButtonsWrapper iseditable={iseditable.toString()}>
       { iseditable &&
-        <LinkButton isCentre={true} to={`/edit/${setid}`}>
-          edit set
-        </LinkButton>
+        <div onClick={handleEdit}>
+          <LinkButton
+             isCentre={true} to={`/edit/${setid}`}>
+            edit set
+          </LinkButton>
+        </div>
       }
       <Button onClick={handleChoice}>
         learn set
@@ -105,7 +125,7 @@ const Buttons = ({ setid, iseditable, chooseMethod }) => {
   );
 };
 
-const TermsList = ({ terms, sortedBy, sortTerms }) => {
+const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
 
   return (
     <TermListWrapper>
@@ -121,16 +141,21 @@ const TermsList = ({ terms, sortedBy, sortTerms }) => {
       </ListLable>
       <List>
         {terms.map((term, index) => (
-          <ListItem key={ term.id }>
+          <ListItem key={term.id}>
             <Counter
-              isLessThanTen={((index + 1) < 10) ? true : false}
-            >
-              { index + 1 }
+              isLessThanTen={((index + 1) < 10) ? true : false}>
+              {index + 1}
             </Counter>
             <SetWrapper>
-              <Term id="term">{ term.term }</Term>
+              <TermWrapper>
+                <Term id="term">{term.term}</Term>
+                { isUserSet &&
+                  <RatioDots ratio={term.ratio} />
+                }
+              </TermWrapper>
+
               <Line />
-              <Term id="definition">{ term.definition }</Term>
+              <Term id="definition">{term.definition}</Term>
             </SetWrapper>
           </ListItem>
         ))}
@@ -141,21 +166,34 @@ const TermsList = ({ terms, sortedBy, sortTerms }) => {
 
 
 const DetailsWrapper = styled.div`
+  grid-template-columns: ${({ isExtended }) =>
+    isExtended ?
+      'min-content 15px min-content 20% 90px' :
+      'min-content 15px min-content 1fr'
+  };
   display: inline-grid;
-  grid-template-columns: min-content 15px min-content 20% 90px;
   grid-template-rows: repeat(2, min-content);
   grid-row-gap: 0.7rem;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    grid-template-columns: ${({ isExtended }) =>
+      isExtended ?
+        'min-content 15px min-content 40% 90px' :
+        'min-content 15px min-content 1fr'
+    }
+  };
 `;
 
 const SetName = styled.h1`
+  max-width: ${({ percentage }) => percentage ? '50vw' : 'none'};
+  font-weight: ${fonts.bold};
   grid-column: span 4;
   font-size: 3.2rem;
-  font-weight: ${fonts.bold};
-  max-width: 50vw;
   margin: 0;
 
   @media (min-width: 768px) {
-    max-width: 35rem
+    max-width: ${({ percentage }) => percentage ? '35rem' : 'none'};
   }
 `;
 
@@ -166,9 +204,9 @@ const Info = styled.span`
 `;
 
 const Border = styled.div`
+  background: ${colors.azure};
   height: 1.8rem;
   width: 1.5px;
-  background: ${colors.azure};
   grid-column: 2 / 3;
   grid-row: 2 /3;
   place-self: center;
@@ -179,7 +217,7 @@ const Progress = styled.figure`
   margin: 0;
   grid-row: 1 / 3;
   grid-column: 5 / 6;
-  align-self: center;
+  place-self: center;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -188,18 +226,16 @@ const ButtonsWrapper = styled.div`
   justify-content: space-evenly;
   max-width: 300px;
 
-  ${'' /* @media (min-width: 768px) {
-    ${props => props.iseditable ? 'justify-content: space-between' : false };
-  } */}
+  @media (min-width: 768px) {
+    justify-content: ${props =>
+      props.iseditable ? 'space-between' : 'flex-start'
+    };
+    margin: 40px 0 60px;
+  }
 `;
 
 const TermListWrapper = styled.div`
-  width: 76vw;
-  margin: 0 auto;
-
-  @media (min-width: 786px) {
-    margin: 0 40px
-  }
+  width: 100%;
 `;
 
 const ListLable = styled.div`
@@ -216,8 +252,8 @@ const SubTitle = styled.h2`
 
 const SortButton = styled.button`
   color: ${colors.white};
-  font-size: 1.4rem;
   font-family: ${fonts.family};
+  font-size: 1.4rem;
   background: none;
   height: min-content;
   border: none;
@@ -234,7 +270,7 @@ const SortImg = styled.img`
 `
 
 const List = styled.ul`
-  margin: 0 0 40px 0;
+  margin: 0 0 4rem 0;
   padding: 0;
 `;
 
@@ -242,8 +278,12 @@ const ListItem = styled.li`
   margin-bottom: 1.6rem;
   height: 7.7rem;
   height: auto;
-  list-style: none
+  list-style: none;
   position: relative;
+
+  @media (min-width: 768px) {
+    margin-bottom: 2rem
+  }
 `;
 
 const SetWrapper = styled(BlockElement)`
@@ -256,9 +296,10 @@ const SetWrapper = styled(BlockElement)`
   align-content: center;
 
   @media (min-width: 768px) {
-    padding: 20px 0;
-    grid-template-columns: 1fr 1px 1fr;
-    grid-template-rows: 1fr
+    padding: 2rem 0;
+    grid-template-columns: 1fr 2px 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
   }
 `;
 
@@ -270,9 +311,20 @@ const Counter = styled.span`
   top: 50%;
   font-size: 2.5rem;
   transform: translateY(-50%);
+  user-select: none;
 
   @media (min-width: 768px) {
     left: -50px
+  }
+`;
+
+const TermWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    padding-right: 3.5rem
   }
 `;
 
@@ -282,17 +334,19 @@ const Term = styled.p`
   color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
   margin: 0;
   white-space: pre-line;
+  user-select: text;
+  padding-right: 1.5rem;
 
   @media (min-width: 768px) {
-    padding-left: 40px
+    padding: 0 3.5rem
   }
 `;
 
 const Line = styled.div`
   @media (min-width: 768px) {
-    width: 1.5px;
-    height: 20px;
-    background: ${colors.gray};
+    background: ${colors.darkGray};
+    width: 100%;
+    height: 2rem;
   }
 `;
 
