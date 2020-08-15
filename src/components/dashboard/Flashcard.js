@@ -13,6 +13,7 @@ export class FrontCard extends Component {
       id: null,
       isFlipped: true,
       isMoved: false,
+      isClicked: false,
       toggle: false,
       cardCenter: {},
       point: { x: 0, y: 0 },
@@ -22,7 +23,7 @@ export class FrontCard extends Component {
       transformCard: { x: 0, y: 0, rotate: 0 },
       moveLeft: false,
       moveRight: false,
-      backAmplitude: 20,
+      backAmplitude: 40,
       horizontalAmp: 100,
       verticalAmp: 50
     }
@@ -53,7 +54,11 @@ export class FrontCard extends Component {
             toggle: !prevState.toggle
           })
         })
-        this.setState({ isFlipped: false });
+        this.setState({
+          isFlipped: false,
+          isClicked: false
+        });
+
       } else {
         this.setState({ isMoved: false });
       }
@@ -64,19 +69,24 @@ export class FrontCard extends Component {
     this.setState({ isFlipped: true });
   }
 
-  startTouch = event => {
+  startMoving = event => {
+    const pagePosition = event.targetTouches ? event.targetTouches[0] : event;
+
     this.setState({
+      isClicked: true,
       point: {
-        x: event.targetTouches[0].pageX,
-        y: event.targetTouches[0].pageY
+        x: pagePosition.pageX,
+        y: pagePosition.pageY
       }
     })
   }
 
   moveCard = event => {
+    const pagePosition = event.targetTouches ? event.targetTouches[0] : event;
+
     const position = {
-      x: event.targetTouches[0].pageX,
-      y: event.targetTouches[0].pageY
+      x: pagePosition.pageX,
+      y: pagePosition.pageY
     };
 
     this.setState({ position: position }, () => {
@@ -108,7 +118,13 @@ export class FrontCard extends Component {
     })
   }
 
-  stopTouch = event => {
+  mouseMove = event => {
+    if (this.state.isClicked) {
+      this.moveCard(event)
+    }
+  }
+
+  stopMoving = event => {
     const { isMoved, cardCenter, backAmplitude } = this.state;
     const cardPosition = this.cardRef.current.getBoundingClientRect();
 
@@ -120,6 +136,7 @@ export class FrontCard extends Component {
 
     } else {
       this.setState({
+        isClicked: false,
         transformCard: {
           x: 0,
           y: 0,
@@ -176,12 +193,16 @@ export class FrontCard extends Component {
         transformation={transformCard}
         moveLeft={moveLeft}
         moveRight={moveRight}
+        isClicked={this.state.isClicked}
         onClick={this.flipCard}
         onTransitionEnd={this.animateCard}
         onTouchMove={this.moveCard}
-        onTouchStart={this.startTouch}
-        onTouchEnd={this.stopTouch}
-      >
+        onTouchStart={this.startMoving}
+        onTouchEnd={this.stopMoving}
+        onMouseMove={this.mouseMove}
+        onMouseDown={this.startMoving}
+        onMouseUp={this.stopMoving}>
+
         <Front rotate={rotateFront}>
           <Top>
             <Term>{ term.term }</Term>
@@ -244,6 +265,7 @@ export const Congratulations = ({ setid, layerIndex, createLearnSet }) => (
 );
 
 
+
 const Wrapper = styled.div`
   color: ${colors.navy};
   grid-column: 1 / 1;
@@ -266,26 +288,33 @@ const Card = styled.div`
   flex-direction: column;
   background: white;
   box-shadow: 0 0 20px rgba(88, 38, 235, 0.53);
-  transition: transform .6s, opacity 0s;
   transform: ${props => `rotateY(${props.rotate}deg)`};
 `;
 
 const Front = styled(Card)`
-  opacity: 1
+  opacity: 1;
+  transition: transform .6s, opacity 0s;
 `;
 
 const Back = styled(Card)`
-  opacity: 0
+  opacity: 0;
+  transition: transform .6s, opacity 0s .15s
 `;
 
 const FrontWrapper = styled(Wrapper)`
   perspective: 1000px;
   z-index: 5;
+  ${'' /* cursor: ${({ isClicked }) => isClicked && 'grabbing'}; */}
+
+  ${ ({ isClicked }) => isClicked && css`
+    cursor: grabbing
+  `};
 
   /*flipping a card */
   ${ ({ flip }) => flip && css`
     ${Front} {
       transition: transform .6s, opacity 0s .5s;
+      transition: transform .6s, opacity 0s .15s;
       opacity: 0;
     }
 
@@ -387,11 +416,6 @@ const Text = styled.p`
   margin: 0 0 40px
 `;
 
-// const Restart = styled(Button)`
-//   font-size: 1.4rem;
-//   padding: 1rem 4rem;
-// `;
-
 const shuffle = (transform) => keyframes`
   0% {
    z-index: 5
@@ -401,13 +425,13 @@ const shuffle = (transform) => keyframes`
     transform: translate(-200px, ${transform.y}px) rotate(-15deg);
   }
 
-  70% {
-    z-index: 3
+  55% {
+    z-index: 3;
   }
 
   100% {
     transform: rotate(0deg);
-    z-index: 3
+    z-index: 3;
   }
 `;
 

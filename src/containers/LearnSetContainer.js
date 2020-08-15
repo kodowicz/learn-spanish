@@ -13,7 +13,7 @@ import {
   changeLocation,
   changeLastLocation,
   setCurrentSetId
-} from '../store/actions/locationActions';
+} from '../store/actions/navigationActions';
 
 import LearnSet from '../pages/LearnSet';
 
@@ -21,6 +21,8 @@ import LearnSet from '../pages/LearnSet';
 const LearnSetContainer = (props) => {
   return props.isLoaded ?
     <LearnSet
+      amount={props.amount}
+      leftTerms={props.leftTerms}
       setid={props.setid}
       terms={props.terms}
       isOverlayOpen={props.isOverlayOpen}
@@ -51,15 +53,18 @@ const layerCards = (terms) => {
 
 const mapStateToProps = (state, ownProps) => {
   const terms = state.firestore.ordered.learnTerms;
+  const amount = state.firestore.data.learnDetails?.amount;
 
   return {
+    amount,
+    leftTerms: terms?.length,
     setid: ownProps.match.params.id,
     uid: state.firebase.auth.uid,
-    location: state.location,
-    lastLocation: state.lastLocation,
+    location: state.navigation.location,
+    lastLocation: state.navigation.lastLocation,
     isOverlayOpen: state.isOverlayOpen.isCancelled,
     terms: terms ? layerCards(terms) : undefined,
-    isLoaded: isLoaded(terms)
+    isLoaded: isLoaded(terms) && Boolean(terms.length)
   }
 }
 
@@ -78,17 +83,32 @@ export default compose(
   ),
   firestoreConnect(props => {
     return props.uid ?
-      [{
-        collection: 'users',
-        doc: props.uid,
-        subcollections: [{
-          collection: 'learn',
-          doc: props.match.params.id,
-          subcollections: [{ collection: 'flashcards' }]
-        }],
-        storeAs: 'learnTerms',
-        orderBy: ["time"]
-      }]
+      [
+        {
+          collection: 'users',
+          doc: props.uid,
+          subcollections: [
+            {
+              collection: 'learn',
+              doc: props.match.params.id,
+              subcollections: [{ collection: 'flashcards' }]
+            }
+          ],
+          storeAs: 'learnTerms',
+          orderBy: ["time"]
+        },
+        {
+          collection: 'users',
+          doc: props.uid,
+          subcollections: [
+            {
+              collection: 'learn',
+              doc: props.match.params.id
+            }
+          ],
+          storeAs: 'learnDetails'
+        },
+      ]
       :
       []
   })

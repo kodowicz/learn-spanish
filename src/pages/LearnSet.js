@@ -10,17 +10,16 @@ import {
 
 class LearnSet extends Component {
   componentDidMount() {
+    this.props.setCurrentSetId(this.props.setid);
+    this.props.createLearnSet(this.props.setid)
     this.props.changeLocation('learn');
     this.props.changeLastLocation(`/sets/${this.props.setid}`);
   }
 
-  componentWillMount() {
-    this.props.setCurrentSetId(this.props.setid);
-    this.props.createLearnSet(this.props.setid)
-  }
-
   render() {
     const {
+      amount,
+      leftTerms,
       setid,
       terms,
       isOverlayOpen,
@@ -29,58 +28,84 @@ class LearnSet extends Component {
       throwoutCard,
       createLearnSet
     } = this.props;
+    let flashcards;
 
     if (isOverlayOpen) {
       return <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
     } else {
-      return (
-        <Cards>
-          { (terms.length > 1) ?
-            terms.map(term => {
-              if (term.layerIndex === 0) {
-                return (
-                  <FrontCard
-                    key={term.id}
-                    layerIndex={term.layerIndex}
-                    term={term}
-                    moveEnabled={true}
-                    shuffleCard={shuffleCard}
-                    throwoutCard={throwoutCard}
-                  />
-                )
-              } else if (term.layerIndex === -1) {
-                return (
-                  <BackCard
-                    key={term.id}
-                    layerIndex={term.layerIndex}
-                    term={term}
-                  />
-                )
-              } else {
-                return <div key={term.id}></div>
-              }
-            })
-            :
-            (terms.length === 1) ?
-              <>
-                <FrontCard
-                  key={terms[0].id}
-                  layerIndex={terms[0].layerIndex}
-                  term={terms[0]}
-                  moveEnabled={false}
-                  shuffleCard={shuffleCard}
-                  throwoutCard={throwoutCard}
-                />
-                <Congratulations layerIndex={-1} />
-              </>
-              :
-              <Congratulations layerIndex={0} createLearnSet={createLearnSet} setid={setid} />
+
+      if (terms.length > 1) {
+
+        flashcards = terms.map(term => {
+          if (term.layerIndex === 0) {
+            return (
+              <FrontCard
+                key={term.id}
+                layerIndex={term.layerIndex}
+                term={term}
+                moveEnabled={true}
+                shuffleCard={shuffleCard}
+                throwoutCard={throwoutCard}
+              />
+            )
+
+          } else if (term.layerIndex === -1) {
+            return (
+              <BackCard
+                key={term.id}
+                layerIndex={term.layerIndex}
+                term={term}
+              />
+            )
+          } else {
+            return <div key={term.id}></div>
           }
-        </Cards>
+        })
+
+      } else if (terms.length === 1) {
+        flashcards = (
+          <>
+            <FrontCard
+              key={terms[0].id}
+              layerIndex={terms[0].layerIndex}
+              term={terms[0]}
+              moveEnabled={false}
+              shuffleCard={shuffleCard}
+              throwoutCard={throwoutCard}/>
+            <Congratulations layerIndex={-1} />
+          </>
+        )
+
+      } else {
+        flashcards = (
+          <Congratulations
+            layerIndex={0}
+            setid={setid}
+            createLearnSet={createLearnSet} />
+        )
+      }
+
+      return (
+        <>
+          <Counter>{ leftTerms } / {amount}</Counter>
+          <Cards>{ flashcards }</Cards>
+        </>
       );
     }
   }
 }
+
+
+const Counter = styled.span`
+  position: absolute;
+  top: 7rem;
+  left: 7vw;
+
+  @media (min-width: 768px) {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+`;
 
 const Cards = styled.div`
   display: grid;
@@ -92,7 +117,11 @@ const Cards = styled.div`
   place-content: center;
   grid-template-rows: 300px;
   grid-template-columns: 220px;
-  width:
+  cursor: grab;
+
+  @media (min-width: 768px) {
+    height: 90vh;
+  }
 `
 
 export default LearnSet
