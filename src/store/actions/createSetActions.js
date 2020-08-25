@@ -43,7 +43,7 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
           definition: "",
           termRows: 1,
           definitionRows: 1,
-          time: new Date()
+          time: firestore.FieldValue.serverTimestamp()
         })
       }
     } else if (size === 1) {  // necessary if cloud function exists
@@ -54,7 +54,7 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
         id: keyId,
         term: "",
         definition: "",
-        time: new Date()
+        time: firestore.FieldValue.serverTimestamp()
       })
     }
   })
@@ -135,7 +135,7 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
     definition: "",
     termRows: 1,
     definitionRows: 1,
-    time: new Date()
+    time: firestore.FieldValue.serverTimestamp()
   })
   .then(() => {
     dispatch({
@@ -214,7 +214,7 @@ export const submitCreateSet = (terms) => (dispatch, getState, { getFirestore })
         definition: element.definition,
         id: termsRef.id,
         time: element.time,
-        knowledge: 0,
+        ratio: 0,
         termRows: element.termRows,
         definitionRows: element.definitionRows
       })

@@ -6,8 +6,8 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
   const setTermsRef = firestore.collection(`sets/${setid}/terms`);
   const learnDetailsRef = firestore.doc(`users/${uid}/learn/${setid}`);
 
-  learnDetailsRef.get().then(snap => {
-    if (!snap.size) {
+  learnDetailsRef.get().then(doc => {
+    if (!doc.exists) {
 
       setRef.get().then(doc => {
         const { amount, name } = doc.data();
@@ -21,7 +21,7 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
 
       setTermsRef.get().then(snap => {
         snap.docs.forEach(doc => {
-          const {id, term, definition, time } = doc.data();
+          const { id, term, definition, time, termRows, definitionRows } = doc.data();
 
           const playSetRef = firestore.doc(`users/${uid}/learn/${setid}/game/${id}`);
 
@@ -30,6 +30,8 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
             term,
             definition,
             time,
+            termRows,
+            definitionRows,
             ratio: 0
           })
         })
@@ -57,7 +59,7 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
-  const time = new Date();
+  const time = firestore.FieldValue.serverTimestamp();
   const newRatio = isCorrect ? item.ratio + 1 : item.ratio - 1;
   const minRatio = 0;
   const maxRatio = 5;

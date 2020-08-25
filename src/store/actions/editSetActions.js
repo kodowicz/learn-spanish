@@ -2,10 +2,10 @@
 export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
+  const setid = getState().navigation.setid;
   const setName = getState().firebase.profile.editedSet;
 
-  const setTermsRef = firestore.collection(`sets/${setid}/terms`);
+  const setTermsRef = firestore.collection(`users/${uid}/learn/${setid}/game`);
   const editTermsRef = firestore.collection(`users/${uid}/edit/${setid}/terms`);
   const setNameRef = firestore.doc(`sets/${setid}`);
   const userRef = firestore.doc(`users/${uid}`);
@@ -22,7 +22,7 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
     setTermsRef.get().then(snapshot => {
       if (snap.empty) {
         snapshot.forEach(doc => {
-          const { id, term, definition, time, termRows, definitionRows } = doc.data();
+          const { id, term, definition, ratio, time, termRows, definitionRows } = doc.data();
           const termRef = editTermsRef.doc(id);
 
           termRef.set({
@@ -30,6 +30,7 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
             time,
             termRows,
             definitionRows,
+            ratio,
             term: /^\.\.\.$/g.test(term) ? '' : term,
             definition: /^\.\.\.$/g.test(definition) ? '' : definition
           })
@@ -53,8 +54,12 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
 export const editSetName = name => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
+  const setid = getState().navigation.setid;
 
   const userRef = firestore.doc(`users/${uid}`);
+  const setRef = firestore.doc(`sets/${setid}`);
+
+  setRef.update({ name });
 
   userRef.update({
     editedSet: name
@@ -75,7 +80,7 @@ export const editSetName = name => (dispatch, getState, { getFirestore }) => {
 export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
+  const setid = getState().navigation.setid;
   const termid = element.id;
 
   const docRef = firestore.doc(`users/${uid}/edit/${setid}/terms/${termid}`);
@@ -106,7 +111,7 @@ export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
 export const removeTerm = termid => (dispatch, getState, { getFirestore })  => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
+  const setid = getState().navigation.setid;
 
   const termRef = firestore.doc(`users/${uid}/edit/${setid}/terms/${termid}`);
 
@@ -126,7 +131,7 @@ export const removeTerm = termid => (dispatch, getState, { getFirestore })  => {
 export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
+  const setid = getState().navigation.setid;
 
   const termRef = firestore.collection(`users/${uid}/edit/${setid}/terms`).doc();
 
@@ -134,7 +139,8 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
     id: termRef.id,
     term: "",
     definition: "",
-    time: new Date(),
+    time: firestore.FieldValue.serverTimestamp(),
+    ratio: 0,
     termRows: 1,
     definitionRows: 1
   })
@@ -154,7 +160,7 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore })  => {
 export const submitEditSet = (terms) => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
+  const setid = getState().navigation.setid;
   const name = getState().firebase.profile.editedSet;
 
   const editedRef = firestore.collection(`users/${uid}/edit/${setid}/terms`);
@@ -162,84 +168,63 @@ export const submitEditSet = (terms) => (dispatch, getState, { getFirebase, getF
   const userRef = firestore.doc(`users/${uid}`);
   const learnRef = firestore.doc(`users/${uid}/learn/${setid}`);
 
-  editedRef.get().then(querySnapshot => {
-  //* update sets/${setid}
-  // update users/4{uid}/learn/${setid}/flashcards
-  // update users/4{uid}/learn/${setid}/game  and knowledge
-  // remove users/${uid}/{editedSet}
-  //* remove users/4{uid}/edit/${setid}/terms
+  // update a new set name
+  setRef.update({
+    name,
+    amount: terms.length
+  });
+  learnRef.update({
+    name,
+    amount: terms.length
+  });
+  userRef.update({ editedSet: '' });
 
-    // update a new set name
-    userRef.update({ editedSet: '' });
-    setRef.update({ name });
-    learnRef.update({ name });
-
-    // delete all set terms
-    setRef.collection('terms').get().then(snapshot => {
-      snapshot.forEach(doc => {
-        doc.ref.delete();
-      })
-    });
-
-    // fill set with edited terms
+  // delete all set terms
+  learnRef.collection('game').get().then(snapshot => {
+    snapshot.forEach(doc => {
+      doc.ref.delete();
+    })
+  }).then(() => {
     terms.forEach(element => {
-      const setTermsRef = firestore.collection(`sets/${setid}/terms/`);
-
-      setTermsRef.get().then(snapshot => {
-        snapshot.forEach(doc => {
-          const termRef = setTermsRef.doc(element.id);
-          termRef.set({
-            ...element
-          })
-        })
-      })
+      const playRef = firestore.doc(`users/${uid}/learn/${setid}/game/${element.id}`);
+      playRef.set({ ...element });
     })
+  });
 
-    // remove edit
-    editedRef.get().then(snapshot => {
-      snapshot.forEach(doc => {
-        doc.ref.delete();
-      });
-    }).then(() => {
-      firestore.doc(`users/${uid}/edit/${setid}`).delete();
+  learnRef.collection('flashcards').get().then(snapshot => {
+    snapshot.forEach(doc => {
+      doc.ref.delete();
     })
+  }).then(() => {
+    terms.forEach(element => {
+      const { id, term, definition, time, termRows, definitionRows } = element;
+      const learnRef = firestore.doc(`users/${uid}/learn/${setid}/flashcards/${id}`);
 
-  // // user learning set
-  //   firestore.collection(`users/${uid}/learn`).doc(createRef.id).set({
-  //     author,
-  //     name,
-  //     authorId: uid,
-  //     id: createRef.id,
-  //     amount: terms.length
-  //   })
-  //
-  //   terms.forEach(element => {
-  //     const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
-  //     const flashcardsRef = firestore.collection(`users/${uid}/learn/${createRef.id}/flashcards/`).doc();
-  //     const gameRef = firestore.collection(`users/${uid}/learn/${createRef.id}/game/`).doc();
-  //
-  //     termsRef.set({
-  //       term: element.term,
-  //       definition: element.definition,
-  //       id: termsRef.id,
-  //       time: element.time
-  //     })
-  //
-  //     flashcardsRef.set({
-  //       term: element.term,
-  //       definition: element.definition,
-  //       id: termsRef.id,
-  //       time: element.time
-  //     })
-  //
-  //     gameRef.set({
-  //       term: element.term,
-  //       definition: element.definition,
-  //       id: termsRef.id,
-  //       time: element.time,
-  //       knowledge: 0
-  //     })
-  //   })
+      learnRef.set({ id, term, definition, time, termRows, definitionRows });
+    })
+  });
+
+  setRef.collection('terms').get().then(snapshot => {
+    snapshot.forEach(doc => {
+      doc.ref.delete();
+    })
+  }).then(() => {
+
+    terms.forEach(element => {
+      const { id, term, definition, time, termRows, definitionRows } = element;
+      const termRef = firestore.doc(`sets/${setid}/terms/${id}`);
+
+      termRef.set({ id, term, definition, time, termRows, definitionRows });
+    })
+  })
+
+  // remove edit
+  editedRef.get().then(snapshot => {
+    snapshot.forEach(doc => {
+      doc.ref.delete();
+    });
+  }).then(() => {
+    firestore.doc(`users/${uid}/edit/${setid}`).delete();
   })
   .then(() => {
     dispatch({
@@ -274,7 +259,7 @@ export const deleteSetChanges = () => (dispatch, getState, { getFirestore }) => 
   }).then(() => {
     dispatch({
       type: 'DELETE_SET_CHANGES',
-      isDeleted: true
+      payload: true
     })
   }).catch(error => {
     dispatch({
