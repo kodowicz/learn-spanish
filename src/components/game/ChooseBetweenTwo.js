@@ -9,6 +9,7 @@ class ChooseBetweenTwo extends Component {
 
     this.state = {
       isChosen: false,
+      isInSpanish: true,
       term: "",
       options: [],
       startingPosition: {
@@ -25,26 +26,17 @@ class ChooseBetweenTwo extends Component {
   }
 
   shuffleOptions = (array) => {
-    let counter = array.length - 1;
-    let newOrder = [...array];
-
-    while (counter > 0) {
-      let index = Math.floor(Math.random() * counter);
-      let temp = newOrder[counter];
-      newOrder[counter] = newOrder[index];
-      newOrder[index] = temp;
-      counter--;
-    }
-
-    return newOrder;
+    return array.sort(() => Math.random() - 0.5);
   }
 
   createGame() {
     this.setState((prevState, props) => {
       const { item, terms } = props;
-      const term = item.term;
-      let options = [item.id];
       const styles = this.termRef.current;
+      const isInSpanish = Math.random() > 0.5 ? true : false;
+      const term = isInSpanish ? item.term : item.definition;
+      let options = [item.id];
+
       const startingPosition = {
         left: styles.offsetLeft,
         top: styles.offsetTop
@@ -60,6 +52,7 @@ class ChooseBetweenTwo extends Component {
       }
 
       return {
+        isInSpanish,
         term,
         startingPosition,
         options: this.shuffleOptions(options)
@@ -84,7 +77,7 @@ class ChooseBetweenTwo extends Component {
 
   render() {
     const { terms, isDesktop } = this.props;
-    const { isChosen, term, options, startingPosition } = this.state;
+    const { isChosen, isInSpanish, term, options, startingPosition } = this.state;
 
     return (
       <GameWrapper isChosen={isChosen}>
@@ -103,7 +96,7 @@ class ChooseBetweenTwo extends Component {
                 index={index}
                 isDesktop={isDesktop}
                 startingPosition={startingPosition}>
-                {terms[elementid].definition}
+                { isInSpanish ? terms[elementid].definition : terms[elementid].term }
               </DefinitionOption>
             </div>
           )

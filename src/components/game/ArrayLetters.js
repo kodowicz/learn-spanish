@@ -2,45 +2,71 @@ import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { colors } from '../../assets/styles/GlobalStyles';
 
+
 class ArrayLetters extends Component {
   state = {
     definition: "",
     correctAnswer: "",
+    prompting: "",
     counter: 0,
     index: 0,
-    lastUserLetter: null,
+    promptingTime: 5000,
+    lastLetterIndex: null,
+    isPrompting: false,
     isFinished: false,
+    excludedIndexes: [],
     answer: [],
-    letters: []
+    groupedWords: [],
+    letters: [],
+    currentLetter: {
+      wordIndex: 0,
+      letterIndex: 0
+    }
   }
 
   componentDidMount() {
     this.createGame();
+    this.prompting = setTimeout(this.promptingTimer, this.state.promptingTime)
   }
 
   createGame() {
-    this.setState((prevState, props) => {
-      const { item } = this.props;
+    this.setState((state, props) => {
+      const { item: { term: correctAnswer, definition }} = props;
       const { index } = this.state;
-      const definition = item.definition;
-      const correctAnswer = item.term;
-      const regex = /(\(|\)|\s|\n)/;
+      const excludedIndexes = this.getExcludedIndexes(correctAnswer);
+      const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
+      let nextIndex = 0;
 
       let answer = correctAnswer
-        .split("")
-        .map(letter => regex.test(letter) ? letter : null);
+      .split("")
+      .map((letter, index) =>
+        excludedIndexes.some(char => char === index) ? letter : null
+      );
 
-      let letters = this.randomLetters(item.term, index);
+      const groupedWords = this.createGroupedWords(answer, excludedIndexes);
+      const currentLetter = this.findCurrentLetter(groupedWords);
+
+      while (excludedIndexes.indexOf(nextIndex) !== -1) {
+        nextIndex++;
+      }
+
+      let letters = this.randomLetters(correctAnswer, nextIndex);
       letters = this.shuffleOptions(letters);
 
-      const lastUserLetter = answer.lastIndexOf(null);
+      const lastLetterIndex = answer.lastIndexOf(null);
+      const prompting = this.getPromptedLetter(answer, correctAnswer);
 
       return {
+        lastLetterIndex,
+        correctAnswer,
         definition,
+        prompting,
+        excludedIndexes,
         letters,
         answer,
-        correctAnswer,
-        lastUserLetter
+        groupedWords,
+        currentLetter,
+        index: nextIndex
       }
     })
   }
@@ -87,7 +113,7 @@ class ArrayLetters extends Component {
   }
 
   getExcludedIndexes = (word) => {
-    const regex = /[$&+,:;=?@#|'<>.^*()%!-\s]/g
+    const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g
     const array = [];
     let match;
 
@@ -98,63 +124,117 @@ class ArrayLetters extends Component {
     return array
   }
 
+  createGroupedWords = (array, excludedIndexes) => {
+    let groupedWords = [];
+    let prevIndex = 0;
+
+    if (excludedIndexes.length) {
+      array.forEach((letter, nextIndex) => {
+        const lastIndex = excludedIndexes.slice(-1)[0];
+
+        if (excludedIndexes.includes(nextIndex)) {
+          let words = [...array];
+          let subarray = [...words.slice(prevIndex, nextIndex)];
+
+          groupedWords.push(subarray, [letter]);
+          prevIndex = nextIndex + 1
+
+          if (lastIndex === nextIndex) {
+            let lastSubarrayLength = (array.length - 1) - lastIndex;
+            let lastSubarray = [...array.slice(-lastSubarrayLength)];
+
+            groupedWords.push(lastSubarray)
+          }
+        }
+      })
+
+    } else {
+      groupedWords.push(array);
+    }
+
+    return groupedWords.filter(subarray => subarray.length)
+  }
+
+  findCurrentLetter = (groupedWords) => {
+    let wordIndex = groupedWords.findIndex(word => word.some(letter => !letter));
+    let letterIndex = groupedWords[wordIndex]?.findIndex(letter => !letter);
+
+    return {
+      wordIndex,
+      letterIndex
+    }
+  }
+
   handlePicking = (event) => {
     event.persist();
 
-    this.setState((prevState, props) => {
-      const correctAnswer = prevState.correctAnswer;
-      const correctLetter = correctAnswer[prevState.index];
+    this.setState((state, props) => {
+      const { index, lastLetterIndex, promptingTime, excludedIndexes } = state;
+      const correctAnswer = state.correctAnswer;
+      const correctLetter = correctAnswer[index];
       const choice = event.target.id;
-      let nextIndex = prevState.index + 1;
-      let answer = [...prevState.answer];
+      let nextIndex = index + 1;
+      let answer = [...state.answer];
       let trimNumber = 1;
       let insertedAnswer = [choice];
 
-      // last answer letter; don't pick a new array of random letters
-      if (prevState.lastUserLetter === prevState.index) {
-        const emptyIndex = answer.findIndex(letter => !letter);
-        answer.splice(emptyIndex, trimNumber, ...insertedAnswer);
+      if (choice === correctLetter) {
 
-        return {
-          answer,
-          index: nextIndex
-        }
-
-      } else if (choice === correctLetter) {
-        const excludedIndexes = this.getExcludedIndexes(correctAnswer);
-        const nextLetter = correctAnswer[nextIndex];
-
-        if (excludedIndexes.indexOf(nextIndex) !== -1) {
-
-          while (excludedIndexes.indexOf(nextIndex) !== -1) {
-            insertedAnswer.push(prevState.correctAnswer[nextIndex]);
-            trimNumber++;
-            nextIndex++;
-          }
-
-          const emptyIndex = answer.findIndex(letter => !letter);
-          answer.splice(emptyIndex, trimNumber, ...insertedAnswer)
-
-        } else if (nextLetter) {
+        // if this is the last correct letter
+        if (lastLetterIndex === index) {
           const emptyIndex = answer.findIndex(letter => !letter);
           answer.splice(emptyIndex, trimNumber, ...insertedAnswer);
-        }
+          const groupedWords = this.createGroupedWords(answer, excludedIndexes);
 
-        // create a new array of random letters
-        let letters = this.randomLetters(prevState.correctAnswer, nextIndex);
-        letters = this.shuffleOptions(letters);
+          return {
+            answer,
+            groupedWords
+          }
 
-        return {
-          letters,
-          answer,
-          index: nextIndex,
-          counter: 0
+        // if this is not the last letter
+        } else {
+          const nextLetter = correctAnswer[nextIndex];
+          if (excludedIndexes.indexOf(nextIndex) !== -1) {
+
+            while (excludedIndexes.indexOf(nextIndex) !== -1) {
+              insertedAnswer.push(correctAnswer[nextIndex]);
+              trimNumber++;
+              nextIndex++;
+            }
+
+            const emptyIndex = answer.findIndex(letter => !letter);
+            answer.splice(emptyIndex, trimNumber, ...insertedAnswer)
+
+          } else if (nextLetter) {
+            const emptyIndex = answer.findIndex(letter => !letter);
+            answer.splice(emptyIndex, trimNumber, ...insertedAnswer);
+          }
+
+          // create a new array of random letters and reset prompting
+          const prompting = this.getPromptedLetter(answer, correctAnswer);
+          let letters = this.randomLetters(correctAnswer, nextIndex);
+          const groupedWords = this.createGroupedWords(answer, excludedIndexes);
+          const currentLetter = this.findCurrentLetter(groupedWords);
+          clearTimeout(this.prompting);
+          this.prompting = setTimeout(this.promptingTimer, promptingTime);
+          letters = this.shuffleOptions(letters);
+
+          return {
+            prompting,
+            letters,
+            answer,
+            groupedWords,
+            currentLetter,
+            index: nextIndex,
+            counter: 0,
+            isPrompting: false,
+          }
         }
 
       // wrong letter
       } else {
-        let counter = prevState.counter + 1;
-        let letters = prevState.letters;
+        let counter = state.counter + 1;
+        let letters = state.letters;
         const wrongIndex = letters.findIndex(element => element.letter === choice);
         let wrongLetter = letters[wrongIndex];
 
@@ -179,8 +259,8 @@ class ArrayLetters extends Component {
   }
 
   handleFadeUp = () => {
-    this.setState((prevState) => {
-      const { answer } = prevState;
+    this.setState((state) => {
+      const { answer, correctAnswer } = state;
       const isFinished = answer.every(letter => letter !== null)
 
       if (isFinished) {
@@ -200,8 +280,8 @@ class ArrayLetters extends Component {
   }
 
   handleLettersAnimation = () => {
-    this.setState((prevState) => {
-      const letters = prevState.letters;
+    this.setState((state) => {
+      const letters = state.letters;
       letters.forEach(element => element.isWrong = false);
       letters.forEach(element => element.isScaled = false);
 
@@ -209,28 +289,79 @@ class ArrayLetters extends Component {
     })
   }
 
+  promptingTimer = () => {
+    this.setState((state) => {
+      const prompting = this.getPromptedLetter(state.answer, state.correctAnswer);
+      return {
+        prompting,
+        isPrompting: true
+      }
+    });
+  }
+
+  getPromptedLetter = (array, str) => {
+    const index = array.findIndex(letter => !letter);
+    const nextLetter = index === -1 ? str[0] : str[index];
+    return nextLetter
+  }
+
   render() {
-    const { definition, isFinished, letters, answer } = this.state;
+    const {
+      currentLetter,
+      definition,
+      groupedWords,
+      correctAnswer,
+      prompting,
+      isPrompting,
+      isFinished,
+      letters,
+      answer
+    } = this.state;
+    // const currentLetter = answer.findIndex(letter => !letter);
 
     return (
       <GameWrapper isFinished={isFinished}>
         <Term>{definition}</Term>
 
         <AnswerWrapper>
-          {answer.map((letter, index) =>
-            <AnswerLetter
-              key={index}
-              letter={letter}
-              isBlock={/\n/.test(letter)}
-              isFaded={letter}
-              onAnimationEnd={this.handleFadeUp}>
-              {letter}
-            </AnswerLetter>
-          )}
+          { groupedWords.map((word, wordIndex) => {
+          const activeWord = wordIndex === currentLetter.wordIndex ? true : false;
+
+          return (
+            <WordAnswer key={wordIndex}>
+              { word.map((letter, letterIndex) => {
+                const activeLetter = letterIndex === currentLetter.letterIndex ? true : false;
+                const isActive = activeWord && activeLetter;
+                // const isActive = currentLetter === index;
+
+              return (isActive && isPrompting) ?
+                <AnswerLetterWrapper key={letterIndex}>
+                  <AnswerLetter
+                    letter={letter}
+                    isBlock={/\n/.test(letter)}
+                    isFaded={letter}
+                    onAnimationEnd={this.handleFadeUp}>
+                    {letter}
+                  </AnswerLetter>
+                  <Prompting>{prompting}</Prompting>
+                </AnswerLetterWrapper>
+              :
+                <AnswerLetter
+                  key={letterIndex}
+                  letter={letter}
+                  isBlock={/\n/.test(letter)}
+                  isFaded={letter}
+                  onAnimationEnd={this.handleFadeUp}>
+                  {letter}
+                </AnswerLetter>
+            })}
+            </WordAnswer>
+          )
+        })}
         </AnswerWrapper>
 
         <PickWrapper>
-          {letters.map(({ letter, isScaled, isWrong }, index) =>
+          {letters.map(({ letter, isScaled, isWrong }, index) => (
             <PickLetter
               id={letter}
               key={index}
@@ -240,7 +371,7 @@ class ArrayLetters extends Component {
               onAnimationEnd={this.handleLettersAnimation}>
               {letter}
             </PickLetter>
-          )}
+          ))}
         </PickWrapper>
 
       </GameWrapper>
@@ -348,7 +479,8 @@ const Term = styled.p`
 const AnswerWrapper = styled.div`
   color: ${colors.lightGray};
   height: auto;
-  width: max-content;
+  width: auto;
+  text-align: center;
   margin: 10rem auto 5rem auto;
 
   @media (min-width: 768px) {
@@ -356,8 +488,21 @@ const AnswerWrapper = styled.div`
   }
 `;
 
+const WordAnswer = styled.div`
+  display: inline-block
+`;
+
+const AnswerLetterWrapper = styled.span`
+  position: relative
+`;
+
 const AnswerLetter = styled.span`
-  width: ${({ letter }) => letter === " " && "1rem"};
+  font-size: 2.4rem;
+  display: inline-block;
+  position: relative;
+
+  width: ${({ letter }) => letter === " " && "1rem" };
+  bottom: ${({ letter }) => letter && "2px" };
 
   ${({ isBlock }) => isBlock && css`
     display: block;
@@ -375,11 +520,9 @@ const AnswerLetter = styled.span`
     animation: ${fadeUp} 0.3s linear
   `};
 
-  font-size: 2.4rem;
-  display: inline-block;
-
   @media (min-width: 768px) {
     font-size: 3rem;
+    bottom: ${({ letter }) => letter && "4px" };
 
     ${({ letter }) => !letter && css`
       height: calc(2.8rem * 1.333);
@@ -387,6 +530,21 @@ const AnswerLetter = styled.span`
       margin: 0 0.3rem;
       border-bottom: 1px solid white
     `}
+  }
+`;
+
+const Prompting = styled.span`
+  color: ${colors.bluish};
+  position: absolute;
+  text-align: center;
+  top: -1.1rem;
+  left: 0;
+  font-size: 2.4rem;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    font-size: 3rem;
+    top: -1.8rem;
   }
 `;
 

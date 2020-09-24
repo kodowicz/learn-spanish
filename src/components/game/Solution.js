@@ -121,12 +121,13 @@ const Answer = styled.img`
 `;
 
 const ItemWrapper = styled.div`
-  animation: ${fadeInOut} 2s ease-out 0.2s forwards;
+  animation: ${fadeInOut} 2s ease-out 0.2s both;
   animation-timing-function: ease-out;
   position: absolute;
   top: 45%;
   left: 50%;
-  transform: translateX(-50%, -50%);
+  width: 70vw;
+  transform: translate(-50%, -50%);
   opacity: 0;
 `;
 
@@ -139,7 +140,7 @@ const Term = styled(Item)`
   font-size: 3.2rem;
 
   @media (min-width: 768px) {
-    font-size: 4rem;
+    font-size: 3.5rem;
   };
 `;
 
@@ -148,7 +149,7 @@ const Definition = styled(Item)`
   color: ${colors.lightGray};
 
   @media (min-width: 768px) {
-    font-size: 3rem;
+    font-size: 2.8rem;
   }
 `;
 

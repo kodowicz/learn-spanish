@@ -32,7 +32,8 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
             time,
             termRows,
             definitionRows,
-            ratio: 0
+            ratio: 0,
+            isMastered: false
           })
         })
       })
@@ -64,6 +65,7 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
   const minRatio = 0;
   const maxRatio = 5;
   let knowledge;
+  let isMastered = item.ratio === 5 ? true : false;
 
   const docRef = firestore.doc(`users/${user}/learn/${set}/game/${item.id}`);
   const knowledgeRef = firestore.doc(`users/${user}/learn/${set}`);
@@ -90,6 +92,7 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
 
   docRef.update({
     time,
+    isMastered,
     ratio: maxRatio < newRatio ?
       maxRatio
       :

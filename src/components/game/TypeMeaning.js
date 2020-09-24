@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
+import { colors } from '../../assets/styles/GlobalStyles';
 
 
 class TypeMeaning extends Component {
@@ -8,29 +9,43 @@ class TypeMeaning extends Component {
 
     this.state = {
       index: 0,
-      dashes: null,
+      counter: 0,
+      promptingTime: 5000,
       definition: "",
-      isFinished: false,
       correctAnswer: "",
+      prompting: "",
+      isFinished: false,
+      isFocused: false,
+      isPrompting: false,
       isActive: false,
       isWrong: false,
       isCorrect: false,
-      counter: 0
+      excludedIndexes: [],
+      dashes: [],
+      groupedWords: [],
+      currentLetter: {
+        wordIndex: 0,
+        letterIndex: 0
+      }
     }
 
+    this.inputRef = React.createRef();
     this.dashRef = React.createRef();
   }
 
   componentDidMount() {
     this.createGame();
-    document.addEventListener("keydown", this.handleTyping);
   }
 
   createGame() {
     this.setState((state, props) => {
       const { item } = props;
-      const dashes = this.createDashes(item.term);
-      const excludedIndexes = this.getExcludedIndexes(item.term);
+      const correctAnswer = item.term;
+      const excludedIndexes = this.getExcludedIndexes(correctAnswer);
+      const dashes = this.createDashes(correctAnswer, excludedIndexes);
+      const groupedWords = this.createGroupedWords(dashes, excludedIndexes);
+      const currentLetter = this.findCurrentLetter(groupedWords);
+      const prompting = this.getPromptedLetter(dashes, correctAnswer);
       let nextIndex = 0;
 
       while (excludedIndexes.indexOf(nextIndex) !== -1) {
@@ -38,17 +53,51 @@ class TypeMeaning extends Component {
       }
 
       return {
+        currentLetter,
+        correctAnswer,
+        prompting,
+        excludedIndexes,
         dashes,
+        groupedWords,
         index: nextIndex,
-        definition: item.definition,
-        correctAnswer: item.term
+        definition: item.definition
       }
     })
   };
 
-  createDashes = (term) => {
+  createGroupedWords = (array, excludedIndexes) => {
+    let groupedWords = [];
+    let prevIndex = 0;
+
+    if (excludedIndexes.length) {
+      array.forEach((letter, nextIndex) => {
+        const lastIndex = excludedIndexes.slice(-1)[0];
+
+        if (excludedIndexes.includes(nextIndex)) {
+          let dashes = [...array];
+          let subarray = [...dashes.slice(prevIndex, nextIndex)];
+
+          groupedWords.push(subarray, [letter]);
+          prevIndex = nextIndex + 1
+
+          if (lastIndex === nextIndex) {
+            let lastSubarrayLength = (array.length - 1) - lastIndex;
+            let lastSubarray = [...array.slice(-lastSubarrayLength)];
+
+            groupedWords.push(lastSubarray)
+          }
+        }
+      })
+
+    } else {
+      groupedWords.push(array);
+    }
+
+    return groupedWords.filter(subarray => subarray.length)
+  }
+
+  createDashes = (term, excludedIndexes) => {
     let dashes = [];
-    const excludedIndexes = this.getExcludedIndexes(term);
 
     dashes = term.split("").map((letter, index) =>
       excludedIndexes.some(i => i === index) ? letter : ""
@@ -56,6 +105,16 @@ class TypeMeaning extends Component {
 
     return dashes;
   };
+
+  findCurrentLetter = (groupedWords) => {
+    let wordIndex = groupedWords.findIndex(word => word.some(letter => !letter));
+    let letterIndex = groupedWords[wordIndex]?.findIndex(letter => !letter);
+
+    return {
+      wordIndex,
+      letterIndex
+    }
+  }
 
   getExcludedIndexes = (word) => {
     // it won't catch special char like
@@ -72,33 +131,43 @@ class TypeMeaning extends Component {
 
   switchSpecialLetters = (letterCode, correctLetter) => {
     const charCodes = [
-      { basic: 65, ext: 'á'},
-      { basic: 69, ext: 'é'},
-      { basic: 73, ext: 'í'},
-      { basic: 78, ext: 'ñ'},
-      { basic: 79, ext: 'ó'},
-      { basic: 85, ext: 'ú'}
+      { basic: 65, ext: ['á', 'à', 'â', 'ã', 'ä', 'å', 'ą'] },
+      { basic: 69, ext: ['é', 'è', 'ê', 'ë', 'ę'] },
+      { basic: 73, ext: ['í', 'ì', 'î', 'ï'] },
+      { basic: 78, ext: ['ñ'] },
+      { basic: 79, ext: ['ó', 'ò', 'ô', 'õ', 'ö'] },
+      { basic: 85, ext: ['ú', 'ù', 'û', 'ü'] },
+      { basic: 89, ext: ['ý', 'ÿ'] },
+      { basic: 67, ext: ['ç'] }
     ];
     const index = charCodes.findIndex(code => code.basic === letterCode);
+    let isCommutable = false;
 
     if (index !== -1) {
-      const isCommutable = correctLetter.toLowerCase() === charCodes[index].ext;
-      if (isCommutable) {
-        return true
-      }
+      isCommutable = charCodes[index].ext.some(letter => letter === correctLetter.toLowerCase());
     }
+
+    return isCommutable
   }
 
   handleTyping = (event) => {
+    const keyCode = event;
+    const currentCode = event.which || event.code;
+    let currentKey = event.key;
+    event.persist();
+
+    if (!currentKey) {
+      currentKey = String.fromCharCode(currentCode);
+    }
+
     this.setState(state => {
-      const { index, correctAnswer, dashes } = state;
+      const { index, promptingTime, correctAnswer, excludedIndexes, dashes } = state;
       const correctLetter = correctAnswer[index];
       let userLetter = event.key;
-      const isCommutable = this.switchSpecialLetters(event.keyCode, correctLetter);
+      const isCommutable = this.switchSpecialLetters(currentCode, correctLetter);
 
       if (isCommutable || userLetter === correctLetter) {
         const counter = 0;
-        const excludedIndexes = this.getExcludedIndexes(state.correctAnswer);
         let nextIndex = index + 1;
         userLetter = (isCommutable ? correctLetter : userLetter);
 
@@ -107,11 +176,22 @@ class TypeMeaning extends Component {
         }
 
         dashes[index] = userLetter;
+        const groupedWords = this.createGroupedWords(dashes, excludedIndexes);
+        const currentLetter = this.findCurrentLetter(groupedWords);
+
+        // prompting
+        clearTimeout(this.prompting);
+        const prompting = this.getPromptedLetter(dashes, correctAnswer);
+        this.prompting = setTimeout(this.promptingTimer, promptingTime);
 
         return {
           counter,
+          currentLetter,
+          prompting,
           dashes,
+          groupedWords,
           index: nextIndex,
+          isPrompting: false,
           isCorrect: true
         };
 
@@ -155,11 +235,49 @@ class TypeMeaning extends Component {
     });
   };
 
+  handleFocus = event => {
+    this.setState({
+      isFocused: true
+    }, () => this.prompting = setTimeout(
+      this.promptingTimer,
+      this.state.promptingTime
+    ))
+  }
+
+  handleBlur = event => {
+    this.setState({
+      isFocused: false,
+      isPrompting: false,
+      prompting: ""
+    }, () => clearTimeout(this.prompting))
+  }
+
+  promptingTimer = () => {
+    this.setState((state) => {
+      const prompting = this.getPromptedLetter(state.dashes, state.correctAnswer);
+      return {
+        prompting,
+        isPrompting: true
+      }
+    });
+  }
+
+  getPromptedLetter = (array, str) => {
+    const index = array.findIndex(letter => !letter);
+    const nextLetter = index === -1 ? str[0] : str[index];
+    return nextLetter
+  }
+
   render() {
     const {
+      currentLetter,
+      prompting,
       dashes,
+      groupedWords,
       definition,
       isFinished,
+      isFocused,
+      isPrompting,
       isWrong,
       isCorrect,
       index: currentIndex
@@ -173,19 +291,53 @@ class TypeMeaning extends Component {
           isWrong={isWrong}
           isCorrect={isCorrect}
           onAnimationEnd={this.handleAnswer}>
+
+          <Input
+            ref={this.inputRef}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+            onKeyDown={this.handleTyping}
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false" />
+
           <Dashes>
-            {dashes &&
-              dashes.map((letter, index) =>
-                <Dash
-                  letter={letter}
-                  ref={currentIndex === index ? this.dashRef : false}
-                  isActive={currentIndex === index}
-                  index={index}
-                  key={index}
-                  isBlock={/\n/.test(letter)}>
-                  {letter}
-                </Dash>
-              )
+            { groupedWords.map((word, wordIndex) => {
+                const activeWord = wordIndex === currentLetter.wordIndex ? true : false;
+
+                return (
+                  <Word key={wordIndex}>
+                    { word.map((letter, letterIndex) => {
+                      const activeLetter = letterIndex === currentLetter.letterIndex ? true : false;
+                      const isActive = isFocused && activeWord && activeLetter;
+
+                      return (isActive && isPrompting) ?
+                        <DashWrapper key={letterIndex}>
+                          <Dash
+                            letter={letter}
+                            ref={isActive ? this.dashRef : false}
+                            isActive={isActive ? true : false}
+                            index={letterIndex}
+                            isBlock={/\n/.test(letter)}>
+                            {letter}
+                          </Dash>
+                          <Prompting>{prompting}</Prompting>
+                        </DashWrapper>
+                        :
+                        <Dash
+                          letter={letter}
+                          ref={isActive ? this.dashRef : false}
+                          isActive={isActive ? true : false}
+                          index={letterIndex}
+                          key={letterIndex}
+                          isBlock={/\n/.test(letter)}>
+                          {letter}
+                        </Dash>
+                    })}
+                  </Word>
+                )
+              })
             }
           </Dashes>
         </InputWrapper>
@@ -303,13 +455,36 @@ const InputWrapper = styled.div`
   `}
 `;
 
+const Input = styled.input`
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  background: none;
+  outline: none;
+  color: transparent;
+  caret-color: transparent;
+  width: 100%;
+  height: 100%;
+  font-size: 1.6rem;
+`;
+
 const Dashes = styled.div`
   margin: 0 auto;
+  padding: 1rem 2rem;
+  text-align: center;
+`;
+
+const Word = styled.div`
+  display: inline-block
+`;
+
+const DashWrapper = styled.span`
+  position: relative
 `;
 
 const Dash = styled.span`
-  font-size: 2.8rem;
-  height: calc(2.2rem * 1.345);
+  font-size: 2.4rem;
   display: inline-block;
   transition: transform 0.1s ease-out;
 
@@ -317,7 +492,7 @@ const Dash = styled.span`
 
   ${({ isActive }) => isActive && css`
     animation: ${blink} 1s linear infinite;
-    transform: translateY(2px);
+    transform: translateY(4px);
   `};
 
   ${({ isBlock }) => isBlock && css`
@@ -327,10 +502,23 @@ const Dash = styled.span`
 
   ${({ letter }) => !letter && css`
     height: calc(2.8rem);
-    width: 1.5rem;
-    margin: 0 0.3rem;
+    width: 1rem;
+    margin: 0 0.2rem;
     border-bottom: 1px solid white;
-  `}
-`
+  `};
+`;
+
+const Prompting = styled.span`
+  position: absolute;
+  top: -1.2rem;
+  left: 0;
+  font-size: 2.4rem;
+  height: 2.4rem;
+  color: ${colors.bluish};
+
+  @media (min-width: 768px) {
+    top: -1rem
+  }
+`;
 
 export default TypeMeaning

@@ -13,54 +13,102 @@ import styled from 'styled-components';
 
 
 class PlaySet extends Component {
+  componentDidMount() {
+    this.props.changeLocation('learn');
+    this.props.setCurrentSetId(this.props.setid);
+  }
+
+  render() {
+    const {
+      terms,
+      setid,
+      answer,
+      correctItem,
+      isOverlayOpen,
+      cancelSesion,
+      cleanGameAnswer,
+      showGameAnswer
+    } = this.props;
+
+    if (answer) {
+      return (
+        <Solution
+          answer={answer}
+          correctItem={correctItem}
+          cleanGameAnswer={cleanGameAnswer} />
+      )
+
+    } else {
+      // choose a game
+      return (
+        <>
+          {
+            isOverlayOpen &&
+            <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
+          }
+          { !answer &&
+            <Game
+              isHidden={isOverlayOpen}
+              terms={terms}
+              answer={answer}
+              correctItem={correctItem}
+              showGameAnswer={showGameAnswer} />
+            }
+        </>
+      )
+    }
+  }
+}
+
+class Game extends Component {
   state = {
     item: {},
+    game: 0,
     isDesktop: false
   }
 
   componentDidMount() {
-    this.props.changeLocation('learn');
-    this.props.changeLastLocation(`/sets/${this.props.setid}`);
-    this.props.setCurrentSetId(this.props.setid);
-
     const isDesktop = window.innerWidth >= 768;
 
     this.setState((state, props) => {
-      const terms = props.terms;
-      const randomIndex = Math.floor(Math.random() * terms.length);
-      const item = terms[randomIndex];
+      const filtredTerms = props.terms.filter(item => !item.isMastered);
+      const randomIndex = Math.floor(Math.random() * filtredTerms.length);
+      let item = filtredTerms[randomIndex];
+      let game =  this.pickGame(item.ratio, item.term.length > 20);
 
       return {
         item,
+        game,
         isDesktop
       }
     })
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.terms !== prevProps.terms) {
-      this.setState((state, props) => {
-        const terms = props.terms;
+  pickGame(ratio, isTooLong) {
+    let game;
 
-        const randomIndex = Math.floor(Math.random() * terms.length);
-        const item = terms[randomIndex];
+    if (ratio <= 2) {
+      game = Math.floor(Math.random() * 3);
 
-        return { item }
-      })
+    } else if (ratio === 5) {
+      game = 5;
+
+    } else {
+      game = Math.floor(Math.random() * 2) + 3;
+
+      if (isTooLong && game === 4) {
+        game--
+      };
     }
+
+    return game
   }
 
-  randomGame = (ratio) => {
-    const { terms, isReady, showGameAnswer } = this.props;
-    const { item, isDesktop } = this.state;
-    const maxNumber = isDesktop ? 6 : 5;
-    let number = Math.floor(Math.random() * maxNumber);
+  randomGame(ratio) {
+    const { terms, showGameAnswer } = this.props;
+    const { item, game, isDesktop } = this.state;
 
-    if (item.term.length > 20 && number === 3) {
-      number--
-    };
-
-    switch (number) {
+    switch (game) {
       case 5:
         return (
           <TypeMeaning
@@ -111,50 +159,23 @@ class PlaySet extends Component {
   }
 
   render() {
-    const {
-      setid,
-      answer,
-      correctItem,
-      isOverlayOpen,
-      cancelSesion,
-      cleanGameAnswer
-    } = this.props;
     const { item } = this.state;
 
-    if (answer) {
-      return (
-        <Solution
-          answer={answer}
-          correctItem={correctItem}
-          cleanGameAnswer={cleanGameAnswer} />
-        )
+    return (
+      <GameWrapper isHidden={this.props.isHidden}>
+        <RatioWrapper>
+          <RatioDots ratio={item.ratio} />
+        </RatioWrapper>
+        {this.randomGame(item.ratio)}
 
-    } else {
-      // choose a game
-      return (
-        <>
-          {
-            isOverlayOpen &&
-            <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
-          }
-          { !answer &&
-            <GameWrapper
-              isHidden={isOverlayOpen}>
-              <RatioWrapper>
-                <RatioDots ratio={item.ratio} />
-              </RatioWrapper>
-              { item.term && this.randomGame(item.ratio) }
-            </GameWrapper>
-          }
-        </>
-      )
-    }
+      </GameWrapper>
+    );
   }
 }
 
 
 const GameWrapper = styled.div`
-  display: ${({ isHidden }) => isHidden && 'none'};
+  visibility: ${({ isHidden }) => isHidden && 'hidden'};
   cursor: pointer
 `;
 
