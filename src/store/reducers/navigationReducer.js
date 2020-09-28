@@ -2,7 +2,8 @@ const initState = {
   location: 'home',
   lastLocation: '',
   isOpen: false,
-  setid: ''
+  setid: '',
+  isLogged: false
 };
 
 export const navigationReducer = (state = initState, action) => {
@@ -25,11 +26,18 @@ export const navigationReducer = (state = initState, action) => {
         lastLocation: action.payload
       }
 
+    case 'SIGNUP_SUCCESS':
+    case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        isLogged: true
+      }
+
     case 'CURRENT_SET_ID':
       return {
         ...state,
         setid: action.payload
-      };
+      }
 
     default:
       return state;

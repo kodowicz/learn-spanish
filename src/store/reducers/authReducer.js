@@ -1,6 +1,5 @@
 const initState = {
-  authError: null,
-  isChanged: false
+  authError: null
 };
 
 export const authReducer = (state = initState, action) => {
@@ -29,10 +28,16 @@ export const authReducer = (state = initState, action) => {
         authError: action.error.message
       }
 
-    case 'LOGOUT_SUCCESS':
+    case 'LOGOUT_NOTIFICATION':
       return {
         ...state,
         authError: 'logout'
+      }
+
+    case 'REMOVE_LOGOUT_NOTIFICATION':
+      return {
+        ...state,
+        authError: ''
       }
 
     case 'LOGOUT_ERROR':

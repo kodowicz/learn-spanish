@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {
   changeLocation,
   changeLastLocation
-} from '../store/actions/locationActions';
+} from '../store/actions/navigationActions';
 import {
   signUp,
   signIn,

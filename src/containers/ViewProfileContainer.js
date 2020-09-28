@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import { firestoreConnect, isLoaded } from 'react-redux-firebase';
 
 import { openPasswordOverlay } from '../store/actions/overlayActions.js';
-import { notificationError } from '../store/actions/notificationActions.js';
+import {
+  notificationError,
+  logoutNotification
+} from '../store/actions/notificationActions.js';
 import {
   logOut,
   changePassword
@@ -12,9 +15,10 @@ import {
 import {
   changeLocation,
   changeLastLocation
-} from '../store/actions/locationActions';
+} from '../store/actions/navigationActions';
 
 import ViewProfile from '../pages/ViewProfile';
+
 
 const ViewProfileContainer = (props) => {
 
@@ -31,6 +35,7 @@ const ViewProfileContainer = (props) => {
         openPasswordOverlay={props.openPasswordOverlay}
         changePassword={props.changePassword}
         notificationError={props.notificationError}
+        logoutNotification={props.logoutNotification}
         changeLocation={props.changeLocation}
         changeLastLocation={props.changeLastLocation}
       />
@@ -72,6 +77,7 @@ export default compose(
       openPasswordOverlay,
       changePassword,
       notificationError,
+      logoutNotification,
       changeLocation,
       changeLastLocation
     }

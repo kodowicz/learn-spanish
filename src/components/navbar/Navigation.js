@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-
+import React, { useRef, useState, useEffect } from 'react';
+import { Redirect, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import back from '../../assets/images/back.svg';
 import menu from '../../assets/images/menu.svg';
@@ -8,7 +8,9 @@ import menu from '../../assets/images/menu.svg';
 const Navigation = ({
   isMobile,
   isOpen,
+  isLogged,
   location,
+  lastLocation,
   goBack,
   handleMenu,
   cancelSesion,
@@ -19,6 +21,7 @@ const Navigation = ({
 }) => {
 
   const titleRef = useRef(0);
+  let history = useHistory();
 
   const handleBackButton = () => {
     handleMenu(false);
@@ -27,17 +30,20 @@ const Navigation = ({
       cancelSesion(true);
 
     } else if (location === 'profile') {
-      // if password opened {
-      //   closeChangePassword(false)
-      // } else {
-      //   goBack()
-      // }
       closeChangePassword(false);
-      goBack();
+      if (isLogged) {             // to prevent going back to signin page
+        history.replace("/");
+      } else {
+        goBack();
+      }
 
     } else if (location === 'set') {
       chooseMethod(false);
-      goBack();
+      if (lastLocation === 'set') {
+        history.replace("/");
+      } else {
+        goBack()
+      }
 
     } else if (location === 'create') {
       askForDeleting(false);
@@ -66,7 +72,10 @@ const Navigation = ({
         <img src={back} alt='go back' />
       </Button>
 
-      <Title ref={titleRef}>{ location }</Title>
+      <Title
+        ref={titleRef}>
+        { location }
+      </Title>
 
       { isMobile &&
         <Button

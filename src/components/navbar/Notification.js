@@ -1,35 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { BlockElement, BasicInput, colors } from '../../assets/styles/GlobalStyles';
+import { colors } from '../../assets/styles/GlobalStyles';
 
 
-class Notification extends React.Component {
-  componentDidMount() {
-    const { message, removeNotification } = this.props;
+const Notification = ({
+  message,
+  removeNotification,
+  removeLogoutNotification
+}) => {
 
-    this.interval = setTimeout(
+  useEffect(() => {
+    setTimeout(
       () => {
-        if (message) removeNotification()
+        if (message) {
+          message === 'logout' ?
+          removeLogoutNotification() :
+          removeNotification();
+        }
       }, 3000
     );
-  }
+  });
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  render() {
-    return (
-      <Wrapper>
-        <Message>{this.props.message}</Message>
-      </Wrapper>
-    );
-  }
+  return (
+    <Wrapper>
+      <Message>{ message }</Message>
+    </Wrapper>
+  );
 };
 
 
 const Wrapper = styled.div`
-  position: absolute;
+  position: fixed;
   top: 3.5em;
   left: 50%;
   width: 80vw;

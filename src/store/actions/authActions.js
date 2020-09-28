@@ -49,7 +49,6 @@ export const logOut = () => (dispatch, getState, { getFirebase }) => {
       type: 'LOGOUT_SUCCESS'
     })
   })
-
 }
 
 export const changePassword = (data) => (dispatch, getState, { getFirebase, getFirestore }) => {
@@ -74,7 +73,6 @@ export const changePassword = (data) => (dispatch, getState, { getFirebase, getF
       type: 'CHANGE_PASSWORD_ERROR'
     })
   })
-
 }
 
 
