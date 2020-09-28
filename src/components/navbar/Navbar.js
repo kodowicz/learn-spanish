@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react'
 import Menu from './Menu';
 import Navigation from './Navigation';
 import Scroller from './Scroller';
@@ -6,28 +6,68 @@ import Scroller from './Scroller';
 import styled from 'styled-components';
 import Background from '../Background';
 
+
 const Navbar = ({
   uid,
-  isMobile,
+  isPageLonger,
   isOpen,
+  isLogged,
   location,
+  lastLocation,
   goBack,
   handleMenu,
   cancelSesion,
   chooseMethod,
   askForDeleting,
   deleteSetChanges,
-  closeChangePassword
+  closeChangePassword,
+  createBasicTerms
 }) => {
 
-  const isVisible = isMobile ? isOpen : false;
-  const isScrollVisible = (location === 'learn' || location === 'play') ? true : false;
+  const [isScrollTop, setScrolled] = useState();
+  const [isMobile, setMobile] = useState(false);
+  const [isMenuVisible, setMenuVisible] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isScrollVisible, setScrollVisible] = useState(false);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const isMenuVisible = isMobile ? isOpen : true;
+    const isScrollTop = window.scrollY <= 0 ? true : false;
+    const isMenuOpen = isMobile ? isMenuVisible : false;
+    const locationRegex = /(learn)/;
+    const isScrollVisible = !locationRegex.test(location);
+
+    setMobile(isMobile);
+    setMenuVisible(isMenuVisible);
+    setScrolled(isScrollTop);
+    setMenuOpen(isMenuOpen);
+    setScrollVisible(isScrollVisible);
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll);
+  })
+
+  const handleResize = () => {
+    const isMobile = window.innerWidth < 768;
+    const isMenuVisible = isMobile ? isOpen : true;
+    const isMenuOpen = isMobile ? isMenuVisible : false;
+
+    setMobile(isMobile);
+    setMenuVisible(isMenuVisible);
+    setMenuOpen(isMenuOpen);
+  };
+  
+  const handleScroll = () => {
+    const isScrollTop = window.scrollY <= 0 ? true : false;
+    setScrolled(isScrollTop);
+  };
 
   return (
     <>
       { location &&
-        <Nav isVisible={isVisible}>
-          { isVisible &&
+        <Nav isVisible={isMenuOpen}>
+          { isOpen &&
             <BackgroundWrapper>
               <Background />
             </BackgroundWrapper>
@@ -36,7 +76,9 @@ const Navbar = ({
           <Navigation
             isMobile={isMobile}
             isOpen={isOpen}
+            isLogged={isLogged}
             location={location}
+            lastLocation={lastLocation}
             goBack={goBack}
             handleMenu={handleMenu}
             cancelSesion={cancelSesion}
@@ -46,18 +88,17 @@ const Navbar = ({
             closeChangePassword={closeChangePassword}
           />
 
-          { isOpen &&
+          { (isOpen || isMenuVisible) &&
             <Menu
               uid={uid}
               handleMenu={handleMenu}
               chooseMethod={chooseMethod}
               askForDeleting={askForDeleting}
+              createBasicTerms={createBasicTerms}
             />
           }
 
-          { !(isOpen || isScrollVisible) &&
-            <Scroller />
-          }
+          {(!isMenuOpen && isPageLonger && !isScrollTop && isScrollVisible) && <Scroller />}
         </Nav>
       }
     </>

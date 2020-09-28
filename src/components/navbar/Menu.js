@@ -9,14 +9,24 @@ const Menu = ({
   uid,
   handleMenu,
   chooseMethod,
-  askForDeleting
+  askForDeleting,
+  createBasicTerms
 }) => {
 
-  const handleMenuButton = (event) => {
+  const handleButton = () => {
     chooseMethod(false);
     askForDeleting(false);
     handleMenu(false);
-    event.target.blur()
+  }
+  const handleMenuButton = (event) => {
+    handleButton();
+    event.target.blur();
+  }
+
+  const handleCreateButton = (event) => {
+    handleButton();
+    event.target.blur();
+    createBasicTerms()
   }
 
   return (
@@ -34,7 +44,7 @@ const Menu = ({
       </LinkAnchor>
 
       <LinkAnchor
-        onClick={handleMenuButton}
+        onClick={handleCreateButton}
         to="/create/">
         create
       </LinkAnchor>

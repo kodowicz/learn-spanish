@@ -11,12 +11,6 @@ class TermsList extends Component {
     movedElement: null
   }
 
-  componentDidMount () {
-    if (this.props.terms.length < 2 && this.props.basicTwoTerms) {
-      this.props.basicTwoTerms(2);
-    }
-  }
-
   onElementMove = (isMoved, element) => {
     this.setState({
       isMoved: isMoved,
@@ -33,12 +27,11 @@ class TermsList extends Component {
           let isVisible = (this.state.movedElement === index && this.state.isMoved) ? false : true;
 
           return (
-          <ListItem key={term.id}>
+          <ListItem key={term.id} id={term.id}>
             <Counter
               isVisible={isVisible}
-              isLessThanTen={((index + 1) < 10) ? true : false}
-            >
-              {index + 1}
+              isLessThanTen={((index + 1) < 10) ? true : false}>
+              { index + 1 }
             </Counter>
             <SetWrapper>
               <Term
@@ -47,8 +40,7 @@ class TermsList extends Component {
                 termDetails={term}
                 updateTerm={updateTerm}
                 removeTerm={removeTerm}
-                onMove={this.onElementMove}
-              />
+                onMove={this.onElementMove}  />
             </SetWrapper>
           </ListItem>
         )

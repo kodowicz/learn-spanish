@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { deleteSetChanges } from '../store/actions/editSetActions';
+import { createBasicTerms } from '../store/actions/createSetActions';
 import { handleMenu } from '../store/actions/navigationActions';
 import {
   cancelSesion,
@@ -15,9 +16,11 @@ import NavBar from '../components/navbar/Navbar';
 const NavbarContainer = (props) => (
   <NavBar
     uid={props.uid}
-    isMobile={props.isMobile}
     isOpen={props.isOpen}
+    isLogged={props.isLogged}
+    isPageLonger={props.isPageLonger}
     location={props.location}
+    lastLocation={props.lastLocation}
     match={props.match}
     goBack={props.goBack}
     handleMenu={props.handleMenu}
@@ -26,17 +29,26 @@ const NavbarContainer = (props) => (
     askForDeleting={props.askForDeleting}
     deleteSetChanges={props.deleteSetChanges}
     closeChangePassword={props.closeChangePassword}
+    createBasicTerms={props.createBasicTerms}
   />
 );
 
 const mapStateToProps = (state, ownProps) => {
-  const isMobile = window.innerWidth < 768;
+  const pageHeight = document.documentElement.scrollHeight;
+  const windowHeight = window.innerHeight;
+  let isPageLonger = false;
+
+  if (pageHeight > windowHeight) {
+    isPageLonger = true
+  }
 
   return {
-    isMobile,
     uid: state.firebase.auth.uid,
-    isOpen: isMobile ? state.navigation.isOpen : true,
+    isPageLonger,
+    isOpen: state.navigation.isOpen,
+    isLogged: state.navigation.isLogged,
     location: state.navigation.location,
+    lastLocation: state.navigation.lastLocation,
     goBack: ownProps.history.goBack
   }
 };
@@ -49,6 +61,7 @@ export default connect(
     chooseMethod,
     askForDeleting,
     deleteSetChanges,
-    closeChangePassword
+    closeChangePassword,
+    createBasicTerms
   }
 )(NavbarContainer)

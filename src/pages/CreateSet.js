@@ -36,7 +36,11 @@ class CreateSet extends Component {
 
   addTerm = event => {
     event.preventDefault();
-    this.props.addNewUnsavedTerm();
+    if (this.props.unsavedSetTerms.length >= 50) {
+      this.props.notificationError("You've reached a limit of terms")
+    } else {
+      this.props.addNewUnsavedTerm();
+    }
   }
 
   render() {
@@ -64,23 +68,20 @@ class CreateSet extends Component {
       return (
         <DeleteSetOverlay
           deleteSet={deleteCreateSet}
-          askForDeleting={askForDeleting}
-         />
-       )
+          askForDeleting={askForDeleting} />
+      )
     } else {
       return (
-        <Main width={80} maxWidth={450}>
+        <Main width={80} maxWidth={450} desktop={500}>
           <Form>
             <SetName>
               <NameInput
                 value={setName}
-                maxLength="40"
-                onChange={this.setName}
-              />
+                maxLength="30"
+                onChange={this.setName} />
               <NameLabel
                 isFilled={isFilled}
-                htmlFor="name"
-              >
+                htmlFor="name">
                 Name your set
               </NameLabel>
               <Border isBig="true" />
@@ -91,16 +92,13 @@ class CreateSet extends Component {
               terms={unsavedSetTerms}
               askForDeleting={askForDeleting}
               submitSet={submitCreateSet}
-              notificationError={notificationError}
-            />
+              notificationError={notificationError} />
 
             <TermsListWrapper>
               <TermsList
-                basicTwoTerms={this.props.basicTwoTerms}
                 terms={unsavedSetTerms}
                 updateTerm={updateUnsavedTerm}
-                removeTerm={removeUnsavedTerm}
-              />
+                removeTerm={removeUnsavedTerm} />
             </TermsListWrapper>
 
             <AddButton onClick={this.addTerm}>add term</AddButton>
@@ -158,8 +156,8 @@ const Buttons = ({
     if (!setName || /^\s$/.test(setName)) {
       notificationError('You must enter a title to save your set');
 
-    } else if (reducedTerms.length < 2) {
-      notificationError('You have to create at least 2 terms');
+    } else if (reducedTerms.length < 4) {
+      notificationError('You must create at least 4 terms');
 
     } else {
       submitSet(reducedTerms);
@@ -205,6 +203,7 @@ const NameInput = styled(BasicInput)`
   font-size: 2rem;
   outline-color: ${colors.blue};
   color: ${colors.white};
+  user-select: auto;
 
   &:focus + ${NameLabel} {
     opacity: 0;
@@ -239,7 +238,7 @@ const TermsListWrapper = styled.div`
   margin: 0 auto;
 
   @media (min-width: 786px) {
-    margin: 0 40px
+    width: 100%
   }
 `;
 

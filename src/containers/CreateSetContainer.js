@@ -9,10 +9,10 @@ import { notificationError } from '../store/actions/notificationActions';
 import {
   changeLocation,
   changeLastLocation
-} from '../store/actions/locationActions';
+} from '../store/actions/navigationActions';
 import {
   setUnsavedName,
-  basicTwoTerms,
+  createBasicTerms,
   updateUnsavedTerm,
   addNewUnsavedTerm,
   removeUnsavedTerm,
@@ -40,7 +40,7 @@ const CreateSetContainer = (props) => {
       changeLastLocation={props.changeLastLocation}
       askForDeleting={props.askForDeleting}
       setUnsavedName={props.setUnsavedName}
-      basicTwoTerms={props.basicTwoTerms}
+      createBasicTerms={props.createBasicTerms}
       updateUnsavedTerm={props.updateUnsavedTerm}
       addNewUnsavedTerm={props.addNewUnsavedTerm}
       removeUnsavedTerm={props.removeUnsavedTerm}
@@ -56,21 +56,22 @@ const CreateSetContainer = (props) => {
 const mapStateToProps = state => {
   const unsavedSetTerms = state.firestore.ordered.unsavedTerms;
   const unsavedSetName = state.firebase.profile.unsavedSet;
-
-  return ({
+  const uid = state.firebase.auth.uid;
+  
+  return {
     unsavedSetTerms,
     unsavedSetName,
-    uid: state.firebase.auth.uid,
+    uid,
     isOverlayOpen: state.isOverlayOpen.isDeleted,
     isSetDeleted: state.isSetDeleted,
     isEditSubmited: state.isEditSubmited,
     isTermAdded: state.isTermAdded,
     isNewTerm: state.isNewTerm,
     newSetKey: state.newSetKey,
-    location: state.location,
-    lastLocation: state.lastLocation,
-    isLoaded: isLoaded(unsavedSetTerms, unsavedSetName)
-  })
+    location: state.navigation.location,
+    lastLocation: state.navigation.lastLocation,
+    isLoaded: uid ? isLoaded(unsavedSetTerms, unsavedSetName) : true
+  }
 }
 
 export default compose(
@@ -78,7 +79,7 @@ export default compose(
     mapStateToProps,
     {
       setUnsavedName,
-      basicTwoTerms,
+      createBasicTerms,
       updateUnsavedTerm,
       addNewUnsavedTerm,
       removeUnsavedTerm,
@@ -97,7 +98,7 @@ export default compose(
         doc: props.uid,
         subcollections: [{ collection: 'unsaved' }],
         storeAs: 'unsavedTerms',
-        orderBy: ["time"]
+        orderBy: ['time']
       }]
     :
       []

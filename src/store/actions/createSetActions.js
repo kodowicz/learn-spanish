@@ -21,9 +21,10 @@ export const setUnsavedName = name => (dispatch, getState, { getFirestore }) => 
 }
 
 // if there is no basic terms
-export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) => {
+export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
+  const termsLength = 3;
   let size;
 
   const unsavedRef = firestore.collection("users").doc(authId).collection("unsaved");
@@ -32,21 +33,7 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
     size = snap.size;
 
   }).then(() => {
-    if (size === 0) {
-      for (let i = 0; i < number; i++) {
-        let newDocument = unsavedRef.doc();
-        let keyId = newDocument.id;
-
-        newDocument.set({
-          id: keyId,
-          term: "",
-          definition: "",
-          termRows: 1,
-          definitionRows: 1,
-          time: firestore.FieldValue.serverTimestamp()
-        })
-      }
-    } else if (size === 1) {  // necessary if cloud function exists
+    while (size <= termsLength) {
       let newDocument = unsavedRef.doc();
       let keyId = newDocument.id;
 
@@ -54,8 +41,12 @@ export const basicTwoTerms = number => (dispatch, getState, { getFirestore }) =>
         id: keyId,
         term: "",
         definition: "",
-        time: firestore.FieldValue.serverTimestamp()
+        termRows: 1,
+        definitionRows: 1,
+        time: new Date()
       })
+
+      size++
     }
   })
   .then(() => {
@@ -127,25 +118,31 @@ export const removeUnsavedTerm = termid => (dispatch, getState, { getFirestore }
 export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const termRef = firestore.collection(`users/${uid}/unsaved`).doc();
+  const termsRef = firestore.collection(`users/${uid}/unsaved`);
 
-  termRef.set({
-    id: termRef.id,
-    term: "",
-    definition: "",
-    termRows: 1,
-    definitionRows: 1,
-    time: firestore.FieldValue.serverTimestamp()
-  })
-  .then(() => {
-    dispatch({
-      type: 'ADD_UNSAVED_NEW_TERM'
-    })
-  }).catch(error => {
-    dispatch({
-      type: 'ADD_UNSAVED_NEW_TERM_ERROR',
-      error
-    })
+  termsRef.get().then(snap => {
+    if (snap.size < 50) {
+      const termRef = termsRef.doc();
+      
+      termRef.set({
+        id: termRef.id,
+        term: "",
+        definition: "",
+        termRows: 1,
+        definitionRows: 1,
+        time: firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        dispatch({
+          type: 'ADD_UNSAVED_NEW_TERM'
+        })
+      }).catch(error => {
+        dispatch({
+          type: 'ADD_UNSAVED_NEW_TERM_ERROR',
+          error
+        })
+      })
+    }
   })
 }
 
