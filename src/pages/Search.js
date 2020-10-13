@@ -2,7 +2,7 @@ import React from 'react';
 import SetsList from '../components/dashboard/SetsList';
 
 import styled from 'styled-components';
-import { Main, Input } from '../assets/styles/GlobalStyles';
+import { Main, Input, fonts } from '../assets/styles/GlobalStyles';
 
 
 class Search extends React.Component {
@@ -63,6 +63,7 @@ const Header = styled.h1`
   font-size: 2.3rem;
   text-align: center;
   margin-bottom: 3rem;
+  font-weight: ${fonts.bold};
 
   @media (min-width: 768px) {
     font-size: 3.6rem;

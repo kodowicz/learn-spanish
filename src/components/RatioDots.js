@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../assets/styles/GlobalStyles';
 
@@ -20,8 +20,11 @@ const Dots = styled.div`
   width: 5rem;
   display: flex;
   justify-content: space-between;
+  box-sizing: content-box;
+  align-items: center;
 
   @media (min-width: 768px) {
+    padding: 0;
     width: 6rem
   }
 `;

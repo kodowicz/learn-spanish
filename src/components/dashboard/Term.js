@@ -282,23 +282,25 @@ const Label = styled.label`
   font-size: ${(props) => props.htmlFor === 'term' ? '1.6rem' : '1.4rem'};
   color: ${colors.darkGray};
   position: absolute;
-  bottom: -2px;
-  left: 0;
+  bottom: 0px;
+  left: 2px;
   z-index: -1;
 `;
 
 const Textarea = styled.textarea`
   font-family: ${fonts.family};
-  font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
   color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+  font-size: 1.6rem;
   background: none;
-  line-height: 18px;
+  line-height: 1.8rem;
   border: none;
   width: 100%;
   outline: none;
   overflow: auto;
   height: auto;
-  resize: none
+  resize: none;
+  padding: 0;
+  user-select: initial;
 `;
 
 const Border = styled.div`

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { colors, fonts } from '../../assets/styles/GlobalStyles';
+import { flipOut, flipIn } from '../../assets/styles/GlobalKeyframes';
 
 
 class SelectFalseOrTrue extends Component {
@@ -90,43 +91,11 @@ class SelectFalseOrTrue extends Component {
 }
 
 
-const flipOut = keyframes`
-  from {
-    transform: perspective(400px);
-  }
-
-  30% {
-    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    opacity: 1;
-  }
-
-  to {
-    transform: perspective(400px) rotate3d(1, 0, 0, 40deg);
-    opacity: 0;
-  }
-`;
-
-const flipIn = keyframes`
-  from {
-    opacity: 0;
-    transform: perspective(400px) rotate3d(1, 0, 0, 40deg);
-  }
-
-  30% {
-    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    opacity: 1;
-  }
-
-  to {
-    transform: perspective(400px);
-    opacity: 1;
-  }
-`;
-
 const GameWrapper = styled.div`
   display: ${({ isFinished }) => isFinished ? 'none' : 'block'};
   padding-top: 20vh;
   width: 70vw;
+  max-width: 30rem;
   margin: 0 auto;
 
   @media (min-width: 768px) {
@@ -181,7 +150,7 @@ const Button = styled.button`
   border: 1px solid ${colors.white};
   font-family: ${fonts.family};
   display: block;
-  width: 9rem;
+  width: 10rem;
   height: 4rem;
   margin: 0;
   text-align: center;
@@ -190,8 +159,9 @@ const Button = styled.button`
   border-radius: 50px;
   transition: transform .2s;
 
-  &:focus {
+  &:focus, &:active {
     transform: translateY(2px);
+    background: ${colors.shadow};
   }
 
   @media (min-width: 768px) {

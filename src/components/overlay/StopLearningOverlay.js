@@ -25,7 +25,7 @@ class StopLearningOverlay extends React.Component {
     const { setid } = this.props;
 
     if (isCancelled) return <Redirect to={`/sets/${setid}`} />;
-    
+
     return (
       <Background>
         <Dialog role="alertdialog" aria-describedby="info">
@@ -39,7 +39,7 @@ class StopLearningOverlay extends React.Component {
               no
             </Button>
             <Button
-              color={colors.warming}
+              color={colors.navy}
               center="true"
               onClick={this.handleStopLearning}
             >
@@ -65,8 +65,8 @@ const Dialog = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 250px;
-  height: 300px;
+  width: 25rem;
+  height: 30rem;
   background: ${colors.white};
   color: ${colors.navy};
   border-radius: 15px;

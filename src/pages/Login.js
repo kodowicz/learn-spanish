@@ -48,7 +48,7 @@ class Login extends Component {
           />
         }
 
-        <Main width={75} maxWidth={450}>
+        <Main width={75} maxWidth={450} desktop={400}>
             <TabList role="tablist" aria-label="login">
               <Switch
                 role="tab"

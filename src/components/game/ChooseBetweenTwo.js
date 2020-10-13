@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { colors } from '../../assets/styles/GlobalStyles';
+import { moveBackards, pulseShadow } from '../../assets/styles/GlobalKeyframes';
 
 
 class ChooseBetweenTwo extends Component {
@@ -149,50 +150,6 @@ class DefinitionOption extends Component {
   }
 }
 
-const move = (transformStart) => keyframes`
-  from {
-    transform: translate(${transformStart.left}px, ${transformStart.top}px) scale(0.6);
-    opacity: 0;
-    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  }
-
-  40% {
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-
-  80% {
-    transform: translate(0, 0) scale(0.7);
-    opacity: 0.7;
-    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-`
-
-const pulse = keyframes`
-  0% {
-    box-shadow: 0 0 0 10px rgba(94, 55, 221, 1);
-  }
-
-  50% {
-    box-shadow: 0 0 0 50px rgba(94, 55, 221, 0.4);
-  }
-
-  55% {
-    box-shadow: 0 0 0 50px rgba(94, 55, 221, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 50px rgba(94, 55, 221, 0);
-  }
-`;
 
 const GameWrapper = styled.div`
   display: ${({ isChosen }) => isChosen ? 'none' : 'grid'};
@@ -230,7 +187,7 @@ const Definition = styled.p`
   color: ${colors.lightGray};
 
   ${({ transformStart, delay }) => css`
-  animation: ${move(transformStart)} 0.5s ${delay * 0.3}s both;
+  animation: ${moveBackards(transformStart)} 0.5s ${delay * 0.3}s both;
   `};
 
   font-size: 2rem;
@@ -240,7 +197,7 @@ const Definition = styled.p`
   z-index: 2;
 
   &::before {
-    animation: ${pulse} 3s infinite 2s;
+    animation: ${pulseShadow} 3s infinite 2s;
     content: '';
     position: absolute;
     top: 50%;

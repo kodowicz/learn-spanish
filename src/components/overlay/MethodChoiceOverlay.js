@@ -100,8 +100,8 @@ const Dialog = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 250px;
-  height: 300px;
+  width: 25rem;
+  height: 30rem;
   background: ${colors.white};
   color: ${colors.navy};
   border-radius: 15px;
@@ -117,7 +117,7 @@ const Alert = styled.p`
 `;
 
 const Buttons = styled.div`
-  height: 100px;
+  height: 10rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between

@@ -319,12 +319,14 @@ const Counter = styled.span`
 `;
 
 const TermWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr min-content;
+  grid-template-rows: 1fr;
+  grid-column-gap: 1.5rem;
 
   @media (min-width: 768px) {
-    padding-right: 3.5rem
+    padding-right: 3.5rem;
+    align-items: center;
   }
 `;
 
@@ -335,7 +337,6 @@ const Term = styled.p`
   margin: 0;
   white-space: pre-line;
   user-select: text;
-  padding-right: 1.5rem;
 
   @media (min-width: 768px) {
     padding: 0 3.5rem

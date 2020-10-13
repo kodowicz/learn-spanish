@@ -84,8 +84,8 @@ const Dialog = styled.form`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 280px;
-  height: 300px;
+  width: 28rem;
+  height: 30rem;
   padding: 0 3rem;
   background: ${colors.white};
   color: ${colors.navy};

@@ -8,7 +8,7 @@ const BGWrapper = styled.div`
   left: 0;
   min-height: 100vh;
   height: auto;
-  background: linear-gradient(180deg, #6837FA 0%, #663CE2 100%);
+  background: #663CE2;
   width: 100%;
   z-index: -1;
 `;

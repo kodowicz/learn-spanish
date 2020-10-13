@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 
 import styled from 'styled-components';
-import { LinkButton, Button, colors } from '../../assets/styles/GlobalStyles';
+import { Button, colors } from '../../assets/styles/GlobalStyles';
 
 
 class DeleteSetOverlay extends React.Component {
@@ -38,15 +38,13 @@ class DeleteSetOverlay extends React.Component {
             <Button
               color={colors.navy}
               center="true"
-              onClick={this.handleDecline}
-            >
+              onClick={this.handleDecline}>
               go back
             </Button>
             <Button
               color={colors.warming}
               center="true"
-              onClick={this.handleDelete}
-            >
+              onClick={this.handleDelete}>
               delete
             </Button>
           </Buttons>
@@ -69,8 +67,8 @@ const Dialog = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 250px;
-  height: 300px;
+  width: 25rem;
+  height: 30rem;
   background: ${colors.white};
   color: ${colors.navy};
   border-radius: 15px;

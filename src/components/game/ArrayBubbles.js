@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { colors, fonts } from '../../assets/styles/GlobalStyles';
+import { shake, pulse, popIn, prompt, moveForwards } from '../../assets/styles/GlobalKeyframes';
+
 
 class ArrayBubbles extends Component {
   constructor(props) {
@@ -482,104 +484,6 @@ class BubbleComponent extends React.Component {
 }
 
 
-const popIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale3d(1, 1, 1);
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale3d(1.15, 1.15, 1.15);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
-  }
-`;
-
-const pulse = keyframes`
-  from {
-    transform: scale3d(1, 1, 1);
-  }
-
-  50% {
-    transform: scale3d(1.05, 1.05, 1.05);
-  }
-
-  to {
-    transform: scale3d(1, 1, 1);
-  }
-`;
-
-const shake = keyframes`
-  0% {
-    transform: translateX(0px);
-    opacity: 0.5;
-  }
-
-  25% {
-    transform: translateX(3px);
-  }
-
-  50% {
-    transform: translateX(-3px);
-  }
-
-  75% {
-    transform: translateX(3px);
-  }
-
-  100% {
-    transform: translateX(0px);
-    opacity: 1
-  }
-`;
-
-const move = (
-  startOffsetLeft,
-  startOffsetTop,
-  offsetLeft,
-  offsetTop
-) => keyframes`
-  from {
-    transform: translate(${startOffsetLeft}px, ${startOffsetTop}px);
-  }
-
-  to {
-    transform: translate(${offsetLeft}px, ${offsetTop}px);
-  }
-`;
-
-const prompt = (
-  offsetLeft,
-  offsetTop
-) => keyframes`
-  from {
-    transform: translate(${offsetLeft}px, ${offsetTop}px);
-  }
-
-  5% {
-    transform: translate(${offsetLeft - 3}px, ${offsetTop}px);
-  }
-
-  15% {
-    transform: translate(${offsetLeft + 3}px, ${offsetTop}px);
-  }
-
-  20% {
-    transform: translate(${offsetLeft}px, ${offsetTop}px);
-  }
-
-  to {
-    transform: translate(${offsetLeft}px, ${offsetTop}px);
-  }
-`;
-
 const GameWrapper = styled.div`
   padding-top: 20vh;
   width: 90vw;
@@ -590,7 +494,7 @@ const Definition = styled.p`
   animation: ${popIn} .3s linear 0.5s forwards;
   font-size: 3rem;
   text-align: center;
-  margin: 0 0 4rem;
+  margin: 0 1.5rem 4rem;
   opacity: 0;
 
   @media (min-width: 768px) {
@@ -609,45 +513,50 @@ const BubblesWrapper = styled.div`
   }
 `;
 
-const Bubble = styled.div`
+const BubbleWrapper = styled.div`
   ${({ startOffsetLeft, startOffsetTop, offsetLeft, offsetTop, index }) =>
     css`
-      animation-name: ${move(startOffsetLeft, startOffsetTop, offsetLeft, offsetTop)};
+      animation-name: ${moveForwards(startOffsetLeft, startOffsetTop, offsetLeft, offsetTop)};
       animation-duration: 0.4s;
       animation-delay: ${0.05 + index*0.05}s;
       animation-fill-mode: both;
-      animation-timing-funtion:cubic-bezier(0.755, 0.05, 0.855, 0.06);
     `
   };
-
-  ${({ offsetLeft, offsetTop, isShaken }) => isShaken &&
-    css`
-      animation-name: ${prompt(offsetLeft, offsetTop)};
-      animation-duration: 3.5s;
-      animation-fill-mode: both;
-      animation-iteration-count: infinite;
-      animation-timing-funtion:cubic-bezier(0.755, 0.05, 0.855, 0.06);
-    `
-  };
-
   visibility: ${({ id }) => !id && 'hidden'};
-  font-weight: ${fonts.bold};
-  color: ${colors.blue};
-  background: ${colors.white};
   width: 5.5rem;
   height: 5.5rem;
   position: absolute;
   border-radius: 4rem;
-  display: flex;
-  justify-content: center;
-  font-size: 2rem;
-  align-items: center;
 
   @media (min-width: 768px) {
     width: 6.5rem;
     height: 6.5rem;
     font-size: 2.3rem;
   }
+`;
+
+const Bubble = styled.div`
+  ${({ isShaken }) => isShaken &&
+    css`
+      animation-name: ${prompt};
+      animation-duration: 3s;
+      animation-fill-mode: both;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    `
+  };
+
+  font-weight: ${fonts.bold};
+  color: ${colors.blue};
+  background: ${colors.white};
+  outline: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 2rem;
+  align-items: center;
+  border-radius: 4rem;
 `;
 
 const AnswerWrapper = styled.div`

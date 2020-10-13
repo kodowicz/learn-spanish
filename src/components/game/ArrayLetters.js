@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { colors } from '../../assets/styles/GlobalStyles';
+import { shake, scale, fadeUp, popIn } from '../../assets/styles/GlobalKeyframes';
 
 
 class ArrayLetters extends Component {
@@ -113,7 +114,7 @@ class ArrayLetters extends Component {
   }
 
   getExcludedIndexes = (word) => {
-    const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g
+    const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
     const array = [];
     let match;
 
@@ -379,82 +380,6 @@ class ArrayLetters extends Component {
   }
 };
 
-
-const shake = keyframes`
-  0% {
-    transform: translateX(0px);
-    opacity: 0.5;
-  }
-
-  25% {
-    transform: translateX(3px);
-  }
-
-  50% {
-    transform: translateX(-3px);
-  }
-
-  75% {
-    transform: translateX(3px);
-  }
-
-  100% {
-    transform: translateX(0px);
-    opacity: 1
-  }
-`;
-
-const scale = keyframes`
-  from {
-    transform: scale(0.7);
-  }
-
-  70% {
-    transform: scale(1.2);
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-`;
-
-const fadeUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translate3d(0, 30%, 0);
-  }
-
-  60% {
-    opacity: 0.9;
-    transform: translate3d(0, 0, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-`;
-
-const popIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale3d(1, 1, 1);
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale3d(1.15, 1.15, 1.15);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
-  }
-`
 
 const GameWrapper = styled.div`
   display: ${({isFinished}) => isFinished ? 'none' : 'block'};

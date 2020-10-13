@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { colors } from '../../assets/styles/GlobalStyles';
+import { popIn, blink, pulse, shake } from '../../assets/styles/GlobalKeyframes';
 
 
 class TypeMeaning extends Component {
@@ -346,74 +347,6 @@ class TypeMeaning extends Component {
   }
 }
 
-
-const popIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale3d(1, 1, 1);
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale3d(1.15, 1.15, 1.15);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
-  }
-`;
-
-const blink = keyframes`
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-`;
-
-const pulse = keyframes`
-  from {
-    transform: scale3d(1, 1, 1);
-  }
-
-  50% {
-    transform: scale3d(1.05, 1.05, 1.05);
-  }
-
-  to {
-    transform: scale3d(1, 1, 1);
-  }
-`;
-
-const shake = keyframes`
-  0% {
-    transform: translateX(0px);
-    opacity: 0.5;
-  }
-
-  25% {
-    transform: translateX(3px);
-  }
-
-  50% {
-    transform: translateX(-3px);
-  }
-
-  75% {
-    transform: translateX(3px);
-  }
-
-  100% {
-    transform: translateX(0px);
-    opacity: 1
-  }
-`;
 
 const GameWrapper = styled.div`
   display: ${({ isChosen }) => (isChosen ? 'none' : 'block')};
