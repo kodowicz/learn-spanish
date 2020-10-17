@@ -1,63 +1,66 @@
-import React from 'react';
-import SetsList from '../components/dashboard/SetsList';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import { Main, Input, fonts } from '../assets/styles/GlobalStyles';
+import SetsList from "../components/dashboard/SetsList";
+import { Main, Input, fonts } from "../assets/styles/GlobalStyles";
 
+const Search = ({
+  searchedSets,
+  changeLocation,
+  changeLastLocation,
+  searchForSets
+}) => {
+  const [value, setValue] = useState("");
 
-class Search extends React.Component {
-  state = {
-    value: ""
+  useEffect(() => {
+    changeLocation("search");
+    changeLastLocation("/");
+  }, []);
+
+  function handleChange(event) {
+    setValue(event.target.value);
+    searchForSets(event.target.value);
   }
 
-  componentDidMount() {
-    this.props.changeLocation('search');
-    this.props.changeLastLocation("/");
-
-  }
-
-  handleChange = event => {
-    this.setState({
-      value: event.target.value
-    })
-  }
-
-  handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
-    this.props.searchForSets(this.state.value)
   }
 
-  render() {
-    const { searchedSets } = this.props;
-    const { value } = this.state;
+  return (
+    <Main width={80} maxWidth={450} desktop={720}>
+      <Header>What are you looking for?</Header>
 
+      <Form onSubmit={handleSubmit}>
+        <Input
+          placeholder="e.g. animals"
+          value={value}
+          onChange={handleChange}
+        />
+      </Form>
+
+      <MatchedSets value={value} searchedSets={searchedSets} />
+    </Main>
+  );
+};
+
+const MatchedSets = ({ value, searchedSets }) => {
+  if (searchedSets?.length) {
     return (
-      <Main width={80} maxWidth={450} desktop={720}>
-        <Header>What are you looking for?</Header>
-
-        <Form onSubmit={this.handleSubmit}>
-          <Input
-            placeholder="e.g. animals"
-            value={value}
-            onChange={this.handleChange} />
-        </Form>
-
-        { (searchedSets && searchedSets.length > 0) &&
-          <SetsList
-            isPercentage={false}
-            sets={searchedSets}
-            title=""
-            margin="4rem 0"
-          />
-        }
-        { (searchedSets && searchedSets.length === 0) &&
-          <Info>sorry! no set found</Info>
-        }
-      </Main>
+      <SetsList
+        isPercentage={false}
+        sets={searchedSets}
+        title=""
+        margin="4rem 0"
+      />
     );
+  } else {
+    if (value) {
+      return <Info>sorry! no set found</Info>;
+    } else {
+      return <Info />;
+    }
   }
-}
-
+};
 
 const Header = styled.h1`
   font-size: 2.3rem;
@@ -85,5 +88,4 @@ const Info = styled.p`
   text-align: center;
 `;
 
-
-export default Search
+export default Search;

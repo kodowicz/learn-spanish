@@ -1,242 +1,240 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
 
-import { colors, fonts } from '../../assets/styles/GlobalStyles';
-import remove from '../../assets/images/remove.svg';
+import { colors, fonts } from "../../assets/styles/GlobalStyles";
+import remove from "../../assets/images/remove.svg";
 
+const Term = ({
+  element,
+  termDetails,
+  isVisible,
+  onMove,
+  removeTerm,
+  updateTerm
+}) => {
+  const [id, setId] = useState(termDetails.id);
+  const [state, setState] = useState({
+    term: "",
+    definition: ""
+  });
+  const [rows, setRows] = useState({
+    termRows: termDetails.termRows,
+    definitionRows: termDetails.definitionRows
+  });
+  const [focus, setFocus] = useState({
+    termFocus: false,
+    definitionFocus: false
+  });
+  const [label, setLabel] = useState({
+    termLabel: false,
+    definitionLabel: false
+  });
 
-class Term extends Component {
-  constructor(props) {
-    super(props);
+  const [isBlockFocused, setIsBlockFocused] = useState(false);
+  const [firstTouch, setFirstTouch] = useState(undefined);
+  const [lastTouch, setLastTouch] = useState(undefined);
+  const [currentTouch, setCurrentTouch] = useState(undefined);
+  let [translation, setTranslation] = useState(0);
 
-    this.state = {
-      term: "",
-      definition: "",
-      id: undefined,
-      firstTouch: undefined,
-      lastTouch: undefined,
-      currentTouch: undefined,
-      isBlockFocused: false,
-      termFocused: false,
-      definitionFocused: false,
-      termLabelVisible: false,
-      definitionLabelVisible: false,
-      translation: 0,
-      termRows: 1,
-      definitionRows: 1,
-      minRows: 1,
-      lineHeight: 18
-    }
+  const buttonRef = useRef();
 
-    this.buttonRef = React.createRef()
-  }
+  const minRows = 1;
+  const lineHeight = 18;
 
-  componentDidMount () {
-    const { definition, term, id, termRows, definitionRows } = this.props.termDetails;
+  useEffect(() => {
+    const definition = /^\.\.\.$/g.test(termDetails.definition)
+      ? ""
+      : termDetails.definition;
+    const term = /^\.\.\.$/g.test(termDetails.term) ? "" : termDetails.term;
 
-    this.setState({
-      id,
-      termRows,
-      definitionRows,
-      term: /^\.\.\.$/g.test(term) ? '' : term,
-      definition: /^\.\.\.$/g.test(definition) ? '' : definition,
-      termLabelVisible: Boolean(term),
-      definitionLabelVisible: Boolean(definition)
-    })
-  }
+    setState({
+      term,
+      definition
+    });
+    setLabel({
+      termLabel: Boolean(term),
+      definitionLabel: Boolean(definition)
+    });
+  }, []);
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.isVisible !== this.props.isVisible) {
-      this.setState({
-        translation: 0
-      })
-    }
-  }
+  useEffect(
+    () => {
+      setTranslation(0);
+    },
+    [isVisible]
+  );
 
-  handleFocus = event => {
+  useEffect(
+    () => {
+      if (state.term || state.definition) {
+        updateTerm({
+          id,
+          ...state,
+          ...rows
+        });
+      }
+    },
+    [state, rows]
+  );
+
+  function handleFocus(event) {
     const id = event.target.id;
-    this.setState({
-      [`${id}Focused`]: true,
-      [`${id}LabelVisible`]: true
-    })
+
+    setFocus(state => ({
+      ...state,
+      [`${id}Focus`]: true
+    }));
+    setLabel(state => ({
+      ...state,
+      [`${id}Label`]: true
+    }));
   }
 
-  handleBlur = event => {
+  function handleBlur(event) {
     const hasValue = event.target.value ? true : false;
     const id = event.target.id;
 
-    this.setState({
-      [`${id}Focused`]: false,
-      [`${id}LabelVisible`]: hasValue
-    })
+    setFocus(state => ({
+      ...state,
+      [`${id}Focus`]: false
+    }));
+    setLabel(state => ({
+      ...state,
+      [`${id}Label`]: hasValue
+    }));
   }
 
-  handleChange = event => {
-    const rows = this.resizeTextarea(event, this.state);
+  function handleChange(event) {
+    const elementRows = resizeTextarea(event, minRows, lineHeight);
+    const { id, value } = event.target;
 
-    this.setState({
-      [`${event.target.id}Rows`]: rows,
-      [event.target.id]: event.target.value
-    },
-      () => this.props.updateTerm(this.state)
-    );
+    setRows(state => ({
+      ...state,
+      [`${id}Rows`]: elementRows
+    }));
+    setState(state => ({
+      ...state,
+      [id]: value
+    }));
   }
 
-  handleTouchStart = event => {
-    this.setState({
-      lastTouch: event.targetTouches[0].clientX,
-      firstTouch: event.targetTouches[0].clientX
-    })
+  function handleTouchStart(event) {
+    setLastTouch(event.targetTouches[0].clientX);
+    setFirstTouch(event.targetTouches[0].clientX);
   }
 
-  handleTouchMove = event => {
+  function handleTouchMove(event) {
     const currentTouch = event.targetTouches[0].clientX;
+    let tranlation = (translation = -(firstTouch - currentTouch));
 
-    this.setState(() => ({
-      currentTouch
-    }), () => {
-      let translation = 0;
+    setCurrentTouch(currentTouch);
 
-      translation = -(this.state.firstTouch - this.state.currentTouch);
+    if (lastTouch > currentTouch) {
+      onMove(true, element);
 
-      if (this.state.lastTouch > this.state.currentTouch) {
-        this.props.onMove(true, this.props.element);
-
-        if (translation <= -80) {
-          translation = -80
-        } else if (translation > 0) {
-          translation = 0
-        }
-
-      } else if (this.state.lastTouch < this.state.currentTouch) {
-        if (translation >= 0) {
-          translation = 0
-        } else if (translation < -80) {
-          translation = -80
-        }
+      if (translation <= -80) {
+        translation = -80;
+      } else if (translation > 0) {
+        translation = 0;
       }
+    } else if (lastTouch < currentTouch) {
+      if (translation >= 0) {
+        translation = 0;
+      } else if (translation < -80) {
+        translation = -80;
+      }
+    }
 
-      this.setState({
-        translation,
-        lastTouch: currentTouch
-      })
-    })
+    setTranslation(translation);
+    setLastTouch(currentTouch);
   }
 
-  handleTouchEnd = event => {
-    if (this.state.translation < -40) {
-      this.setState({
-        translation: -80
-      })
+  function handleTouchEnd(event) {
+    if (translation < -40) {
+      setTranslation(-80);
     } else {
-      this.props.onMove(false, this.props.element);
-      this.setState({
-        translation: 0
-      })
+      onMove(false, element);
+      setTranslation(0);
     }
   }
 
-  handleBlockFocus = (event) => {
-    const buttonRef = this.buttonRef;
+  function handleBlockFocus(event) {
     let isBlockFocused = true;
 
-    if (event.type === 'blur' && event.relatedTarget !== buttonRef) {
-      isBlockFocused = false
+    if (event.type === "blur" && event.relatedTarget !== buttonRef) {
+      isBlockFocused = false;
     }
 
-    this.setState({ isBlockFocused });
+    setIsBlockFocused(isBlockFocused);
   }
 
-  removeElement = event => {
+  function removeElement(event) {
     event.preventDefault();
-    this.props.removeTerm(this.state.id);
+    removeTerm(id);
   }
 
-  resizeTextarea = (event, state) => {
+  function resizeTextarea(event, minRows, lineHeight) {
     const previousRows = event.target.rows;
-		const { minRows, lineHeight } = state;
     event.target.rows = minRows;
 
     const currentRows = ~~(event.target.scrollHeight / lineHeight);
 
     if (currentRows === previousRows) {
-    	event.target.rows = currentRows;
+      event.target.rows = currentRows;
     }
 
-    return currentRows
+    return currentRows;
   }
 
-  render() {
-    const {
-      term,
-      definition,
-      termRows,
-      definitionRows,
-      translation,
-      isBlockFocused,
-      termFocused,
-      definitionFocused,
-      termLabelVisible,
-      definitionLabelVisible
-    } = this.state;
-
-    return (
-      <Wrapper onBlur={this.handleBlockFocus} onFocus={this.handleBlockFocus}>
-        <TermWrapper
-          translation={translation}
-          onTouchStart={this.handleTouchStart}
-          onTouchMove={this.handleTouchMove}
-          onTouchEnd={this.handleTouchEnd}
-        >
-          <DefineTerm>
-            <Textarea
-              id="term"
-              lang="es"
-              value={term}
-              rows={termRows}
-              onChange={this.handleChange}
-              onFocus={this.handleFocus}
-              onBlur={this.handleBlur}
-            />
-            <Label
-              isVisible={termLabelVisible}
-              htmlFor="term"
-            >
-              term
-            </Label>
-            <Border focused={termFocused} />
-          </DefineTerm>
-          <DefineTerm>
-            <Textarea
-              id="definition"
-              value={definition}
-              rows={definitionRows}
-              onChange={this.handleChange}
-              onFocus={this.handleFocus}
-              onBlur={this.handleBlur}
-            />
-            <Label
-              isVisible={definitionLabelVisible}
-              htmlFor="definition"
-            >
-              definition
-            </Label>
-            <Border focused={definitionFocused} />
-          </DefineTerm>
-        </TermWrapper>
-        <DeleteButton
-          ref={this.buttonRef}
-          isVisible={translation < -55 ? true : false}
-          isFocused={isBlockFocused}
-          onClick={this.removeElement}
-        >
-          <img src={remove} alt="remove" />
-        </DeleteButton>
-      </Wrapper>
-    );
-  }
-}
-
+  return (
+    <Wrapper onBlur={handleBlockFocus} onFocus={handleBlockFocus}>
+      <TermWrapper
+        translation={translation}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <DefineTerm>
+          <Textarea
+            id="term"
+            lang="es"
+            value={state.term}
+            rows={rows.termRows}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+          <Label isVisible={label.termLabel} htmlFor="term">
+            term
+          </Label>
+          <Border focused={focus.termFocus} />
+        </DefineTerm>
+        <DefineTerm>
+          <Textarea
+            id="definition"
+            value={state.definition}
+            rows={rows.definitionRows}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+          <Label isVisible={label.definitionLabel} htmlFor="definition">
+            definition
+          </Label>
+          <Border focused={focus.definitionFocus} />
+        </DefineTerm>
+      </TermWrapper>
+      <DeleteButton
+        ref={buttonRef}
+        isVisible={translation < -55 ? true : false}
+        isFocused={isBlockFocused}
+        onClick={removeElement}
+      >
+        <img src={remove} alt="remove" />
+      </DeleteButton>
+    </Wrapper>
+  );
+};
 
 const Wrapper = styled.div`
   display: grid;
@@ -258,7 +256,7 @@ const TermWrapper = styled.div`
   display: grid;
   grid-template-columns: 80%;
   grid-template-rows: repeat(2, min-content);
-  grid-row-gap: .5rem;
+  grid-row-gap: 0.5rem;
   place-content: center;
   grid-column: 1 / 3;
   grid-row: 1 / 2;
@@ -267,7 +265,7 @@ const TermWrapper = styled.div`
   @media (min-width: 768px) {
     grid-template-columns: 100%;
     grid-column: 2 / 3;
-    background: none
+    background: none;
   }
 `;
 
@@ -278,8 +276,8 @@ const DefineTerm = styled.div`
 `;
 
 const Label = styled.label`
-  display: ${(props) => props.isVisible && 'none'};
-  font-size: ${(props) => props.htmlFor === 'term' ? '1.6rem' : '1.4rem'};
+  display: ${props => props.isVisible && "none"};
+  font-size: ${props => (props.htmlFor === "term" ? "1.6rem" : "1.4rem")};
   color: ${colors.darkGray};
   position: absolute;
   bottom: 0px;
@@ -288,18 +286,20 @@ const Label = styled.label`
 `;
 
 const Textarea = styled.textarea`
+  color: ${props =>
+    props.id === "term" ? `${colors.white}` : `${colors.lightGray}`};
   font-family: ${fonts.family};
-  color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+  padding: 2px 0;
   font-size: 1.6rem;
   background: none;
   line-height: 1.8rem;
   border: none;
   width: 100%;
   outline: none;
-  overflow: auto;
+  overflow: hidden;
   height: auto;
   resize: none;
-  padding: 0;
+  /* padding: 0; */
   user-select: initial;
 `;
 
@@ -313,7 +313,7 @@ const Border = styled.div`
 `;
 
 const DeleteButton = styled.button`
-  display: ${ props => props.isVisible ? 'block' : 'none' };
+  display: ${props => (props.isVisible ? "block" : "none")};
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   background: none;
@@ -326,7 +326,7 @@ const DeleteButton = styled.button`
   @media (min-width: 768px) {
     grid-column: 3 / 4;
     display: block;
-    opacity: ${ props => props.isFocused ? 1 : 0 };
+    opacity: ${props => (props.isFocused ? 1 : 0)};
 
     img {
       width: 2rem;
@@ -335,5 +335,4 @@ const DeleteButton = styled.button`
   }
 `;
 
-
-export default Term
+export default Term;

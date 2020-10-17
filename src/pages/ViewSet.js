@@ -1,99 +1,112 @@
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import MethodChoiceOverlay from '../components/overlay/MethodChoiceOverlay';
-import ProgressBar from '../components/ProgressBar';
-import RatioDots from '../components/RatioDots';
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import sort from '../assets/images/sort.svg';
-import { LinkButton, Button, Main, BlockElement, colors, fonts } from '../assets/styles/GlobalStyles';
+import MethodChoiceOverlay from "../components/overlay/MethodChoiceOverlay";
+import ProgressBar from "../components/ProgressBar";
+import RatioDots from "../components/RatioDots";
+import sort from "../assets/images/sort.svg";
+import {
+  LinkButton,
+  Button,
+  Main,
+  BlockElement,
+  colors,
+  fonts
+} from "../assets/styles/GlobalStyles";
 
+const ViewSet = ({
+  match,
+  setDetails,
+  author,
+  percentage,
+  sortedBy,
+  terms,
+  signedUser,
+  isUserSet,
+  isOverlayOpen,
+  sortTerms,
+  createEditSet,
+  chooseMethod,
+  createLearnSet,
+  createPlaySet,
+  changeLocation,
+  changeLastLocation,
+  removeNewKey,
+  enableEditSet,
+  setCurrentSetId
+}) => {
+  const iseditable = author === signedUser ? true : false;
+  const progressBarWidth = window.innerWidth < 768 ? 6 : 7;
 
-class ViewSet extends Component {
-  componentDidMount() {
-    this.props.changeLocation('set');
-    this.props.changeLastLocation("/");
-    this.props.removeNewKey();
-    this.props.enableEditSet();
-    this.props.setCurrentSetId(this.props.match.params.id);
+  useEffect(() => {
+    changeLocation("set");
+    changeLastLocation("/");
+    removeNewKey();
+    enableEditSet();
+    setCurrentSetId(match.params.id);
+  }, []);
 
-    window.scrollTo(0, 0)
-  }
+  // handle if set doesn't exist
+  if (terms.length === 0 && !setDetails) return <Redirect to="/404" />;
 
-  render() {
-    const {
-      match,
-      setDetails,
-      author,
-      percentage,
-      sortedBy,
-      terms,
-      signedUser,
-      isUserSet,
-      isOverlayOpen,
-      sortTerms,
-      createEditSet,
-      chooseMethod,
-      createLearnSet,
-      createPlaySet
-    } = this.props;
-
-    const iseditable = author === signedUser ? true : false;
-    const progressBarWidth = window.innerWidth < 768 ? 6 : 7;
-
-    // handle if set doesn't exist
-    if (terms.length === 0 && !setDetails) return <Redirect to='/404' />;
-
-    if (isOverlayOpen) {
-      return (
-        <MethodChoiceOverlay
+  if (isOverlayOpen) {
+    return (
+      <MethodChoiceOverlay
+        signedUser={signedUser}
+        setid={match.params.id}
+        chooseMethod={chooseMethod}
+        createLearnSet={createLearnSet}
+        createPlaySet={createPlaySet}
+      />
+    );
+  } else {
+    return (
+      <Main width={76} maxWidth={650} desktop={700}>
+        <Description
           signedUser={signedUser}
+          setDetails={setDetails}
+          percentage={percentage}
+          width={progressBarWidth}
+        />
+
+        <Buttons
           setid={match.params.id}
+          iseditable={iseditable}
+          createEditSet={createEditSet}
           chooseMethod={chooseMethod}
-          createLearnSet={createLearnSet}
-          createPlaySet={createPlaySet} />
-      )
-    } else {
+        />
 
-      return (
-        <Main width={76} maxWidth={650} desktop={700}>
-          <Description
-            setDetails={setDetails}
-            percentage={percentage}
-            width={progressBarWidth} />
-
-          <Buttons
-            setid={match.params.id}
-            iseditable={iseditable}
-            createEditSet={createEditSet}
-            chooseMethod={chooseMethod} />
-
-          <TermsList
-            terms={terms}
-            isUserSet={isUserSet}
-            sortedBy={sortedBy}
-            sortTerms={sortTerms} />
-        </Main>
-      )
-    }
+        <TermsList
+          terms={terms}
+          isUserSet={isUserSet}
+          sortedBy={sortedBy}
+          sortTerms={sortTerms}
+        />
+      </Main>
+    );
   }
-}
+};
 
-const Description = ({ setDetails, percentage, width }) => (
+const Description = ({ signedUser, setDetails, percentage, width }) => (
   <>
     <DetailsWrapper isExtended={!isNaN(percentage)}>
       <SetName isExtended={percentage}>{setDetails.name}</SetName>
-        <Info>{setDetails.amount} terms</Info>
-        <Border />
-        <Info>by {setDetails.author}</Info>
-        { (!isNaN(percentage)) &&
-          <Progress>
-            <ProgressBar
-              percentage={percentage}
-              width={`${width}rem`}
-              bgColor={colors.progress} />
-          </Progress>
-        }
+      <Info>{setDetails.amount} terms</Info>
+      <Border />
+      <Info>
+        {"by "}
+        {signedUser === setDetails.authorId ? "you" : setDetails.author}
+      </Info>
+      {!isNaN(percentage) && (
+        <Progress>
+          <ProgressBar
+            percentage={percentage}
+            width={`${width}rem`}
+            bgColor={colors.progress}
+          />
+        </Progress>
+      )}
     </DetailsWrapper>
   </>
 );
@@ -101,59 +114,48 @@ const Description = ({ setDetails, percentage, width }) => (
 const Buttons = ({ setid, iseditable, chooseMethod, createEditSet }) => {
   const handleChoice = () => {
     // open overlay then create
-    chooseMethod(true)
-  }
+    chooseMethod(true);
+  };
 
   const handleEdit = () => {
     createEditSet();
-  }
+  };
 
   return (
     <ButtonsWrapper iseditable={iseditable.toString()}>
-      { iseditable &&
+      {iseditable && (
         <div onClick={handleEdit}>
-          <LinkButton
-             isCentre={true} to={`/edit/${setid}`}>
+          <LinkButton isCentre={true} to={`/edit/${setid}`}>
             edit set
           </LinkButton>
         </div>
-      }
-      <Button onClick={handleChoice}>
-        learn set
-      </Button>
+      )}
+      <Button onClick={handleChoice}>learn set</Button>
     </ButtonsWrapper>
   );
 };
 
 const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
-
   return (
     <TermListWrapper>
       <ListLable>
         <SubTitle>terms</SubTitle>
-        <SortButton
-          onClick={() => sortTerms()}>
-          <span>
-            {sortedBy ? 'alphabetical' : 'original'}
-          </span>
+        <SortButton onClick={() => sortTerms()}>
+          <span>{sortedBy ? "alphabetical" : "original"}</span>
           <SortImg src={sort} alt="" />
         </SortButton>
       </ListLable>
       <List>
         {terms.map((term, index) => (
           <ListItem key={term.id}>
-            <Counter
-              isLessThanTen={((index + 1) < 10) ? true : false}>
+            <Counter isLessThanTen={index + 1 < 10 ? true : false}>
               {index + 1}
             </Counter>
             <SetWrapper>
               <TermWrapper>
                 <Term id="term">{term.term}</Term>
-                { isUserSet &&
-                  <RatioDots ratio={term.ratio} />
-                }
+                {isUserSet && <RatioDots ratio={term.ratio} />}
               </TermWrapper>
-
               <Line />
               <Term id="definition">{term.definition}</Term>
             </SetWrapper>
@@ -161,16 +163,14 @@ const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
         ))}
       </List>
     </TermListWrapper>
-  )
+  );
 };
-
 
 const DetailsWrapper = styled.div`
   grid-template-columns: ${({ isExtended }) =>
-    isExtended ?
-      'min-content 15px min-content 20% 90px' :
-      'min-content 15px min-content 1fr'
-  };
+    isExtended
+      ? "min-content 15px min-content 20% 90px"
+      : "min-content 15px min-content 1fr"};
   display: inline-grid;
   grid-template-rows: repeat(2, min-content);
   grid-row-gap: 0.7rem;
@@ -178,22 +178,21 @@ const DetailsWrapper = styled.div`
 
   @media (min-width: 768px) {
     grid-template-columns: ${({ isExtended }) =>
-      isExtended ?
-        'min-content 15px min-content 40% 90px' :
-        'min-content 15px min-content 1fr'
-    }
-  };
+      isExtended
+        ? "min-content 15px min-content 40% 90px"
+        : "min-content 15px min-content 1fr"};
+  }
 `;
 
 const SetName = styled.h1`
-  max-width: ${({ percentage }) => percentage ? '50vw' : 'none'};
+  max-width: ${({ percentage }) => (percentage ? "50vw" : "none")};
   font-weight: ${fonts.bold};
   grid-column: span 4;
   font-size: 3.2rem;
   margin: 0;
 
   @media (min-width: 768px) {
-    max-width: ${({ percentage }) => percentage ? '35rem' : 'none'};
+    max-width: ${({ percentage }) => (percentage ? "35rem" : "none")};
   }
 `;
 
@@ -228,8 +227,7 @@ const ButtonsWrapper = styled.div`
 
   @media (min-width: 768px) {
     justify-content: ${props =>
-      props.iseditable ? 'space-between' : 'flex-start'
-    };
+      props.iseditable ? "space-between" : "flex-start"};
     margin: 40px 0 60px;
   }
 `;
@@ -247,7 +245,7 @@ const ListLable = styled.div`
 const SubTitle = styled.h2`
   color: ${colors.white};
   font-size: 1.6rem;
-  margin: 0
+  margin: 0;
 `;
 
 const SortButton = styled.button`
@@ -266,8 +264,8 @@ const SortButton = styled.button`
 const SortImg = styled.img`
   width: 2rem;
   height: 2rem;
-  padding-left: 3px
-`
+  padding-left: 3px;
+`;
 
 const List = styled.ul`
   margin: 0 0 4rem 0;
@@ -282,7 +280,7 @@ const ListItem = styled.li`
   position: relative;
 
   @media (min-width: 768px) {
-    margin-bottom: 2rem
+    margin-bottom: 2rem;
   }
 `;
 
@@ -304,7 +302,7 @@ const SetWrapper = styled(BlockElement)`
 `;
 
 const Counter = styled.span`
-  left: ${props => props.isLessThanTen ? '-8vw' : '-10vw' };
+  left: ${props => (props.isLessThanTen ? "-8vw" : "-10vw")};
   color: ${colors.azure};
   font-weight: ${fonts.bold};
   position: absolute;
@@ -314,7 +312,7 @@ const Counter = styled.span`
   user-select: none;
 
   @media (min-width: 768px) {
-    left: -50px
+    left: -50px;
   }
 `;
 
@@ -331,15 +329,17 @@ const TermWrapper = styled.div`
 `;
 
 const Term = styled.p`
-  font-weight: ${(props) => props.id === 'term' ? `${fonts.bold}` : `${fonts.semiBold}`};
-  font-size: ${(props) => props.id === 'term' ? '1.6rem' : '1.4rem'};
-  color: ${(props) => props.id === 'term' ? `${colors.white}` : `${colors.lightGray}`};
+  font-weight: ${props =>
+    props.id === "term" ? `${fonts.bold}` : `${fonts.semiBold}`};
+  font-size: ${props => (props.id === "term" ? "1.6rem" : "1.4rem")};
+  color: ${props =>
+    props.id === "term" ? `${colors.white}` : `${colors.lightGray}`};
   margin: 0;
   white-space: pre-line;
   user-select: text;
 
   @media (min-width: 768px) {
-    padding: 0 3.5rem
+    padding: 0 3.5rem;
   }
 `;
 
@@ -351,4 +351,4 @@ const Line = styled.div`
   }
 `;
 
-export default ViewSet
+export default ViewSet;

@@ -1,92 +1,76 @@
-import React from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 
-import styled from 'styled-components';
-import { Button, colors } from '../../assets/styles/GlobalStyles';
+import styled from "styled-components";
+import { Button, colors } from "../../assets/styles/GlobalStyles";
 
+const MethodChoiceOverlay = ({
+  setid,
+  signedUser,
+  chooseMethod,
+  createLearnSet,
+  createPlaySet
+}) => {
+  const [chosenMethod, setChosenMethod] = useState("");
+  const backgroundRef = useRef();
 
-class MethodChoiceOverlay extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      chosenMethod: ''
+  function handleCancel(event) {
+    if (backgroundRef.current === event.target) {
+      chooseMethod(false);
+    }
+  }
+
+  function handleLearnChoice() {
+    setChosenMethod("learn");
+    createLearnSet(setid);
+    createPlaySet(setid);
+  }
+
+  function handlePlayChoice() {
+    setChosenMethod("play");
+    createPlaySet(setid);
+  }
+
+  useEffect(() => {
+    return () => {
+      chooseMethod(false);
     };
+  }, []);
 
-    this.bgRef = React.createRef();
-  }
-
-  handleCancel = (event) => {
-    const node = this.bgRef.current;
-
-    if (node === event.target) {
-      this.props.chooseMethod(false);
-    }
-  }
-
-  handleLearnChoice = () => {
-    this.setState({
-      chosenMethod: 'learn'
-    }, () => {
-      this.props.createLearnSet(this.props.setid)
-    })
-  }
-
-  handlePlayChoice = () => {
-    this.setState({
-      chosenMethod: 'play'
-    }, () => {
-      this.props.createPlaySet(this.props.setid)
-    })
-  }
-
-  componentWillUnmount() {
-    this.props.chooseMethod(false);
-  }
-
-  render() {
-    const { chosenMethod } = this.state;
-    const { setid, signedUser } = this.props;
-
-    if (!signedUser) {
-      return <Redirect to='/signup' />
-
-    } else if (chosenMethod === 'learn') {
-      return <Redirect to={`/learn/${setid}`} />
-
-    } else if (chosenMethod === 'play') {
-      return <Redirect to={`/play/${setid}`} />
-
-    } else {
-      return (
-        <Background
-          ref={this.bgRef}
-          onClick={this.handleCancel}
-        >
-          <Dialog role="alertdialog" aria-describedby="info">
-            <Alert id="info">Do you want to learn words by flashcards or by game?</Alert>
-            <Buttons>
-              <Button
-                color={colors.navy}
-                center="true"
-                onClick={this.handleLearnChoice}
-              >
-                flashcards
-              </Button>
-              <Button
-                color={colors.navy}
-                center="true"
-                onClick={this.handlePlayChoice}
-              >
-                game
-              </Button>
-            </Buttons>
-          </Dialog>
-        </Background>
-      )
-    }
+  if (!signedUser) {
+    return <Redirect to="/signup" />;
+  } else if (chosenMethod === "learn") {
+    return <Redirect to={`/learn/${setid}`} />;
+  } else if (chosenMethod === "play") {
+    return <Redirect to={`/play/${setid}`} />;
+  } else {
+    return (
+      <Background ref={backgroundRef} onClick={handleCancel}>
+        <Dialog role="alertdialog" aria-describedby="info">
+          <Alert id="info">
+            Do you want to learn words by flashcards or by game?
+          </Alert>
+          <Buttons>
+            <Button
+              color={colors.navy}
+              center="true"
+              onClick={handleLearnChoice}
+            >
+              flashcards
+            </Button>
+            <Button
+              color={colors.navy}
+              center="true"
+              onClick={handlePlayChoice}
+            >
+              game
+            </Button>
+          </Buttons>
+        </Dialog>
+      </Background>
+    );
   }
 };
-
 
 const Background = styled.div`
   position: absolute;
@@ -120,8 +104,7 @@ const Buttons = styled.div`
   height: 10rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between
+  justify-content: space-between;
 `;
 
-
-export default MethodChoiceOverlay
+export default MethodChoiceOverlay;

@@ -1,57 +1,62 @@
-import React from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 
-import styled from 'styled-components';
-import { Button, colors } from '../../assets/styles/GlobalStyles';
+import styled from "styled-components";
+import { Button, colors } from "../../assets/styles/GlobalStyles";
 
+const StopLearningOverlay = ({ setid, cancelSesion }) => {
+  const backgroundRef = useRef();
+  const [isCancelled, setIsCancelled] = useState(false);
 
-class StopLearningOverlay extends React.Component {
-  state = {
-    isCancelled: false
+  function handleKeepLearning() {
+    cancelSesion(false);
   }
 
-  handleKeepLearning = event => {
-    this.props.cancelSesion(false)
+  function handleStopLearning() {
+    setIsCancelled(true);
   }
 
-  handleStopLearning = event => {
-    this.setState({
-      isCancelled: true
-    }, () => this.props.cancelSesion(false))
+  function handleCancel(event) {
+    if (event.target === backgroundRef.current) {
+      cancelSesion(false);
+    }
   }
 
-  render() {
-    const { isCancelled } = this.state;
-    const { setid } = this.props;
+  useEffect(
+    () => {
+      if (isCancelled) {
+        cancelSesion(false);
+      }
+    },
+    [isCancelled]
+  );
 
-    if (isCancelled) return <Redirect to={`/sets/${setid}`} />;
+  if (isCancelled) return <Redirect to={`/sets/${setid}`} />;
 
-    return (
-      <Background>
-        <Dialog role="alertdialog" aria-describedby="info">
-          <Alert id="info">Are you sure you want to finish learning?</Alert>
-          <Buttons>
-            <Button
-              color={colors.navy}
-              center="true"
-              onClick={this.handleKeepLearning}
-            >
-              no
-            </Button>
-            <Button
-              color={colors.navy}
-              center="true"
-              onClick={this.handleStopLearning}
-            >
-              yes
-            </Button>
-          </Buttons>
-        </Dialog>
-      </Background>
-    );
-  }
-}
-
+  return (
+    <Background ref={backgroundRef} onClick={handleCancel}>
+      <Dialog role="alertdialog" aria-describedby="info">
+        <Alert id="info">Are you sure you want to finish learning?</Alert>
+        <Buttons>
+          <Button
+            color={colors.navy}
+            center="true"
+            onClick={handleKeepLearning}
+          >
+            no
+          </Button>
+          <Button
+            color={colors.navy}
+            center="true"
+            onClick={handleStopLearning}
+          >
+            yes
+          </Button>
+        </Buttons>
+      </Dialog>
+    </Background>
+  );
+};
 
 const Background = styled.div`
   position: absolute;
@@ -84,8 +89,7 @@ const Buttons = styled.div`
   height: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between
+  justify-content: space-between;
 `;
 
-
-export default StopLearningOverlay
+export default StopLearningOverlay;

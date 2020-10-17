@@ -1,37 +1,37 @@
-import React, { Component } from 'react';
-import Term from './Term';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import { colors, fonts } from '../../assets/styles/GlobalStyles';
+import Term from "./Term";
+import { colors, fonts } from "../../assets/styles/GlobalStyles";
 
+const TermsList = ({ terms, updateTerm, removeTerm }) => {
+  const [isMoved, setIsMoved] = useState(false);
+  const [movedElement, setMovedElement] = useState(null);
 
-class TermsList extends Component {
-  state = {
-    isMoved: false,
-    movedElement: null
+  function moveElement(isMoved, element) {
+    setIsMoved(isMoved);
+    setMovedElement(element);
   }
 
-  onElementMove = (isMoved, element) => {
-    this.setState({
-      isMoved: isMoved,
-      movedElement: element
-    })
-  }
+  useEffect(
+    () => {
+      setIsMoved(false); // after removing term
+    },
+    [terms]
+  );
 
-  render() {
-    const { terms, updateTerm, removeTerm } = this.props;
+  return (
+    <>
+      {terms.map((term, index) => {
+        let isVisible = movedElement === index && isMoved ? false : true;
 
-    return (
-      <>
-        {terms.map((term, index) => {
-          let isVisible = (this.state.movedElement === index && this.state.isMoved) ? false : true;
-
-          return (
+        return (
           <ListItem key={term.id} id={term.id}>
             <Counter
               isVisible={isVisible}
-              isLessThanTen={((index + 1) < 10) ? true : false}>
-              { index + 1 }
+              isLessThanTen={index + 1 < 10 ? true : false}
+            >
+              {index + 1}
             </Counter>
             <SetWrapper>
               <Term
@@ -40,16 +40,15 @@ class TermsList extends Component {
                 termDetails={term}
                 updateTerm={updateTerm}
                 removeTerm={removeTerm}
-                onMove={this.onElementMove}  />
+                onMove={moveElement}
+              />
             </SetWrapper>
           </ListItem>
-        )
+        );
       })}
-      </>
-    );
-  }
-}
-
+    </>
+  );
+};
 
 const ListItem = styled.li`
   margin-bottom: 2rem;
@@ -67,8 +66,8 @@ const SetWrapper = styled.div`
 `;
 
 const Counter = styled.span`
-  opacity: ${props => props.isVisible ? 1 : 0 };
-  left: ${props => props.isLessThanTen ? '-8vw' : '-10vw' };
+  opacity: ${props => (props.isVisible ? 1 : 0)};
+  left: ${props => (props.isLessThanTen ? "-8vw" : "-10vw")};
   color: ${colors.azure};
   font-weight: ${fonts.bold};
   position: absolute;
@@ -78,9 +77,8 @@ const Counter = styled.span`
   user-select: none;
 
   @media (min-width: 768px) {
-    left: -50px
+    left: -50px;
   }
 `;
 
-
-export default TermsList
+export default TermsList;

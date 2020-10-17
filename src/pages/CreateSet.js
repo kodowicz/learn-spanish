@@ -1,131 +1,129 @@
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import TermsList from '../components/dashboard/TermsList';
-import DeleteSetOverlay from '../components/overlay/DeleteSetOverlay';
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
+import styled, { css } from "styled-components";
 
-import styled, { css } from 'styled-components';
-import { Button, Main, BasicInput, colors } from '../assets/styles/GlobalStyles';
+import TermsList from "../components/dashboard/TermsList";
+import DeleteSetOverlay from "../components/overlay/DeleteSetOverlay";
+import {
+  Button,
+  Main,
+  BasicInput,
+  colors
+} from "../assets/styles/GlobalStyles";
 
+const CreateSet = ({
+  uid,
+  setid,
+  setName,
+  unsavedSetTerms,
+  newSetKey,
+  isSetDeleted,
+  isOverlayOpen,
+  setUnsavedName,
+  addNewUnsavedTerm,
+  updateUnsavedTerm,
+  removeUnsavedTerm,
+  changeLocation,
+  changeLastLocation,
+  submitCreateSet,
+  askForDeleting,
+  deleteCreateSet,
+  notificationError
+}) => {
+  const [topic, setTopic] = useState("");
+  const [redirect, setRedirect] = useState(false);
+  const [isFilled, setFilled] = useState(false);
 
-class CreateSet extends Component {
-  state = {
-    setName: "",
-  }
+  useEffect(() => {
+    changeLocation("create");
+    changeLastLocation("/");
+  }, []);
 
-  componentDidMount() {
-    this.props.changeLocation('create');
-    this.props.changeLastLocation("/");
-    window.scrollTo(0, 0);
-  }
-
-  componentWillMount() {
-    this.setState({
-      setName: this.props.unsavedSetName
-    })
-  }
-
-  setName = event => {
-    const setName = event.target.value;
-
-    this.setState({
-      setName
+  useEffect(
+    () => {
+      setTopic(setName);
+      setFilled(setName ? true : false);
     },
-      this.props.setUnsavedName(setName)
+    [setName]
+  );
+
+  function changeTopic(event) {
+    const topic = event.target.value;
+    setTopic(topic);
+    setUnsavedName(topic);
+    setFilled(topic ? true : false);
+  }
+
+  function addTerm(event) {
+    event.preventDefault();
+    if (unsavedSetTerms.length === 50) {
+      notificationError("You've reached a limit of terms");
+    } else {
+      addNewUnsavedTerm();
+    }
+  }
+
+  if (!uid) return <Redirect to="/signup" />;
+  if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />;
+  if (isSetDeleted) return <Redirect to="/" />;
+
+  if (isOverlayOpen) {
+    return (
+      <DeleteSetOverlay
+        deleteSet={deleteCreateSet}
+        askForDeleting={askForDeleting}
+      />
+    );
+  } else {
+    return (
+      <Main width={80} desktop={500}>
+        <Form>
+          <SetName>
+            <NameInput value={topic} maxLength="30" onChange={changeTopic} />
+            <NameLabel isFilled={isFilled} htmlFor="name">
+              Name your set
+            </NameLabel>
+            <Border isBig="true" />
+          </SetName>
+
+          <Buttons
+            topic={topic}
+            terms={unsavedSetTerms}
+            askForDeleting={askForDeleting}
+            submitSet={submitCreateSet}
+            notificationError={notificationError}
+          />
+
+          <TermsListWrapper>
+            <TermsList
+              terms={unsavedSetTerms}
+              updateTerm={updateUnsavedTerm}
+              removeTerm={removeUnsavedTerm}
+            />
+          </TermsListWrapper>
+
+          <AddButton onClick={addTerm}>add term</AddButton>
+        </Form>
+      </Main>
     );
   }
-
-  addTerm = event => {
-    event.preventDefault();
-    if (this.props.unsavedSetTerms.length >= 50) {
-      this.props.notificationError("You've reached a limit of terms")
-    } else {
-      this.props.addNewUnsavedTerm();
-    }
-  }
-
-  render() {
-    const { setName } = this.state;
-    const isFilled = setName ? true : false;
-    const {
-      uid,
-      unsavedSetTerms,
-      newSetKey,
-      isSetDeleted,
-      isOverlayOpen,
-      updateUnsavedTerm,
-      removeUnsavedTerm,
-      submitCreateSet,
-      askForDeleting,
-      deleteCreateSet,
-      notificationError,
-    } = this.props;
-
-    if (!uid) return <Redirect to="/signup" />;
-    if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />
-    if (isSetDeleted) return <Redirect to="/" />
-
-    if (isOverlayOpen) {
-      return (
-        <DeleteSetOverlay
-          deleteSet={deleteCreateSet}
-          askForDeleting={askForDeleting} />
-      )
-    } else {
-      return (
-        <Main width={80} maxWidth={450} desktop={500}>
-          <Form>
-            <SetName>
-              <NameInput
-                value={setName}
-                maxLength="30"
-                onChange={this.setName} />
-              <NameLabel
-                isFilled={isFilled}
-                htmlFor="name">
-                Name your set
-              </NameLabel>
-              <Border isBig="true" />
-            </SetName>
-
-            <Buttons
-              setName={setName}
-              terms={unsavedSetTerms}
-              askForDeleting={askForDeleting}
-              submitSet={submitCreateSet}
-              notificationError={notificationError} />
-
-            <TermsListWrapper>
-              <TermsList
-                terms={unsavedSetTerms}
-                updateTerm={updateUnsavedTerm}
-                removeTerm={removeUnsavedTerm} />
-            </TermsListWrapper>
-
-            <AddButton onClick={this.addTerm}>add term</AddButton>
-          </Form>
-
-        </Main>
-      )
-    }
-  }
-}
+};
 
 const Buttons = ({
-  setName,
+  topic,
   terms,
   askForDeleting,
   submitSet,
   notificationError
 }) => {
-
-  const reduceTerms = terms => {
+  function reduceTerms(terms) {
     return terms
       .map(element => {
         return {
           ...element,
           term: element.term.trim(),
           definition: element.definition.trim()
-        }
+        };
       })
       .map(element => {
         const { term, definition } = element;
@@ -134,49 +132,43 @@ const Buttons = ({
           (/^\s$/.test(term) || term.length === 0) &&
           (/^\s$/.test(definition) || definition.length === 0)
         ) {
-          return null
-
+          return null;
         } else if (/^\s$/.test(term) || term.length === 0) {
-          return {...element, term: '...' };
-
+          return { ...element, term: "..." };
         } else if (/^\s$/.test(definition) || definition.length === 0) {
-          return {...element, definition: '...' };
-
+          return { ...element, definition: "..." };
         } else {
-          return element
+          return element;
         }
       })
-      .filter(element => element)
+      .filter(element => element);
   }
 
-  const handleSubmitSet = (event) => {
+  function handleSubmitSet(event) {
     const reducedTerms = reduceTerms(terms);
     event.preventDefault();
 
-    if (!setName || /^\s$/.test(setName)) {
-      notificationError('You must enter a title to save your set');
-
+    if (!topic || /^\s$/.test(topic)) {
+      notificationError("You must enter a title to save your set");
     } else if (reducedTerms.length < 4) {
-      notificationError('You must create at least 4 terms');
-
+      notificationError("You must create at least 4 terms");
     } else {
       submitSet(reducedTerms);
     }
   }
 
-  const handleDeleteSet = (event) => {
+  function handleDeleteSet(event) {
     event.preventDefault();
-    askForDeleting(true)
+    askForDeleting(true);
   }
 
   return (
     <ButtonsWrapper>
-      <Button onClick={handleSubmitSet}>save set</Button>
       <Button onClick={handleDeleteSet}>delete set</Button>
+      <Button onClick={handleSubmitSet}>save set</Button>
     </ButtonsWrapper>
   );
 };
-
 
 const SetName = styled.div`
   position: relative;
@@ -192,9 +184,11 @@ const NameLabel = styled.label`
   transition: opacity 0.1s;
   z-index: -1;
 
-  ${props => props.isFilled && css `
-    opacity: 0;
-  `}
+  ${props =>
+    props.isFilled &&
+    css`
+      opacity: 0;
+    `};
 `;
 
 const NameInput = styled(BasicInput)`
@@ -215,7 +209,7 @@ const Border = styled.div`
   height: 2px;
   background: ${colors.white};
   position: absolute;
-  bottom: ${props => props.isBig ? '-2px' : '10px'};
+  bottom: ${props => (props.isBig ? "-2px" : "10px")};
   left: 0;
 `;
 
@@ -225,26 +219,24 @@ const ButtonsWrapper = styled.div`
   justify-content: space-evenly;
   max-width: 300px;
 
-  ${'' /* @media (min-width: 768px) {
+  ${"" /* @media (min-width: 768px) {
     ${props => props.iseditable ? 'justify-content: space-between' : false };
-  } */}
+  } */};
 `;
 
-const Form = styled.form`
-`;
+const Form = styled.form``;
 
 const TermsListWrapper = styled.div`
   width: 76vw;
   margin: 0 auto;
 
   @media (min-width: 786px) {
-    width: 100%
+    width: 100%;
   }
 `;
 
 const AddButton = styled(Button)`
-  margin: 50px auto
+  margin: 50px auto;
 `;
 
-
-export default CreateSet
+export default CreateSet;

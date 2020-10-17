@@ -1,53 +1,39 @@
-import React, { Component } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { colors } from '../../assets/styles/GlobalStyles';
-import good from '../../assets/images/good.svg';
-import wrong from '../../assets/images/wrong.svg';
+import React, { useState } from "react";
+import styled, { css, keyframes } from "styled-components";
+import { colors } from "../../assets/styles/GlobalStyles";
+import good from "../../assets/images/good.svg";
+import wrong from "../../assets/images/wrong.svg";
 
+const Solution = ({ answer, correctItem, cleanGameAnswer }) => {
+  const [isAnswer, setIsAnswer] = useState(true);
+  const [isItem, setIsItem] = useState(false);
 
-class Solution extends Component {
-  state = {
-    isAnswer: true,
-    isItem: false
+  function handleAnswer() {
+    setIsAnswer(false);
+    setIsItem(true);
   }
 
-  handleAnswer = () => {
-    this.setState({
-      isAnswer: false,
-      isItem: true
-    })
+  function handleItem() {
+    const isCorrect = answer === "correct" ? true : false;
+    cleanGameAnswer(correctItem, isCorrect);
   }
 
-  handleItem = () => {
-    const { answer, correctItem, cleanGameAnswer } = this.props;
-    const isCorrect = answer === 'correct' ? true : false;
-    cleanGameAnswer(correctItem, isCorrect)
-  }
-
-  render() {
-    const { correctItem, answer } = this.props;
-    const { isItem, isAnswer } = this.state;
-
-    return (
-      <>
-        {isAnswer &&
-          <AnswerWrapper
-            onAnimationEnd={this.handleAnswer}>
-            <Answer src={answer === 'correct' ? good : wrong} />
-          </AnswerWrapper>
-        }
-        {isItem &&
-          <ItemWrapper
-            onAnimationEnd={this.handleItem}>
-            <Term>{correctItem.term}</Term>
-            <Definition>{correctItem.definition}</Definition>
-          </ItemWrapper>
-        }
-      </>
-    )
-  }
-}
-
+  return (
+    <>
+      {isAnswer && (
+        <AnswerWrapper onAnimationEnd={handleAnswer}>
+          <Answer src={answer === "correct" ? good : wrong} />
+        </AnswerWrapper>
+      )}
+      {isItem && (
+        <ItemWrapper onAnimationEnd={handleItem}>
+          <Term>{correctItem.term}</Term>
+          <Definition>{correctItem.definition}</Definition>
+        </ItemWrapper>
+      )}
+    </>
+  );
+};
 
 const zoomInOut = keyframes`
   from {
@@ -141,7 +127,7 @@ const Term = styled(Item)`
 
   @media (min-width: 768px) {
     font-size: 3.5rem;
-  };
+  }
 `;
 
 const Definition = styled(Item)`
@@ -153,4 +139,4 @@ const Definition = styled(Item)`
   }
 `;
 
-export default Solution
+export default Solution;

@@ -1,100 +1,128 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
-import StopLearningOverlay from '../components/overlay/StopLearningOverlay';
+import React, { useEffect } from "react";
+import styled from "styled-components";
+import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import {
   FrontCard,
   BackCard,
   Congratulations
-} from '../components/dashboard/Flashcard';
+} from "../components/dashboard/Flashcard";
 
+const LearnSet = ({
+  amount,
+  leftTerms,
+  setid,
+  terms,
+  isOverlayOpen,
+  cancelSesion,
+  shuffleCard,
+  throwoutCard,
+  createLearnSet,
+  setCurrentSetId,
+  changeLocation,
+  changeLastLocation
+}) => {
+  useEffect(() => {
+    setCurrentSetId(setid);
+    createLearnSet(setid);
+    changeLocation("learn");
+    changeLastLocation(`/sets/${setid}`);
+  }, []);
 
-class LearnSet extends Component {
-  componentDidMount() {
-    this.props.setCurrentSetId(this.props.setid);
-    this.props.createLearnSet(this.props.setid)
-    this.props.changeLocation('learn');
-    this.props.changeLastLocation(`/sets/${this.props.setid}`);
-  }
+  return (
+    <>
+      <Counter>
+        {leftTerms} / {amount}
+      </Counter>
+      <Cards>
+        <Flashcards
+          amount={amount}
+          leftTerms={leftTerms}
+          setid={setid}
+          terms={terms}
+          isOverlayOpen={isOverlayOpen}
+          cancelSesion={cancelSesion}
+          shuffleCard={shuffleCard}
+          throwoutCard={throwoutCard}
+          createLearnSet={createLearnSet}
+          setCurrentSetId={setCurrentSetId}
+          createLearnSet={createLearnSet}
+          changeLocation={changeLocation}
+          changeLastLocation={changeLastLocation}
+        />
+      </Cards>
+    </>
+  );
+};
 
-  render() {
-    const {
-      amount,
-      leftTerms,
-      setid,
-      terms,
-      isOverlayOpen,
-      cancelSesion,
-      shuffleCard,
-      throwoutCard,
-      createLearnSet
-    } = this.props;
-    let flashcards;
-
-    if (isOverlayOpen) {
-      return <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
-    } else {
-
-      if (terms.length > 1) {
-
-        flashcards = terms.map(term => {
-          if (term.layerIndex === 0) {
-            return (
-              <FrontCard
-                key={term.id}
-                layerIndex={term.layerIndex}
-                term={term}
-                moveEnabled={true}
-                shuffleCard={shuffleCard}
-                throwoutCard={throwoutCard}
-              />
-            )
-
-          } else if (term.layerIndex === -1) {
-            return (
-              <BackCard
-                key={term.id}
-                layerIndex={term.layerIndex}
-                term={term}
-              />
-            )
-          } else {
-            return <div key={term.id}></div>
-          }
-        })
-
-      } else if (terms.length === 1) {
-        flashcards = (
-          <>
+const Flashcards = ({
+  amount,
+  leftTerms,
+  setid,
+  terms,
+  isOverlayOpen,
+  cancelSesion,
+  shuffleCard,
+  throwoutCard,
+  createLearnSet,
+  setCurrentSetId,
+  changeLocation,
+  changeLastLocation
+}) => {
+  if (isOverlayOpen) {
+    return (
+      <StopLearningOverlay
+        setid={setid}
+        cancelSesion={cancelSesion}
+        changeLastLocation={changeLastLocation}
+      />
+    );
+  } else {
+    if (terms.length > 1) {
+      return terms.map(term => {
+        if (term.layerIndex === 0) {
+          return (
             <FrontCard
-              key={terms[0].id}
-              layerIndex={terms[0].layerIndex}
-              term={terms[0]}
-              moveEnabled={false}
+              key={term.id}
+              layerIndex={term.layerIndex}
+              term={term}
+              moveEnabled={true}
               shuffleCard={shuffleCard}
-              throwoutCard={throwoutCard}/>
-            <Congratulations layerIndex={-1} />
-          </>
-        )
-
-      } else {
-        flashcards = (
-          <Congratulations
-            layerIndex={0}
-            setid={setid}
-            createLearnSet={createLearnSet} />
-        )
-      }
-
+              throwoutCard={throwoutCard}
+            />
+          );
+        } else if (term.layerIndex === -1) {
+          return (
+            <BackCard key={term.id} layerIndex={term.layerIndex} term={term} />
+          );
+        } else {
+          return <div key={term.id} />;
+        }
+      });
+    } else if (terms.length === 1) {
       return (
         <>
-          <Counter>{ leftTerms } / {amount}</Counter>
-          <Cards>{ flashcards }</Cards>
+          <FrontCard
+            key={terms[0].id}
+            layerIndex={terms[0].layerIndex}
+            term={terms[0]}
+            moveEnabled={false}
+            shuffleCard={shuffleCard}
+            throwoutCard={throwoutCard}
+          />
+          <Congratulations layerIndex={-1} />
         </>
+      );
+    } else {
+      return (
+        <Congratulations
+          layerIndex={0}
+          setid={setid}
+          createLearnSet={createLearnSet}
+        />
       );
     }
   }
-}
-
+};
 
 const Counter = styled.span`
   position: absolute;
@@ -122,6 +150,6 @@ const Cards = styled.div`
   @media (min-width: 768px) {
     height: 90vh;
   }
-`
+`;
 
-export default LearnSet
+export default LearnSet;

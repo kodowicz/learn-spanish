@@ -1,76 +1,79 @@
-import React from 'react';
+import React, { useState, useRef } from "react";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import { BasicInput, Button, colors } from '../../assets/styles/GlobalStyles';
+import { BasicInput, Button, colors } from "../../assets/styles/GlobalStyles";
 
-
-class Password extends React.Component {
-  state = {
+const Password = ({
+  notificationError,
+  changePassword,
+  openPasswordOverlay
+}) => {
+  const backgroundRef = useRef();
+  const [login, setLogin] = useState({
     password: "",
     newpassword: ""
+  });
+
+  function handleChange(event) {
+    const { id, value } = event.target;
+    setLogin(state => ({
+      ...state,
+      [id]: value
+    }));
   }
 
-  handleChange = event => {
-    this.setState({
-      [event.target.id]: event.target.value
-    })
-  }
-
-  handleSubmit = (event) => {
-    const { newpassword } = this.state;
-    const { notificationError, changePassword } = this.props;
+  function handleSubmit(event) {
     event.preventDefault();
 
-    if (newpassword.length < 6) {
-      notificationError("The password must be 6 characters long or more.")
+    if (login.newpassword.length < 6) {
+      notificationError("The password must be 6 characters long or more.");
     } else {
-      changePassword(this.state);
+      changePassword(login);
     }
   }
 
-  render() {
-    const { password, newpassword } = this.state;
-
-    return (
-      <Background>
-
-        <Dialog aria-labelledby="change-password" onSubmit={this.handleSubmit}>
-          <Alert id="change-password">Change your password</Alert>
-
-          <Wrapper>
-            <Label htmlFor="password" isHidden={password}>password</Label>
-            <Input
-              id="password"
-              type="password"
-              required
-              onChange={this.handleChange}
-            />
-          </Wrapper>
-
-          <Wrapper>
-            <Label htmlFor="newpassword" isHidden={newpassword}>new password</Label>
-            <Input
-              id="newpassword"
-              type="password"
-              required
-              onChange={this.handleChange}
-            />
-          </Wrapper>
-
-          <Button
-            color={colors.navy}
-            center="true"
-            type="submit"
-            onClick={this.handleDecline}
-          >
-            change
-          </Button>
-        </Dialog>
-      </Background>
-    );
+  function handleCancel(event) {
+    if (event.target === backgroundRef.current) {
+      openPasswordOverlay(false);
+    }
   }
-}
 
+  return (
+    <Background ref={backgroundRef} onClick={handleCancel}>
+      <Dialog aria-labelledby="change-password" onSubmit={handleSubmit}>
+        <Alert id="change-password">Change your password</Alert>
+
+        <Wrapper>
+          <Label htmlFor="password" isHidden={login.password}>
+            old password
+          </Label>
+          <Input
+            required
+            id="password"
+            type="password"
+            onChange={handleChange}
+          />
+        </Wrapper>
+
+        <Wrapper>
+          <Label htmlFor="newpassword" isHidden={login.newpassword}>
+            new password
+          </Label>
+          <Input
+            required
+            id="newpassword"
+            type="password"
+            onChange={handleChange}
+          />
+        </Wrapper>
+
+        <Button color={colors.navy} center="true" type="submit">
+          change
+        </Button>
+      </Dialog>
+    </Background>
+  );
+};
 
 const Background = styled.div`
   position: absolute;
@@ -106,10 +109,10 @@ const Wrapper = styled.div`
 `;
 
 const Label = styled.label`
-  display: ${props => props.isHidden && 'none'};
+  display: ${props => props.isHidden && "none"};
   color: ${colors.darkGray};
   position: absolute;
-  top: 0.9rem;
+  top: 1rem;
   left: 1.6rem;
   font-size: 1.2rem;
 `;
@@ -124,4 +127,4 @@ const Input = styled(BasicInput)`
   border-radius: 20px;
 `;
 
-export default Password
+export default Password;

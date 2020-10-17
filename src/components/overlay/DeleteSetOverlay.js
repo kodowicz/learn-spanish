@@ -1,59 +1,59 @@
-import React from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useState, useRef } from "react";
+import { Redirect } from "react-router-dom";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import { Button, colors } from '../../assets/styles/GlobalStyles';
+import { Button, colors } from "../../assets/styles/GlobalStyles";
 
+const DeleteSetOverlay = ({
+  isEdited,
+  askForDeleting,
+  deleteSet,
+  deleteSetChanges
+}) => {
+  const [isDeleted, setIsDeleted] = useState(false);
+  const backgroundRef = useRef();
 
-class DeleteSetOverlay extends React.Component {
-  state = {
-    isDeleted: false
+  function handleDecline(event) {
+    askForDeleting(false);
   }
 
-  handleDecline = event => {
-    this.props.askForDeleting(false);
-  }
+  function handleDelete(event) {
+    setIsDeleted(true);
+    askForDeleting(false);
+    deleteSet();
 
-  handleDelete = event => {
-    this.props.askForDeleting(false);
-    this.props.deleteSet();
-
-    if (this.props.isEdited) {
-      this.props.deleteSetChanges();
+    if (isEdited) {
+      deleteSetChanges();
     }
-
-    this.setState({
-      isDeleted: true
-    })
   }
 
-  render() {
-    if (this.state.isDeleted) return <Redirect to="/" />;
-
-    return (
-      <Background>
-        <Dialog role="alertdialog" aria-describedby="info">
-          <Alert id="info">Are you sure you want to delete this set? The action will be irreversible.</Alert>
-          <Buttons>
-            <Button
-              color={colors.navy}
-              center="true"
-              onClick={this.handleDecline}>
-              go back
-            </Button>
-            <Button
-              color={colors.warming}
-              center="true"
-              onClick={this.handleDelete}>
-              delete
-            </Button>
-          </Buttons>
-        </Dialog>
-      </Background>
-    );
+  function handleCancel(event) {
+    if (event.target === backgroundRef.current) {
+      askForDeleting(false);
+    }
   }
-}
 
+  if (isDeleted) return <Redirect to="/" />;
+
+  return (
+    <Background ref={backgroundRef} onClick={handleCancel}>
+      <Dialog role="alertdialog" aria-describedby="info">
+        <Alert id="info">
+          Are you sure you want to delete this set? The action will be
+          irreversible.
+        </Alert>
+        <Buttons>
+          <Button color={colors.navy} center="true" onClick={handleDecline}>
+            go back
+          </Button>
+          <Button color={colors.warming} center="true" onClick={handleDelete}>
+            delete
+          </Button>
+        </Buttons>
+      </Dialog>
+    </Background>
+  );
+};
 
 const Background = styled.div`
   position: absolute;
@@ -86,7 +86,7 @@ const Buttons = styled.div`
   height: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between
+  justify-content: space-between;
 `;
 
-export default DeleteSetOverlay
+export default DeleteSetOverlay;

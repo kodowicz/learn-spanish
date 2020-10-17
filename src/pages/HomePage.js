@@ -1,48 +1,46 @@
-import React, { Component } from 'react';
-import SetsList from '../components/dashboard/SetsList';
+import React, { useEffect } from "react";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import { LinkButton, Main, fonts } from '../assets/styles/GlobalStyles';
+import SetsList from "../components/dashboard/SetsList";
+import { LinkButton, Main, fonts } from "../assets/styles/GlobalStyles";
 
+const HomePage = ({
+  userSets,
+  allSets,
+  changeLocation,
+  changeLastLocation,
+  enableEditSet
+}) => {
+  useEffect(() => {
+    changeLocation("home");
+    changeLastLocation("/");
+    enableEditSet();
+  }, []);
 
-class HomePage extends Component {
-  componentDidMount() {
-    this.props.changeLocation('home');
-    this.props.changeLastLocation("/");
-    this.props.enableEditSet();
-    window.scrollTo(0, 0);
-  }
+  return (
+    <>
+      <Main width={80} maxWidth={450} desktop={720}>
+        <Title>Are you ready for a new dose of words?</Title>
 
-  render() {
-    // will-change: transform
-    const { userSets, allSets } = this.props;
-
-    return (
-      <>
-        <Main width={80} maxWidth={450} desktop={720}>
-          <Title>Are you ready for a new dose of words?</Title>
-
-          { userSets?.length &&
-            <SetsList
-              isPercentage={true}
-              sets={userSets}
-              title="get back to learn"
-              margin="4rem 0"
-            />
-          }
-
+        {userSets?.length > 0 && (
           <SetsList
-            isPercentage={false}
-            sets={allSets}
-            title="available sets"
+            isPercentage={true}
+            sets={userSets}
+            title="get back to learn"
             margin="4rem 0"
           />
-        </Main>
-      </>
-    );
-  }
-}
+        )}
 
+        <SetsList
+          isPercentage={false}
+          sets={allSets}
+          title="available sets"
+          margin="4rem 0"
+        />
+      </Main>
+    </>
+  );
+};
 
 const Title = styled.h1`
   text-align: center;
@@ -57,5 +55,4 @@ const Title = styled.h1`
   }
 `;
 
-
-export default HomePage
+export default HomePage;

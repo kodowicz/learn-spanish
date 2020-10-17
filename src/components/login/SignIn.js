@@ -1,47 +1,60 @@
-import React, { Component } from 'react';
-import { Form, Wrapper, Label, Input, Button, colors } from '../../assets/styles/GlobalStyles';
+import React, { useState } from "react";
+import {
+  Form,
+  Wrapper,
+  Label,
+  Input,
+  Button,
+  colors
+} from "../../assets/styles/GlobalStyles";
 
-
-class SignIn extends Component {
-  state = {
+const SignIn = ({ signIn }) => {
+  const [login, setLogin] = useState({
     email: "",
     password: ""
+  });
+
+  function handleChange(event) {
+    const { id, value } = event.target;
+    setLogin(state => ({
+      ...state,
+      [id]: value
+    }));
   }
 
-  handleChange = event => {
-    this.setState({
-      [event.target.id]: event.target.value
-    })
-  }
-
-  handleSubmit = event => {
+  function handleSubmit(event) {
     event.preventDefault();
-    this.props.signIn(this.state);
+    signIn(login);
   }
 
-  render() {
-    return (
-      <Form onSubmit={this.handleSubmit}>
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Wrapper>
+        <Label htmlFor="email">email</Label>
+        <Input
+          required
+          id="email"
+          name="email"
+          type="email"
+          onChange={handleChange}
+        />
+      </Wrapper>
+      <Wrapper>
+        <Label htmlFor="password">password</Label>
+        <Input
+          required
+          id="password"
+          name="password"
+          type="password"
+          onChange={handleChange}
+        />
+      </Wrapper>
 
-        <Wrapper>
-          <Label htmlFor="email">email</Label>
-          <Input id="email" name="email" type="email" onChange={this.handleChange} required/>
-        </Wrapper>
-        <Wrapper>
-          <Label htmlFor="password">password</Label>
-          <Input id="password" name="password" type="password" onChange={this.handleChange} required/>
-        </Wrapper>
+      <Button color={colors.white} center="true">
+        sign in
+      </Button>
+    </Form>
+  );
+};
 
-        <Button
-          color={colors.white}
-          center="true"
-        >
-          sign in
-        </Button>
-      </Form>
-    );
-  }
-}
-
-
-export default SignIn
+export default SignIn;
