@@ -6,6 +6,7 @@ import { LinkButton, Main, fonts } from "../assets/styles/GlobalStyles";
 
 const HomePage = ({
   userSets,
+  otherSets,
   allSets,
   changeLocation,
   changeLastLocation,
@@ -22,21 +23,30 @@ const HomePage = ({
       <Main width={80} maxWidth={450} desktop={720}>
         <Title>Are you ready for a new dose of words?</Title>
 
-        {userSets?.length > 0 && (
+        {userSets?.length > 0 ? (
+          <>
+            <SetsList
+              isPercentage={true}
+              sets={userSets}
+              title="get back to learn"
+              margin="4rem 0"
+            />
+
+            <SetsList
+              isPercentage={false}
+              sets={otherSets}
+              title="available sets"
+              margin="4rem 0"
+            />
+          </>
+        ) : (
           <SetsList
-            isPercentage={true}
-            sets={userSets}
-            title="get back to learn"
+            isPercentage={false}
+            sets={allSets}
+            title="available sets"
             margin="4rem 0"
           />
         )}
-
-        <SetsList
-          isPercentage={false}
-          sets={allSets}
-          title="available sets"
-          margin="4rem 0"
-        />
       </Main>
     </>
   );
