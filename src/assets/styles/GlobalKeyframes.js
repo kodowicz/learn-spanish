@@ -1,5 +1,4 @@
-import styled, { css, keyframes } from 'styled-components'
-
+import styled, { css, keyframes } from "styled-components";
 
 export const popIn = keyframes`
   from {
@@ -19,11 +18,13 @@ export const popIn = keyframes`
     opacity: 1;
     transform: scale3d(1, 1, 1);
   }
-`
+`;
 
-export const moveBackards = (transformStart) => keyframes`
+export const moveBackards = transformStart => keyframes`
   from {
-    transform: translate(${transformStart.left}px, ${transformStart.top}px) scale(0.6);
+    transform: translate(${transformStart.left}px, ${
+  transformStart.top
+}px) scale(0.6);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
   }
@@ -46,7 +47,7 @@ export const moveBackards = (transformStart) => keyframes`
     transform: scale(1);
     opacity: 1;
   }
-`
+`;
 
 export const pulseShadow = keyframes`
   0% {
@@ -64,7 +65,19 @@ export const pulseShadow = keyframes`
   100% {
     box-shadow: 0 0 0 50px rgba(94, 55, 221, 0);
   }
-`
+`;
+
+export const tapPulse = keyframes`
+  0% {
+    box-shadow: 0 0 0 1rem #51359d40;
+    background: #51359d40;
+  }
+
+  100% {
+    box-shadow: 0 0 0 2rem #51359d40;
+    background: #51359d40;
+  }
+`;
 
 export const pulse = keyframes`
   from {
@@ -78,7 +91,7 @@ export const pulse = keyframes`
   to {
     transform: scale3d(1, 1, 1);
   }
-`
+`;
 
 export const shake = keyframes`
   0% {
@@ -102,7 +115,7 @@ export const shake = keyframes`
     transform: translateX(0px);
     opacity: 1
   }
-`
+`;
 
 export const moveForwards = (
   startOffsetLeft,
@@ -117,7 +130,7 @@ export const moveForwards = (
   to {
     transform: translate(${offsetLeft}px, ${offsetTop}px);
   }
-`
+`;
 
 export const prompt = keyframes`
   from {
@@ -139,7 +152,7 @@ export const prompt = keyframes`
   to {
     transform: translate(0px, 0px);
   }
-`
+`;
 
 export const scale = keyframes`
   from {
@@ -154,7 +167,7 @@ export const scale = keyframes`
     transform: scale(1);
     opacity: 1;
   }
-`
+`;
 
 export const fadeUp = keyframes`
   from {
@@ -171,7 +184,7 @@ export const fadeUp = keyframes`
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
-`
+`;
 
 export const flipOut = keyframes`
   from {
@@ -187,7 +200,7 @@ export const flipOut = keyframes`
     transform: perspective(400px) rotate3d(1, 0, 0, 40deg);
     opacity: 0;
   }
-`
+`;
 
 export const flipIn = keyframes`
   from {
@@ -204,7 +217,7 @@ export const flipIn = keyframes`
     transform: perspective(400px);
     opacity: 1;
   }
-`
+`;
 
 export const blink = keyframes`
   from {
@@ -214,9 +227,9 @@ export const blink = keyframes`
   to {
     opacity: 0;
   }
-`
+`;
 
-export const shuffle = (transform) => keyframes`
+export const shuffle = transform => keyframes`
   0% {
    z-index: 5
   }
@@ -233,7 +246,7 @@ export const shuffle = (transform) => keyframes`
     transform: rotate(0deg);
     z-index: 3;
   }
-`
+`;
 
 export const throwOut = keyframes`
   0% {
@@ -253,4 +266,4 @@ export const throwOut = keyframes`
     transform: translateX(300px) rotate(15deg);
     opacity: 0
   }
-`
+`;
