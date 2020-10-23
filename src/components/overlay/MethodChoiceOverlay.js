@@ -1,8 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
-
-import styled from "styled-components";
-import { Button, colors } from "../../assets/styles/GlobalStyles";
+import {
+  Background,
+  Dialog,
+  Alert,
+  Buttons,
+  Button,
+  colors
+} from "../../assets/styles/GlobalStyles";
 
 const MethodChoiceOverlay = ({
   setid,
@@ -71,40 +76,5 @@ const MethodChoiceOverlay = ({
     );
   }
 };
-
-const Background = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100%;
-`;
-
-const Dialog = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 25rem;
-  height: 30rem;
-  background: ${colors.white};
-  color: ${colors.navy};
-  border-radius: 15px;
-  box-shadow: 10px 10px 20px ${colors.shadow};
-  transform: translate(-50%, -50%);
-`;
-
-const Alert = styled.p`
-  font-size: 1.6rem;
-  margin: 3rem;
-  text-align: center;
-  user-select: none;
-`;
-
-const Buttons = styled.div`
-  height: 10rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
 
 export default MethodChoiceOverlay;

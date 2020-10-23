@@ -1,7 +1,13 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-
-import { BasicInput, Button, colors } from "../../assets/styles/GlobalStyles";
+import {
+  Background,
+  Dialog,
+  Alert,
+  BasicInput,
+  Button,
+  colors
+} from "../../assets/styles/GlobalStyles";
 
 const Password = ({
   notificationError,
@@ -75,34 +81,6 @@ const Password = ({
   );
 };
 
-const Background = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100%;
-`;
-
-const Dialog = styled.form`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 28rem;
-  height: 30rem;
-  padding: 0 3rem;
-  background: ${colors.white};
-  color: ${colors.navy};
-  border-radius: 15px;
-  box-shadow: 10px 10px 20px ${colors.shadow};
-  transform: translate(-50%, -50%);
-`;
-
-const Alert = styled.p`
-  font-size: 1.8rem;
-  margin: 3.5rem 0;
-  text-align: center;
-`;
-
 const Wrapper = styled.div`
   position: relative;
   margin: 2rem 0;
@@ -124,7 +102,7 @@ const Input = styled(BasicInput)`
   margin: 0 auto;
   display: block;
   padding: 0.8rem 1.6rem;
-  border-radius: 20px;
+  border-radius: 2rem;
 `;
 
 export default Password;

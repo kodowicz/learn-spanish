@@ -205,3 +205,39 @@ export const Input = styled(BasicInput)`
   padding: 1rem 1.8rem;
   width: 100%;
 `;
+
+/* overlay styles */
+export const Background = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+`;
+
+export const Dialog = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25rem;
+  height: 30rem;
+  background: ${colors.white};
+  color: ${colors.navy};
+  border-radius: 15px;
+  box-shadow: 10px 10px 20px ${colors.shadow};
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+`;
+
+export const Alert = styled.p`
+  font-size: 1.8rem;
+  margin: 2.5rem 0 3.5rem;
+  text-align: center;
+`;
+
+export const Buttons = styled.div`
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
