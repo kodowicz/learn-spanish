@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
+import GameOverOverlay from "../components/overlay/GameOverOverlay";
 import ChooseBetweenTwo from "../components/game/ChooseBetweenTwo";
 import ChooseBetweenFour from "../components/game/ChooseBetweenFour";
 import SelectFalseOrTrue from "../components/game/SelectFalseOrTrue";
@@ -9,6 +10,7 @@ import ArrayBubbles from "../components/game/ArrayBubbles";
 import TypeMeaning from "../components/game/TypeMeaning";
 import ArrayLetters from "../components/game/ArrayLetters";
 import Solution from "../components/game/Solution";
+import GameTimer from "../components/game/GameTimer";
 import RatioDots from "../components/RatioDots";
 
 const PlaySet = ({
@@ -16,48 +18,55 @@ const PlaySet = ({
   setid,
   answer,
   correctItem,
-  isOverlayOpen,
+  isCancelOpen,
+  isGameOverOpen,
   cancelSesion,
   cleanGameAnswer,
   showGameAnswer,
   changeLocation,
-  setCurrentSetId
+  setCurrentSetId,
+  finishGame
 }) => {
   useEffect(() => {
     changeLocation("learn");
     setCurrentSetId(setid);
   }, []);
 
-  if (answer) {
-    return (
-      <Solution
-        answer={answer}
-        correctItem={correctItem}
-        cleanGameAnswer={cleanGameAnswer}
-      />
-    );
+  if (isGameOverOpen) {
+    return <GameOverOverlay setid={setid} finishGame={finishGame} />;
   } else {
-    // choose a game
     return (
       <>
-        {isOverlayOpen && (
-          <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
-        )}
-        {!answer && (
-          <Game
-            isHidden={isOverlayOpen}
-            terms={terms}
+        <GameTimer isStopped={isCancelOpen || answer} finishGame={finishGame} />
+
+        {answer ? (
+          <Solution
             answer={answer}
             correctItem={correctItem}
-            showGameAnswer={showGameAnswer}
+            cleanGameAnswer={cleanGameAnswer}
           />
+        ) : (
+          <>
+            {isCancelOpen && (
+              <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
+            )}
+            <Game
+              setid={setid}
+              isHidden={isCancelOpen}
+              terms={terms}
+              answer={answer}
+              correctItem={correctItem}
+              showGameAnswer={showGameAnswer}
+              finishGame={finishGame}
+            />
+          </>
         )}
       </>
     );
   }
 };
 
-const Game = ({ isHidden, terms, showGameAnswer }) => {
+const Game = ({ setid, isHidden, terms, showGameAnswer, finishGame }) => {
   const [item, setItem] = useState({});
   const [game, setgame] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -151,12 +160,11 @@ const GameWrapper = styled.div`
 
 const RatioWrapper = styled.div`
   position: sticky;
-  top: 10rem;
-  left: 10vw;
+  top: 8rem;
+  left: 7vw;
   width: 5rem;
 
   @media (min-width: 768px) {
-    left: 3rem;
     width: 6rem;
   }
 `;
