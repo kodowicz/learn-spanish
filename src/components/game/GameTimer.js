@@ -19,16 +19,18 @@ const GameTimer = ({ isStopped, finishGame }) => {
   useEffect(
     () => {
       if (!isStopped) {
-        if (time >= 0) {
-          interval = setInterval(() => {
+        if (time > 0) {
+          interval = window.setInterval(() => {
             setTime(time - 1);
           }, 1000);
         } else {
-          finishGame(true);
+          window.setInterval(() => {
+            finishGame(true);
+          }, 1000);
         }
       }
 
-      return () => clearInterval(interval);
+      return () => window.clearInterval(interval);
     },
     [time, isStopped]
   );
@@ -44,10 +46,13 @@ const GameTimer = ({ isStopped, finishGame }) => {
 
 const Timer = styled.span`
   visibility: ${({ isVisible }) => (isVisible ? `hidden` : `visible`)};
-  position: sticky;
+  position: absolute;
   top: 7.2rem;
-  left: calc(100vw - 15vw);
-  width: 5rem;
+  right: 7vw;
+
+  @media (min-width: 768px) {
+    right: 3rem;
+  }
 `;
 
 export default GameTimer;

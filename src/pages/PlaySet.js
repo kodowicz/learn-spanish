@@ -159,13 +159,14 @@ const GameWrapper = styled.div`
 `;
 
 const RatioWrapper = styled.div`
-  position: sticky;
+  position: absolute;
   top: 8rem;
   left: 7vw;
   width: 5rem;
 
   @media (min-width: 768px) {
     width: 6rem;
+    left: 3rem;
   }
 `;
 
