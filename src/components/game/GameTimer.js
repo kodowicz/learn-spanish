@@ -24,7 +24,7 @@ const GameTimer = ({ isStopped, finishGame }) => {
             setTime(time - 1);
           }, 1000);
         } else {
-          window.setInterval(() => {
+          interval = window.setInterval(() => {
             finishGame(true);
           }, 1000);
         }
