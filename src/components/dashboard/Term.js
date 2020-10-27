@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
-import { colors, fonts } from "../../assets/styles/GlobalStyles";
+import { BasicTextArea, colors, fonts } from "../../assets/styles/GlobalStyles";
 import remove from "../../assets/images/remove.svg";
 
 const Term = ({
@@ -285,22 +285,13 @@ const Label = styled.label`
   z-index: -1;
 `;
 
-const Textarea = styled.textarea`
+const Textarea = styled(BasicTextArea)`
   color: ${props =>
     props.id === "term" ? `${colors.white}` : `${colors.lightGray}`};
-  font-family: ${fonts.family};
   padding: 2px 0;
   font-size: 1.6rem;
-  background: none;
   line-height: 1.8rem;
-  border: none;
   width: 100%;
-  outline: none;
-  overflow: hidden;
-  height: auto;
-  resize: none;
-  /* padding: 0; */
-  user-select: initial;
 `;
 
 const Border = styled.div`

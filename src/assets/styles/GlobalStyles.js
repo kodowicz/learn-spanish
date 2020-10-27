@@ -163,17 +163,32 @@ export const LinkButton = props => (
   </Anchor>
 );
 
+const mutualInputs = {
+  fontFamily: fonts.family,
+  background: "none",
+  border: "none",
+  outline: "none",
+  overflow: "hidden",
+  height: "auto",
+  resize: "none",
+  userSelect: "text"
+};
+
 export const BasicInput = styled.input`
-  font-family: ${fonts.family};
-  background: none;
-  border: none;
-  box-sizing: border-box;
+  ${css({
+    ...mutualInputs
+  })};
   font-size: 1.6rem;
-  user-select: text;
 
   &::placeholder {
     color: ${colors.darkGray};
   }
+`;
+
+export const BasicTextArea = styled.textarea`
+  ${css({
+    ...mutualInputs
+  })};
 `;
 
 /* login styles */
@@ -200,7 +215,6 @@ export const Label = styled.label`
 export const Input = styled(BasicInput)`
   color: ${colors.navy};
   background: ${colors.white};
-  outline: none;
   border-radius: 30px;
   padding: 1rem 1.8rem;
   width: 100%;
@@ -236,7 +250,7 @@ export const Alert = styled.p`
 `;
 
 export const Buttons = styled.div`
-  height: 100px;
+  height: 10rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

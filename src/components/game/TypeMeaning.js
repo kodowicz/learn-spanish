@@ -1,36 +1,40 @@
-import React, { Component } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { colors } from '../../assets/styles/GlobalStyles';
-import { popIn, blink, pulse, shake } from '../../assets/styles/GlobalKeyframes';
-
+import React, { Component } from "react";
+import styled, { css } from "styled-components";
+import { BasicTextArea, colors, fonts } from "../../assets/styles/GlobalStyles";
+import { popIn, pulse, shake } from "../../assets/styles/GlobalKeyframes";
 
 class TypeMeaning extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      index: 0,
+      valueIndex: 1,
       counter: 0,
-      promptingTime: 5000,
+      promptingTime: 3000,
+      dashesWidth: 0,
+      inputPadding: 0,
+      inputWidth: 0,
+      inputHeight: 0,
+      inputValue: "",
       definition: "",
       correctAnswer: "",
-      prompting: "",
-      isFinished: false,
       isFocused: false,
       isPrompting: false,
-      isActive: false,
+      isInputWrong: false,
+      hasMoreLines: false,
       isWrong: false,
       isCorrect: false,
       excludedIndexes: [],
-      dashes: [],
       groupedWords: [],
-      currentLetter: {
+      promptedLetter: {
         wordIndex: 0,
         letterIndex: 0
       }
-    }
+    };
 
     this.inputRef = React.createRef();
+    this.dashesRef = React.createRef();
+    this.firstWordRef = React.createRef();
     this.dashRef = React.createRef();
   }
 
@@ -38,308 +42,368 @@ class TypeMeaning extends Component {
     this.createGame();
   }
 
-  createGame() {
+  componentDidUpdate(prevProps, prevState) {
+    const { inputValue, correctAnswer, counter } = this.state;
+    const dashesRect = this.dashesRef.current.getBoundingClientRect();
+    const wordRect = this.firstWordRef.current.getBoundingClientRect();
+    const dashesWidth = dashesRect.width;
+    const inputPadding = wordRect.left - dashesRect.left;
+    const hasMoreLines = dashesRect.height > 60;
+    const wordsRef = this.dashesRef.current.childNodes;
+    let inputWidth = 0;
+    const maxWidth = prevProps.isDesktop ? 400 : 250;
+
+    wordsRef.forEach(word => {
+      const width = word.getBoundingClientRect().width;
+      const newWidth = inputWidth + width;
+
+      if (newWidth < maxWidth) {
+        inputWidth += width;
+      }
+    });
+
+    if (dashesWidth !== prevState.dashesWidth) {
+      this.setState({
+        hasMoreLines,
+        dashesWidth,
+        inputWidth,
+        inputPadding
+      });
+    }
+
+    if (prevState.inputValue !== inputValue) {
+      const { item, showGameAnswer } = prevProps;
+      const isFinished = inputValue === correctAnswer;
+
+      if (counter === 3) {
+        window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
+      } else if (isFinished) {
+        window.setTimeout(() => showGameAnswer(item, "correct"), 500);
+      }
+    }
+  }
+
+  createGame = () => {
     this.setState((state, props) => {
       const { item } = props;
-      const correctAnswer = item.term;
+      const correctAnswer = item.term.replace(/\n/, "");
       const excludedIndexes = this.getExcludedIndexes(correctAnswer);
-      const dashes = this.createDashes(correctAnswer, excludedIndexes);
-      const groupedWords = this.createGroupedWords(dashes, excludedIndexes);
-      const currentLetter = this.findCurrentLetter(groupedWords);
-      const prompting = this.getPromptedLetter(dashes, correctAnswer);
+      const groupedWords = this.createGroupedWords(
+        correctAnswer,
+        excludedIndexes
+      );
+      const promptedLetter = this.findCurrentLetter(0, groupedWords);
       let nextIndex = 0;
 
       while (excludedIndexes.indexOf(nextIndex) !== -1) {
         nextIndex++;
       }
 
+      if (excludedIndexes.includes(0)) {
+        this.prompting = setTimeout(this.promptingTimer, 0);
+      } else {
+        this.prompting = setTimeout(
+          this.promptingTimer,
+          this.state.promptingTime
+        );
+      }
+
       return {
-        currentLetter,
+        promptedLetter,
         correctAnswer,
-        prompting,
         excludedIndexes,
-        dashes,
         groupedWords,
         index: nextIndex,
         definition: item.definition
-      }
-    })
+      };
+    });
   };
 
-  createGroupedWords = (array, excludedIndexes) => {
+  excludeSpaces = word => {
+    const regex = /\s/g;
+    const array = [];
+    let match;
+
+    while ((match = regex.exec(word)) != null) {
+      array.push(match.index);
+    }
+
+    return array;
+  };
+
+  createGroupedWords = text => {
+    let array = text.split("");
     let groupedWords = [];
     let prevIndex = 0;
+    let lastWordIndex = text.length - 1;
+    const excludedIndexes = this.excludeSpaces(text);
 
     if (excludedIndexes.length) {
-      array.forEach((letter, nextIndex) => {
-        const lastIndex = excludedIndexes.slice(-1)[0];
+      const lastIndex = excludedIndexes.slice(-1)[0];
 
+      array.forEach((letter, nextIndex) => {
         if (excludedIndexes.includes(nextIndex)) {
           let dashes = [...array];
           let subarray = [...dashes.slice(prevIndex, nextIndex)];
 
           groupedWords.push(subarray, [letter]);
-          prevIndex = nextIndex + 1
+          prevIndex = nextIndex + 1;
 
-          if (lastIndex === nextIndex) {
-            let lastSubarrayLength = (array.length - 1) - lastIndex;
+          if (lastIndex === nextIndex && lastIndex !== lastWordIndex) {
+            let lastSubarrayLength = array.length - 1 - lastIndex;
             let lastSubarray = [...array.slice(-lastSubarrayLength)];
 
-            groupedWords.push(lastSubarray)
+            groupedWords.push(lastSubarray);
           }
         }
-      })
-
+      });
     } else {
       groupedWords.push(array);
     }
 
-    return groupedWords.filter(subarray => subarray.length)
-  }
-
-  createDashes = (term, excludedIndexes) => {
-    let dashes = [];
-
-    dashes = term.split("").map((letter, index) =>
-      excludedIndexes.some(i => i === index) ? letter : ""
-    );
-
-    return dashes;
+    return groupedWords.filter(subarray => subarray.length);
   };
 
-  findCurrentLetter = (groupedWords) => {
-    let wordIndex = groupedWords.findIndex(word => word.some(letter => !letter));
-    let letterIndex = groupedWords[wordIndex]?.findIndex(letter => !letter);
+  findCurrentLetter = (index, groupedWords) => {
+    let inputIndex = index;
+    let wordIndex = 0;
+    let letterIndex = 0;
+
+    groupedWords.forEach(word => {
+      const wordLength = word.length;
+      if (inputIndex) {
+        if (wordLength - 1 < inputIndex) {
+          wordIndex++;
+          inputIndex = inputIndex - wordLength;
+        } else {
+          letterIndex = inputIndex;
+          inputIndex = 0;
+        }
+      }
+    });
 
     return {
       wordIndex,
       letterIndex
-    }
-  }
+    };
+  };
 
-  getExcludedIndexes = (word) => {
+  getExcludedIndexes = word => {
     // it won't catch special char like
-    const regex = /[$&+,:;=?@#|'<>.^*()%!-\s]/g
+    const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
     const array = [];
     let match;
 
     while ((match = regex.exec(word)) != null) {
-      array.push(match.index)
+      array.push(match.index);
     }
 
-    return array
-  }
+    return array;
+  };
 
-  switchSpecialLetters = (letterCode, correctLetter) => {
-    const charCodes = [
-      { basic: 65, ext: ['á', 'à', 'â', 'ã', 'ä', 'å', 'ą'] },
-      { basic: 69, ext: ['é', 'è', 'ê', 'ë', 'ę'] },
-      { basic: 73, ext: ['í', 'ì', 'î', 'ï'] },
-      { basic: 78, ext: ['ñ'] },
-      { basic: 79, ext: ['ó', 'ò', 'ô', 'õ', 'ö'] },
-      { basic: 85, ext: ['ú', 'ù', 'û', 'ü'] },
-      { basic: 89, ext: ['ý', 'ÿ'] },
-      { basic: 67, ext: ['ç'] }
+  switchSpecialLetters = (letters, correctLetters) => {
+    const chars = [
+      { basic: "a", regex: /[áàâãäåą]/ },
+      { basic: "e", regex: /[éèêëę]/ },
+      { basic: "i", regex: /[íìîï]/ },
+      { basic: "n", regex: /[ñń]/ },
+      { basic: "o", regex: /[óòôõö]/ },
+      { basic: "u", regex: /[úùûü]/ },
+      { basic: "y", regex: /[ýÿ]/ },
+      { basic: "c", regex: /[ç]/ },
+      { basic: "l", regex: /ł/ },
+      { basic: "z", regex: /[żź]/ },
+      { basic: "s", regex: /ś/ }
     ];
-    const index = charCodes.findIndex(code => code.basic === letterCode);
-    let isCommutable = false;
 
-    if (index !== -1) {
-      isCommutable = charCodes[index].ext.some(letter => letter === correctLetter.toLowerCase());
+    const lastLetter = letters[letters.length - 1];
+    const lastCorrectLetter = correctLetters[correctLetters.length - 1];
+
+    const isCommutable = chars.some(
+      char => char.basic === lastLetter && char.regex.test(lastCorrectLetter)
+    );
+
+    if (isCommutable) {
+      return correctLetters;
     }
+  };
 
-    return isCommutable
-  }
+  handleTyping = event => {
+    const inputValue = event.target.value;
 
-  handleTyping = (event) => {
-    const keyCode = event;
-    const currentCode = event.which || event.code;
-    let currentKey = event.key;
-    event.persist();
+    this.setState(prevState => {
+      const {
+        promptingTime,
+        correctAnswer,
+        excludedIndexes,
+        groupedWords
+      } = prevState;
+      let valueIndex = inputValue.length;
+      let counter = prevState.counter;
 
-    if (!currentKey) {
-      currentKey = String.fromCharCode(currentCode);
-    }
+      // prevent typing if task is completed
+      const isFinished = inputValue.length > correctAnswer.length;
 
-    this.setState(state => {
-      const { index, promptingTime, correctAnswer, excludedIndexes, dashes } = state;
-      const correctLetter = correctAnswer[index];
-      let userLetter = event.key;
-      const isCommutable = this.switchSpecialLetters(currentCode, correctLetter);
+      if (!isFinished) {
+        const correctLetters = correctAnswer.slice(0, valueIndex);
+        const exchanged = this.switchSpecialLetters(inputValue, correctLetters);
 
-      if (isCommutable || userLetter === correctLetter) {
-        const counter = 0;
-        let nextIndex = index + 1;
-        userLetter = (isCommutable ? correctLetter : userLetter);
+        if (exchanged || inputValue === correctLetters) {
+          if (prevState.valueIndex < valueIndex) {
+            counter = 0;
+          }
 
-        while (excludedIndexes.indexOf(nextIndex) !== -1) {
-          nextIndex++;
+          const promptedLetter = this.findCurrentLetter(
+            valueIndex,
+            groupedWords
+          );
+
+          // prompting
+          clearTimeout(this.prompting);
+          if (excludedIndexes.includes(valueIndex)) {
+            this.prompting = setTimeout(this.promptingTimer, 0);
+          } else {
+            this.prompting = setTimeout(this.promptingTimer, promptingTime);
+          }
+
+          return {
+            counter,
+            valueIndex,
+            promptedLetter,
+            correctLetters,
+            inputValue: correctLetters,
+            isInputWrong: false,
+            isPrompting: false,
+            isCorrect: true
+          };
+        } else {
+          let counter = prevState.counter;
+
+          if (prevState.valueIndex < valueIndex) {
+            counter++;
+          }
+
+          clearTimeout(this.prompting);
+
+          return {
+            counter,
+            valueIndex,
+            inputValue,
+            correctLetters,
+            isPrompting: false,
+            isInputWrong: true,
+            isWrong: true
+          };
         }
-
-        dashes[index] = userLetter;
-        const groupedWords = this.createGroupedWords(dashes, excludedIndexes);
-        const currentLetter = this.findCurrentLetter(groupedWords);
-
-        // prompting
-        clearTimeout(this.prompting);
-        const prompting = this.getPromptedLetter(dashes, correctAnswer);
-        this.prompting = setTimeout(this.promptingTimer, promptingTime);
-
-        return {
-          counter,
-          currentLetter,
-          prompting,
-          dashes,
-          groupedWords,
-          index: nextIndex,
-          isPrompting: false,
-          isCorrect: true
-        };
-
-      } else {
-        const counter = state.counter + 1;
-
-        return {
-          counter,
-          isWrong: true
-        };
       }
     });
-  }
+  };
 
   handleAnswer = () => {
-    this.setState((state) => {
-      const { dashes, correctAnswer, counter } = this.state;
-      const isFinished = dashes.join('') === correctAnswer;
-
-      if (isFinished || counter === 3) {
-        return {
-          isFinished: true
-        }
-      } else {
-        return {
-          isCorrect: false,
-          isWrong: false
-        }
-      }
-    }, () => {
-      const { item, showGameAnswer } = this.props;
-      const { isFinished, counter } = this.state;
-
-      if (isFinished) {
-        if (counter === 3) {
-          showGameAnswer(item, 'wrong');
-        } else {
-          showGameAnswer(item, 'correct');
-        }
-      }
+    this.setState({
+      isCorrect: false,
+      isWrong: false
     });
   };
 
   handleFocus = event => {
     this.setState({
       isFocused: true
-    }, () => this.prompting = setTimeout(
-      this.promptingTimer,
-      this.state.promptingTime
-    ))
-  }
+    });
+  };
 
   handleBlur = event => {
     this.setState({
-      isFocused: false,
-      isPrompting: false,
-      prompting: ""
-    }, () => clearTimeout(this.prompting))
-  }
+      isFocused: false
+    });
+  };
 
   promptingTimer = () => {
-    this.setState((state) => {
-      const prompting = this.getPromptedLetter(state.dashes, state.correctAnswer);
-      return {
-        prompting,
-        isPrompting: true
-      }
+    this.setState({
+      isPrompting: true
     });
-  }
-
-  getPromptedLetter = (array, str) => {
-    const index = array.findIndex(letter => !letter);
-    const nextLetter = index === -1 ? str[0] : str[index];
-    return nextLetter
-  }
+  };
 
   render() {
     const {
-      currentLetter,
-      prompting,
-      dashes,
-      groupedWords,
+      inputPadding,
+      inputValue,
       definition,
-      isFinished,
+      hasMoreLines,
       isFocused,
       isPrompting,
       isWrong,
       isCorrect,
-      index: currentIndex
+      inputWidth,
+      isInputWrong,
+      groupedWords,
+      promptedLetter
     } = this.state;
+    const { isDesktop } = this.props;
+    const aditionalWidth = hasMoreLines ? 0 : isDesktop ? 24 : 16;
 
     return (
-      <GameWrapper isFinished={isFinished}>
-        <Definition>{definition}</Definition>
+      <GameWrapper>
+        <Definition isFocused={true}>{definition}</Definition>
 
         <InputWrapper
           isWrong={isWrong}
+          isInputWrong={isInputWrong}
           isCorrect={isCorrect}
-          onAnimationEnd={this.handleAnswer}>
-
+          onAnimationEnd={this.handleAnswer}
+        >
           <Input
             ref={this.inputRef}
+            value={inputValue}
+            width={inputWidth + aditionalWidth} // for wrong letter at the end
+            isInputWrong={isInputWrong}
+            hasMoreLines={hasMoreLines}
+            padding={inputPadding}
+            isWrong={isWrong}
+            onInput={this.handleTyping}
             onFocus={this.handleFocus}
             onBlur={this.handleBlur}
-            onKeyDown={this.handleTyping}
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false" />
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+          />
 
-          <Dashes>
-            { groupedWords.map((word, wordIndex) => {
-                const activeWord = wordIndex === currentLetter.wordIndex ? true : false;
+          <Dashes
+            hasMoreLines={hasMoreLines}
+            width={inputWidth}
+            ref={this.dashesRef}
+          >
+            {groupedWords.map((word, wordIndex) => {
+              const isFirstWord = wordIndex === 0;
+              const activeWord = wordIndex === promptedLetter.wordIndex;
 
-                return (
-                  <Word key={wordIndex}>
-                    { word.map((letter, letterIndex) => {
-                      const activeLetter = letterIndex === currentLetter.letterIndex ? true : false;
-                      const isActive = isFocused && activeWord && activeLetter;
-
-                      return (isActive && isPrompting) ?
-                        <DashWrapper key={letterIndex}>
-                          <Dash
-                            letter={letter}
-                            ref={isActive ? this.dashRef : false}
-                            isActive={isActive ? true : false}
-                            index={letterIndex}
-                            isBlock={/\n/.test(letter)}>
-                            {letter}
-                          </Dash>
-                          <Prompting>{prompting}</Prompting>
-                        </DashWrapper>
-                        :
-                        <Dash
-                          letter={letter}
-                          ref={isActive ? this.dashRef : false}
-                          isActive={isActive ? true : false}
-                          index={letterIndex}
-                          key={letterIndex}
-                          isBlock={/\n/.test(letter)}>
-                          {letter}
-                        </Dash>
-                    })}
-                  </Word>
-                )
-              })
-            }
+              return (
+                <Word
+                  ref={isFirstWord ? this.firstWordRef : false}
+                  key={wordIndex}
+                >
+                  {word.map((letter, letterIndex) => {
+                    const activeLetter =
+                      letterIndex === promptedLetter.letterIndex;
+                    const isActive = activeWord && activeLetter;
+                    return (
+                      <Dash
+                        letter={letter}
+                        ref={isActive ? this.dashRef : false}
+                        isInputWrong={isInputWrong}
+                        isActive={isPrompting && isActive}
+                        index={letterIndex}
+                        key={letterIndex}
+                        isWrong={isWrong}
+                      >
+                        {letter}
+                      </Dash>
+                    );
+                  })}
+                </Word>
+              );
+            })}
           </Dashes>
         </InputWrapper>
       </GameWrapper>
@@ -347,9 +411,7 @@ class TypeMeaning extends Component {
   }
 }
 
-
 const GameWrapper = styled.div`
-  display: ${({ isChosen }) => (isChosen ? 'none' : 'block')};
   padding-top: 20vh;
   width: 80vw;
   margin: 0 auto;
@@ -360,98 +422,181 @@ const Definition = styled.p`
   text-align: center;
   margin: 7rem 0;
   opacity: 0;
-  animation: ${popIn} .3s linear 0.4s forwards;
+  animation: ${popIn} 0.3s linear 0.4s forwards;
+
+  @media (max-width: 686px) {
+    ${({ isFocused }) =>
+      isFocused &&
+      css`
+        font-size: 3rem;
+        margin: 12rem 0 3rem;
+      `};
+  }
 `;
 
 const InputWrapper = styled.div`
   position: relative;
-  border: 1px solid white;
-  border-radius: 4rem;
   min-height: 5rem;
-  height: auto;
-  display: flex;
-  align-items: center;
-
+  border-radius: 4rem;
   width: 80vw;
   margin: 0 auto;
+
+  &::after {
+    border: 1px solid ${colors.white};
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 4rem;
+
+    ${({ isInputWrong }) =>
+      isInputWrong
+        ? css`
+            border: 1px solid ${colors.warming};
+          `
+        : css`
+            border: 1px solid ${colors.white};
+          `};
+
+    ${({ isWrong }) =>
+      isWrong &&
+      css`
+        animation: ${shake} 0.5s linear;
+      `};
+
+    ${({ isCorrect }) =>
+      isCorrect &&
+      css`
+        animation: ${pulse} 0.4s linear;
+      `};
+  }
 
   @media (min-width: 768px) {
     width: 50rem;
   }
-
-  ${({ isWrong }) => isWrong && css`
-    animation: ${shake} 0.5s linear;
-  `};
-
-  ${({ isCorrect }) => isCorrect && css`
-    animation: ${pulse} 0.4s linear;
-  `}
 `;
 
-const Input = styled.input`
+const Input = styled(BasicTextArea)`
+  width: ${({ width }) => `${width}px`};
+
+  ${({ isInputWrong }) =>
+    isInputWrong
+      ? css`
+          color: ${colors.warming};
+        `
+      : css`
+          color: ${colors.white};
+        `};
+
+  ${({ hasMoreLines }) =>
+    hasMoreLines
+      ? css`
+          transform: translateX(-50%);
+        `
+      : css`
+          transform: translateX(calc(-50% + 8px));
+        `};
+
+  padding: 1.1rem 0;
+  height: 100%;
   position: absolute;
   top: 0;
-  left: 0;
-  border: none;
-  background: none;
+  left: 50%;
+  font-size: 2rem;
   outline: none;
-  color: transparent;
-  caret-color: transparent;
-  width: 100%;
-  height: 100%;
-  font-size: 1.6rem;
-`;
-
-const Dashes = styled.div`
-  margin: 0 auto;
-  padding: 1rem 2rem;
-  text-align: center;
-`;
-
-const Word = styled.div`
-  display: inline-block
-`;
-
-const DashWrapper = styled.span`
-  position: relative
-`;
-
-const Dash = styled.span`
-  font-size: 2.4rem;
-  display: inline-block;
-  transition: transform 0.1s ease-out;
-
-  width: ${({ letter }) => letter === ' ' && '1rem'};
-
-  ${({ isActive }) => isActive && css`
-    animation: ${blink} 1s linear infinite;
-    transform: translateY(4px);
-  `};
-
-  ${({ isBlock }) => isBlock && css`
-    display: block;
-    height: 1rem;
-  `};
-
-  ${({ letter }) => !letter && css`
-    height: calc(2.8rem);
-    width: 1rem;
-    margin: 0 0.2rem;
-    border-bottom: 1px solid white;
-  `};
-`;
-
-const Prompting = styled.span`
-  position: absolute;
-  top: -1.2rem;
-  left: 0;
-  font-size: 2.4rem;
-  height: 2.4rem;
-  color: ${colors.bluish};
+  margin: 0;
+  z-index: 1;
 
   @media (min-width: 768px) {
-    top: -1rem
+    font-size: 2.4rem;
+
+    ${({ hasMoreLines }) =>
+      hasMoreLines
+        ? css`
+            transform: translateX(-50%);
+          `
+        : css`
+            transform: translateX(calc(-50% + 12px));
+          `};
   }
 `;
 
-export default TypeMeaning
+const Dashes = styled.div`
+  ${({ width }) =>
+    width
+      ? css`
+          width: ${width}px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+        `
+      : css`
+          width: fit-content;
+          display: flex;
+          flex-wrap: wrap;
+        `};
+
+  ${({ hasMoreLines }) =>
+    hasMoreLines
+      ? css`
+          justify-content: flex-start;
+        `
+      : css`
+          justify-content: center;
+        `};
+
+  padding: 1.1rem 0;
+  height: 100%;
+  margin: 0 auto;
+  font-size: 2rem;
+  z-index: 0;
+
+  @media (min-width: 768px) {
+    font-size: 2.4rem;
+  }
+`;
+
+const Word = styled.div`
+  display: inline-block;
+`;
+
+const Dash = styled.span`
+  display: inline-block;
+  transition: transform 0.1s ease-out;
+
+  ${({ isActive }) =>
+    isActive
+      ? css`
+          color: ${colors.darkGray};
+        `
+      : css`
+          color: transparent;
+        `};
+
+  ${({ isInputWrong, letter }) =>
+    letter === " "
+      ? css`
+          border: none;
+          width: 0.5rem;
+        `
+      : isInputWrong
+        ? css`
+            border-bottom: 1px solid ${colors.warming};
+          `
+        : css`
+            border-bottom: 1px solid ${colors.white};
+          `};
+
+  @media (min-width: 768px) {
+    ${({ letter }) =>
+      letter === " " &&
+      css`
+        width: 0.6rem;
+      `};
+  }
+`;
+
+export default TypeMeaning;
