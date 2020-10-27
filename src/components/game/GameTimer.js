@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-const GameTimer = ({ isStopped, finishGame }) => {
+const GameTimer = ({ isStopped, isAnswered, isAnimated, finishGame }) => {
   const [time, setTime] = useState(5 * 60);
   let interval;
   const clock = timer(time);
@@ -18,25 +18,24 @@ const GameTimer = ({ isStopped, finishGame }) => {
 
   useEffect(
     () => {
+      if (isAnimated && time === 0) {
+        finishGame(true);
+      }
       if (!isStopped) {
         if (time > 0) {
           interval = window.setInterval(() => {
             setTime(time - 1);
-          }, 1000);
-        } else {
-          interval = window.setInterval(() => {
-            finishGame(true);
           }, 1000);
         }
       }
 
       return () => window.clearInterval(interval);
     },
-    [time, isStopped]
+    [time, isStopped, isAnimated]
   );
 
   return (
-    <Timer isVisible={isStopped}>
+    <Timer isVisible={isStopped || isAnswered}>
       {clock.minutes}
       :
       {clock.seconds}
@@ -46,7 +45,7 @@ const GameTimer = ({ isStopped, finishGame }) => {
 
 const Timer = styled.span`
   visibility: ${({ isVisible }) => (isVisible ? `hidden` : `visible`)};
-  position: absolute;
+  position: fixed;
   top: 7.2rem;
   right: 7vw;
 

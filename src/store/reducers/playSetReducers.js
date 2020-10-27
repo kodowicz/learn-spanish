@@ -1,22 +1,29 @@
 const initState = {
-  answer: '',
-  item: {}
-}
+  answer: "",
+  item: {},
+  isAnimated: false
+};
 
 export const gameAnswerReducer = (state = initState, action) => {
   switch (action.type) {
-    case 'SHOW_ANSWER':
+    case "SHOW_ANSWER":
       return {
         ...state,
         item: action.item,
         answer: action.answer
       };
 
-    case 'CLEAR_ANSWER':
+    case "CLEAR_ANSWER":
       return {
         ...state,
-        answer: '',
+        answer: "",
         item: {}
+      };
+
+    case "ANIMATION_END":
+      return {
+        ...state,
+        isAnimated: action.payload
       };
 
     default:

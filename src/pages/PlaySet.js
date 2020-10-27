@@ -19,10 +19,12 @@ const PlaySet = ({
   answer,
   correctItem,
   isCancelOpen,
+  isAnimated,
   isGameOverOpen,
   cancelSesion,
   cleanGameAnswer,
   showGameAnswer,
+  setAnimationEnd,
   changeLocation,
   setCurrentSetId,
   finishGame
@@ -32,18 +34,31 @@ const PlaySet = ({
     setCurrentSetId(setid);
   }, []);
 
+  useEffect(
+    () => {
+      setAnimationEnd(false);
+    },
+    [isAnimated]
+  );
+
   if (isGameOverOpen) {
     return <GameOverOverlay setid={setid} finishGame={finishGame} />;
   } else {
     return (
       <>
-        <GameTimer isStopped={isCancelOpen || answer} finishGame={finishGame} />
+        <GameTimer
+          isStopped={isCancelOpen}
+          isAnswered={answer}
+          isAnimated={isAnimated}
+          finishGame={finishGame}
+        />
 
         {answer ? (
           <Solution
             answer={answer}
             correctItem={correctItem}
             cleanGameAnswer={cleanGameAnswer}
+            setAnimationEnd={setAnimationEnd}
           />
         ) : (
           <>
@@ -55,9 +70,7 @@ const PlaySet = ({
               isHidden={isCancelOpen}
               terms={terms}
               answer={answer}
-              correctItem={correctItem}
               showGameAnswer={showGameAnswer}
-              finishGame={finishGame}
             />
           </>
         )}
@@ -66,7 +79,7 @@ const PlaySet = ({
   }
 };
 
-const Game = ({ setid, isHidden, terms, showGameAnswer, finishGame }) => {
+const Game = ({ setid, isHidden, terms, showGameAnswer }) => {
   const [item, setItem] = useState({});
   const [game, setgame] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -93,7 +106,7 @@ const Game = ({ setid, isHidden, terms, showGameAnswer, finishGame }) => {
     } else {
       game = Math.floor(Math.random() * 2) + 3;
 
-      if (isTooLong && game === 4) {
+      if (isTooLong && game === 3) {
         game--;
       }
     }
@@ -159,7 +172,7 @@ const GameWrapper = styled.div`
 `;
 
 const RatioWrapper = styled.div`
-  position: absolute;
+  position: fixed;
   top: 8rem;
   left: 7vw;
   width: 5rem;

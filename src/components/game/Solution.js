@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import styled, { css, keyframes } from "styled-components";
 import { colors } from "../../assets/styles/GlobalStyles";
+import { zoomInOut, fadeInOut } from "../../assets/styles/GlobalKeyframes";
 import good from "../../assets/images/good.svg";
 import wrong from "../../assets/images/wrong.svg";
 
-const Solution = ({ answer, correctItem, cleanGameAnswer }) => {
+const Solution = ({
+  answer,
+  correctItem,
+  cleanGameAnswer,
+  setAnimationEnd
+}) => {
   const [isAnswer, setIsAnswer] = useState(true);
   const [isItem, setIsItem] = useState(false);
 
@@ -16,6 +22,7 @@ const Solution = ({ answer, correctItem, cleanGameAnswer }) => {
   function handleItem() {
     const isCorrect = answer === "correct" ? true : false;
     cleanGameAnswer(correctItem, isCorrect);
+    setAnimationEnd(true);
   }
 
   return (
@@ -34,58 +41,6 @@ const Solution = ({ answer, correctItem, cleanGameAnswer }) => {
     </>
   );
 };
-
-const zoomInOut = keyframes`
-  from {
-    opacity: 0;
-    transform: translate(-50%,-50%) scale3d(1.3, 1.3, 1.3);
-  }
-
-  40% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale3d(1, 1, 1);
-  }
-
-  60% {
-    transform: translate(-50%,-50%) scale3d(1, 1, 1);
-  }
-
-  80% {
-    opacity: 1;
-    transform: translate(-50%,-50%) scale3d(0.6, 0.6, 0.6);
-  }
-
-  to {
-    opacity: 0;
-    transform: translate(-50%,-50%) scale3d(1, 1, 1);
-  }
-`;
-
-const fadeInOut = keyframes`
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale3d(0.6, 0.6, 0.6);
-  }
-
-  15% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale3d(1, 1, 1);
-  }
-
-  70% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale3d(1, 1, 1);
-  }
-
-  85% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale3d(0.8, 0.8, 0.8)
-  }
-
-  to {
-    opacity: 0;
-  }
-`;
 
 const AnswerWrapper = styled.div`
   animation: ${zoomInOut} 1.5s both;

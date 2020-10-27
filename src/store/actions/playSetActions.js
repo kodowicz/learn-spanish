@@ -1,4 +1,8 @@
-export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createPlaySet = setid => (
+  dispatch,
+  getState,
+  { getFirebase, getFirestore }
+) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -6,57 +10,73 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
   const setTermsRef = firestore.collection(`sets/${setid}/terms`);
   const learnDetailsRef = firestore.doc(`users/${uid}/learn/${setid}`);
 
-  learnDetailsRef.get().then(doc => {
-    if (!doc.exists) {
+  learnDetailsRef
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        setRef.get().then(doc => {
+          const { amount, name } = doc.data();
 
-      setRef.get().then(doc => {
-        const { amount, name } = doc.data();
+          learnDetailsRef.set({
+            name,
+            amount,
+            id: learnDetailsRef.id
+          });
+        });
 
-        learnDetailsRef.set({
-          name,
-          amount,
-          id: learnDetailsRef.id,
-        })
-      })
+        setTermsRef.get().then(snap => {
+          snap.docs.forEach(doc => {
+            const {
+              id,
+              term,
+              definition,
+              time,
+              termRows,
+              definitionRows
+            } = doc.data();
 
-      setTermsRef.get().then(snap => {
-        snap.docs.forEach(doc => {
-          const { id, term, definition, time, termRows, definitionRows } = doc.data();
+            const playSetRef = firestore.doc(
+              `users/${uid}/learn/${setid}/game/${id}`
+            );
 
-          const playSetRef = firestore.doc(`users/${uid}/learn/${setid}/game/${id}`);
-
-          playSetRef.set({
-            id,
-            term,
-            definition,
-            time,
-            termRows,
-            definitionRows,
-            ratio: 0,
-            isMastered: false
-          })
-        })
-      })
-    }
-  }).then(() => {
-    dispatch({
-      type: 'CREATE_PLAY_SET'
+            playSetRef.set({
+              id,
+              term,
+              definition,
+              time,
+              termRows,
+              definitionRows,
+              ratio: 0,
+              isMastered: false
+            });
+          });
+        });
+      }
     })
-  }).catch(error => {
-    dispatch({
-      type: 'CREATE_PLAY_SET_ERROR',
-      error
+    .then(() => {
+      dispatch({
+        type: "CREATE_PLAY_SET"
+      });
     })
-  })
-}
+    .catch(error => {
+      dispatch({
+        type: "CREATE_PLAY_SET_ERROR",
+        error
+      });
+    });
+};
 
 export const showGameAnswer = (item, answer) => ({
-  type: 'SHOW_ANSWER',
+  type: "SHOW_ANSWER",
   item,
   answer
 });
 
-export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const cleanGameAnswer = (item, isCorrect) => (
+  dispatch,
+  getState,
+  { getFirebase, getFirestore }
+) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
@@ -80,30 +100,34 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
       } else {
         knowledge = prevKnowledge;
       }
-
     } else {
-      knowledge = isCorrect ? 1 : 0
+      knowledge = isCorrect ? 1 : 0;
     }
 
     knowledgeRef.update({
       knowledge
-    })
-  })
+    });
+  });
 
-  docRef.update({
-    time,
-    isMastered,
-    ratio: maxRatio < newRatio ?
-      maxRatio
-      :
-      newRatio < minRatio ?
-        minRatio
-        :
-        newRatio
-  })
-  .then(() => {
-    dispatch({
-      type: 'CLEAR_ANSWER'
+  docRef
+    .update({
+      time,
+      isMastered,
+      ratio:
+        maxRatio < newRatio
+          ? maxRatio
+          : newRatio < minRatio
+            ? minRatio
+            : newRatio
     })
-  })
-}
+    .then(() => {
+      dispatch({
+        type: "CLEAR_ANSWER"
+      });
+    });
+};
+
+export const setAnimationEnd = isFinished => ({
+  type: "ANIMATION_END",
+  payload: isFinished
+});

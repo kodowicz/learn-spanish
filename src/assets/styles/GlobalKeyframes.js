@@ -22,9 +22,7 @@ export const popIn = keyframes`
 
 export const moveBackards = transformStart => keyframes`
   from {
-    transform: translate(${transformStart.left}px, ${
-  transformStart.top
-}px) scale(0.6);
+    transform: translate(${transformStart.left}px, ${transformStart.top}px) scale(0.6);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
   }
@@ -171,18 +169,11 @@ export const scale = keyframes`
 
 export const fadeUp = keyframes`
   from {
-    opacity: 0;
-    transform: translate3d(0, 30%, 0);
-  }
-
-  60% {
-    opacity: 0.9;
-    transform: translate3d(0, 0, 0);
+    color: transparent;
   }
 
   to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+    color: white
   }
 `;
 
@@ -222,6 +213,58 @@ export const flipIn = keyframes`
 export const blink = keyframes`
   from {
     opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+`;
+
+const zoomInOut = keyframes`
+  from {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale3d(1.3, 1.3, 1.3);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale3d(1, 1, 1);
+  }
+
+  60% {
+    transform: translate(-50%,-50%) scale3d(1, 1, 1);
+  }
+
+  80% {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale3d(0.6, 0.6, 0.6);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale3d(1, 1, 1);
+  }
+`;
+
+const fadeInOut = keyframes`
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale3d(0.6, 0.6, 0.6);
+  }
+
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale3d(1, 1, 1);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale3d(1, 1, 1);
+  }
+
+  85% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale3d(0.8, 0.8, 0.8)
   }
 
   to {
