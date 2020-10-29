@@ -54,6 +54,7 @@ const ListItem = styled.li`
   margin-bottom: 2rem;
   list-style: none;
   position: relative;
+  cursor: text;
 `;
 
 const SetWrapper = styled.div`

@@ -94,6 +94,7 @@ const EditSet = ({
             topic={topic}
             terms={terms}
             askForDeleting={askForDeleting}
+            editSetName={editSetName}
             submitSet={submitEditSet}
             notificationError={notificationError}
           />
@@ -117,6 +118,7 @@ const Buttons = ({
   topic,
   terms,
   askForDeleting,
+  editSetName,
   submitSet,
   notificationError
 }) => {
@@ -157,6 +159,7 @@ const Buttons = ({
     } else if (reducedTerms.length < 4) {
       notificationError("You have to create at least 4 terms");
     } else {
+      editSetName(topic);
       submitSet(reducedTerms);
     }
   }

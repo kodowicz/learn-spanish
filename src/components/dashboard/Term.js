@@ -38,8 +38,9 @@ const Term = ({
 
   const buttonRef = useRef();
 
+  const deviceWidth = window.innerWidth;
   const minRows = 1;
-  const lineHeight = 18;
+  const lineHeight = deviceWidth > 350 ? 18 : 14;
 
   useEffect(() => {
     const definition = /^\.\.\.$/g.test(termDetails.definition)
@@ -212,6 +213,7 @@ const Term = ({
         <DefineTerm>
           <Textarea
             id="definition"
+            lang="en"
             value={state.definition}
             rows={rows.definitionRows}
             onChange={handleChange}
@@ -292,6 +294,7 @@ const Textarea = styled(BasicTextArea)`
   font-size: 1.6rem;
   line-height: 1.8rem;
   width: 100%;
+  height: auto;
 `;
 
 const Border = styled.div`

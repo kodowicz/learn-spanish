@@ -1,16 +1,16 @@
-import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect, isLoaded } from 'react-redux-firebase';
+import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firestoreConnect, isLoaded } from "react-redux-firebase";
 
-import { askForDeleting } from '../store/actions/overlayActions';
-import { deleteEditSet } from '../store/actions/deleteSetActions';
-import { notificationError } from '../store/actions/notificationActions';
+import { askForDeleting } from "../store/actions/overlayActions";
+import { deleteEditSet } from "../store/actions/deleteSetActions";
+import { notificationError } from "../store/actions/notificationActions";
 import {
   changeLocation,
   changeLastLocation,
   setCurrentSetId
-} from '../store/actions/locationActions';
+} from "../store/actions/navigationActions";
 import {
   createEditSet,
   editSetName,
@@ -19,13 +19,12 @@ import {
   addNewTerm,
   submitEditSet,
   deleteSetChanges
-} from '../store/actions/editSetActions';
+} from "../store/actions/editSetActions";
 
-import EditSet from '../pages/EditSet';
+import EditSet from "../pages/EditSet";
 
-
-const EditSetContainer = (props) => {
-  return props.isLoaded ?
+const EditSetContainer = props => {
+  return props.isLoaded ? (
     <EditSet
       terms={props.terms}
       setName={props.setName}
@@ -50,10 +49,10 @@ const EditSetContainer = (props) => {
       notificationError={props.notificationError}
       deleteSetChanges={props.deleteSetChanges}
     />
-  :
+  ) : (
     <></>
+  );
 };
-
 
 const mapStateToProps = (state, ownProps) => {
   const terms = state.firestore.ordered.editedTerms;
@@ -69,11 +68,11 @@ const mapStateToProps = (state, ownProps) => {
     isSetDeleted: state.isSetDeleted,
     isEditSubmited: state.isEditSubmited,
     isNewTerm: state.isNewTerm,
-    location: state.location,
-    lastLocation: state.lastLocation,
+    location: state.navigation.location,
+    lastLocation: state.navigation.lastLocation,
     isLoaded: isLoaded(terms, editSetDetails)
-  }
-}
+  };
+};
 
 export default compose(
   connect(
@@ -95,28 +94,31 @@ export default compose(
     }
   ),
   firestoreConnect(props => {
-    return props.uid ?
-      [
-        {
-          collection: 'users',
-          doc: props.uid,
-          storeAs: 'editSetDetails'
-        },
-        {
-          collection: 'users',
-          doc: props.uid,
-          subcollections: [{
-            collection: 'edit',
-            doc: props.match.params.id,
-            subcollections: [{
-              collection: 'terms'
-            }]
-          }],
-          storeAs: 'editedTerms',
-          orderBy: ['time']
-        }
-      ]
-    :
-      []
+    return props.uid
+      ? [
+          {
+            collection: "users",
+            doc: props.uid,
+            storeAs: "editSetDetails"
+          },
+          {
+            collection: "users",
+            doc: props.uid,
+            subcollections: [
+              {
+                collection: "edit",
+                doc: props.match.params.id,
+                subcollections: [
+                  {
+                    collection: "terms"
+                  }
+                ]
+              }
+            ],
+            storeAs: "editedTerms",
+            orderBy: ["time"]
+          }
+        ]
+      : [];
   })
 )(EditSetContainer);

@@ -1,29 +1,27 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { firestoreConnect, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
+import React from "react";
+import { connect } from "react-redux";
+import { firestoreConnect, isLoaded } from "react-redux-firebase";
+import { compose } from "redux";
 
-import { askForDeleting } from '../store/actions/overlayActions';
-import { deleteCreateSet } from '../store/actions/deleteSetActions';
-import { notificationError } from '../store/actions/notificationActions';
+import { askForDeleting } from "../store/actions/overlayActions";
+import { deleteCreateSet } from "../store/actions/deleteSetActions";
+import { notificationError } from "../store/actions/notificationActions";
 import {
   changeLocation,
   changeLastLocation
-} from '../store/actions/navigationActions';
+} from "../store/actions/navigationActions";
 import {
   setUnsavedName,
-  createBasicTerms,
   updateUnsavedTerm,
   addNewUnsavedTerm,
   removeUnsavedTerm,
   submitCreateSet
-} from '../store/actions/createSetActions';
+} from "../store/actions/createSetActions";
 
-import CreateSet from '../pages/CreateSet';
+import CreateSet from "../pages/CreateSet";
 
-
-const CreateSetContainer = (props) => {
-  return props.isLoaded ?
+const CreateSetContainer = props => {
+  return props.isLoaded ? (
     <CreateSet
       uid={props.uid}
       location={props.location}
@@ -40,7 +38,6 @@ const CreateSetContainer = (props) => {
       changeLastLocation={props.changeLastLocation}
       askForDeleting={props.askForDeleting}
       setUnsavedName={props.setUnsavedName}
-      createBasicTerms={props.createBasicTerms}
       updateUnsavedTerm={props.updateUnsavedTerm}
       addNewUnsavedTerm={props.addNewUnsavedTerm}
       removeUnsavedTerm={props.removeUnsavedTerm}
@@ -48,16 +45,16 @@ const CreateSetContainer = (props) => {
       deleteCreateSet={props.deleteCreateSet}
       notificationError={props.notificationError}
     />
-  :
+  ) : (
     <></>
+  );
 };
-
 
 const mapStateToProps = state => {
   const unsavedSetTerms = state.firestore.ordered.unsavedTerms;
   const unsavedSetName = state.firebase.profile.unsavedSet;
   const uid = state.firebase.auth.uid;
-  
+
   return {
     unsavedSetTerms,
     unsavedSetName,
@@ -71,15 +68,14 @@ const mapStateToProps = state => {
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     isLoaded: uid ? isLoaded(unsavedSetTerms, unsavedSetName) : true
-  }
-}
+  };
+};
 
 export default compose(
   connect(
     mapStateToProps,
     {
       setUnsavedName,
-      createBasicTerms,
       updateUnsavedTerm,
       addNewUnsavedTerm,
       removeUnsavedTerm,
@@ -92,15 +88,16 @@ export default compose(
     }
   ),
   firestoreConnect(props => {
-    return props.uid ?
-      [{
-        collection: 'users',
-        doc: props.uid,
-        subcollections: [{ collection: 'unsaved' }],
-        storeAs: 'unsavedTerms',
-        orderBy: ['time']
-      }]
-    :
-      []
+    return props.uid
+      ? [
+          {
+            collection: "users",
+            doc: props.uid,
+            subcollections: [{ collection: "unsaved" }],
+            storeAs: "unsavedTerms",
+            orderBy: ["time"]
+          }
+        ]
+      : [];
   })
 )(CreateSetContainer);

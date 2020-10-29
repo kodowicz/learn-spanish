@@ -1,26 +1,25 @@
-import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect, isLoaded } from 'react-redux-firebase';
-import { chooseMethod } from '../store/actions/overlayActions';
-import { createLearnSet } from '../store/actions/learnSetActions';
-import { createPlaySet } from '../store/actions/playSetActions';
-import { removeNewKey } from '../store/actions/createSetActions';
-import { deleteSetChanges } from '../store/actions/editSetActions';
-import { sortTerms } from '../store/actions/setActions';
-import { createEditSet } from '../store/actions/editSetActions';
+import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firestoreConnect, isLoaded } from "react-redux-firebase";
+import { chooseMethod } from "../store/actions/overlayActions";
+import { createLearnSet } from "../store/actions/learnSetActions";
+import { createPlaySet } from "../store/actions/playSetActions";
+import { removeNewKey } from "../store/actions/createSetActions";
+import { deleteSetChanges } from "../store/actions/editSetActions";
+import { sortTerms } from "../store/actions/setActions";
+import { createEditSet } from "../store/actions/editSetActions";
 import {
   changeLocation,
   changeLastLocation,
   setCurrentSetId,
   enableEditSet
-} from '../store/actions/navigationActions';
+} from "../store/actions/navigationActions";
 
-import ViewSet from '../pages/ViewSet';
+import ViewSet from "../pages/ViewSet";
 
-
-const ViewSetContainer = (props) => {
-  return props.isLoaded ?
+const ViewSetContainer = props => {
+  return props.isLoaded ? (
     <ViewSet
       match={props.match}
       setDetails={props.setDetails}
@@ -45,8 +44,32 @@ const ViewSetContainer = (props) => {
       createPlaySet={props.createPlaySet}
       enableEditSet={props.enableEditSet}
     />
-    :
+  ) : (
     <></>
+  );
+};
+
+function compare(a, b) {
+  const termA = a.term.toUpperCase();
+  const termB = b.term.toUpperCase();
+  let comparison = 0;
+
+  if (termA > termB) {
+    comparison = 1;
+  } else if (termA < termB) {
+    comparison = -1;
+  }
+  return comparison;
+}
+
+function orderTerms(terms, orderBy) {
+  let orderedTerms = [...terms];
+
+  if (orderBy) {
+    orderedTerms = orderedTerms.sort(compare);
+  }
+
+  return orderedTerms;
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -57,38 +80,28 @@ const mapStateToProps = (state, ownProps) => {
   const knowledge = userProgress?.knowledge;
   const amount = userProgress?.amount;
   const isUserSet = userProgress ? true : false;
-  const percentage = userProgress ?
-    knowledge ?
-      Math.round((knowledge * 100) / (amount * 5))
-      :
-      0
-    :
-    undefined;
-  
+  const orderedTerms = terms && orderTerms(terms, state.sortedBy);
+  const percentage = userProgress
+    ? knowledge
+      ? Math.round((knowledge * 100) / (amount * 5))
+      : 0
+    : undefined;
+
   return {
     percentage,
-    terms,
     author,
     setDetails,
     isUserSet,
-    sortedBy: state.sortedBy,
     signedUser: state.firebase.auth.uid,
     lastLocation: state.navigation.lastLocation,
     isEditSubmited: state.isEditSubmited,
     isOverlayOpen: state.isOverlayOpen.isChosen,
-    isLoaded: userProgress ?
-      isLoaded(
-        terms,
-        setDetails,
-        userProgress
-      )
-      :
-      isLoaded(
-        terms,
-        setDetails
-      )
-  }
-}
+    terms: orderedTerms,
+    isLoaded: userProgress
+      ? isLoaded(terms, setDetails, userProgress)
+      : isLoaded(terms, setDetails)
+  };
+};
 
 export default compose(
   connect(
@@ -108,83 +121,81 @@ export default compose(
     }
   ),
   firestoreConnect(props => {
-    const sortedBy = props.sortedBy ? 'term' : 'time';
-
     if (props.signedUser) {
       if (props.isUserSet) {
         return [
           {
-            collection: 'sets',
+            collection: "sets",
             doc: props.match.params.id,
-            storeAs: 'setDetails'
+            storeAs: "setDetails"
           },
           {
-            collection: 'users',
+            collection: "users",
             doc: props.signedUser,
             subcollections: [
               {
-                collection: 'learn',
+                collection: "learn",
                 doc: props.match.params.id,
-                subcollections: [{ collection: 'game' }]
+                subcollections: [{ collection: "game" }]
               }
             ],
-            storeAs: 'viewTerms',
-            orderBy: [sortedBy]
+            storeAs: "viewTerms",
+            orderBy: ["time"]
           },
           {
-            collection: 'users',
+            collection: "users",
             doc: props.signedUser,
             subcollections: [
               {
-                collection: 'learn',
+                collection: "learn",
                 doc: props.match.params.id
               }
             ],
-            storeAs: 'userProgress'
+            storeAs: "userProgress"
           }
-        ]
+        ];
       } else {
         return [
           {
-            collection: 'sets',
+            collection: "sets",
             doc: props.match.params.id,
-            storeAs: 'setDetails'
+            storeAs: "setDetails"
           },
           {
-            collection: 'sets',
+            collection: "sets",
             doc: props.match.params.id,
-            subcollections: [{ collection: 'terms' }],
-            storeAs: 'viewTerms',
-            orderBy: [sortedBy]
+            subcollections: [{ collection: "terms" }],
+            storeAs: "viewTerms",
+            orderBy: ["time"]
           },
           {
-            collection: 'users',
+            collection: "users",
             doc: props.signedUser,
             subcollections: [
               {
-                collection: 'learn',
+                collection: "learn",
                 doc: props.match.params.id
               }
             ],
-            storeAs: 'userProgress'
+            storeAs: "userProgress"
           }
-        ]
+        ];
       }
     } else {
       return [
         {
-          collection: 'sets',
+          collection: "sets",
           doc: props.match.params.id,
-          storeAs: 'setDetails'
+          storeAs: "setDetails"
         },
         {
-          collection: 'sets',
+          collection: "sets",
           doc: props.match.params.id,
-          subcollections: [{ collection: 'terms' }],
-          storeAs: 'viewTerms',
+          subcollections: [{ collection: "terms" }],
+          storeAs: "viewTerms",
           orderBy: ["time"]
         }
-      ]
+      ];
     }
   })
 )(ViewSetContainer);

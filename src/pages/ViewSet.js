@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import MethodChoiceOverlay from "../components/overlay/MethodChoiceOverlay";
 import ProgressBar from "../components/ProgressBar";
 import RatioDots from "../components/RatioDots";
 import sort from "../assets/images/sort.svg";
-import {
-  LinkButton,
-  Button,
-  Main,
-  BlockElement,
-  colors,
-  fonts
-} from "../assets/styles/GlobalStyles";
+import { LinkButton, Button, Main, BlockElement, colors, fonts } from "../assets/styles/GlobalStyles";
 
 const ViewSet = ({
   match,
@@ -151,11 +144,9 @@ const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
             <Counter isLessThanTen={index + 1 < 10 ? true : false}>
               {index + 1}
             </Counter>
-            <SetWrapper>
-              <TermWrapper>
-                <Term id="term">{term.term}</Term>
-                {isUserSet && <RatioDots ratio={term.ratio} />}
-              </TermWrapper>
+            <SetWrapper isUserSet={isUserSet}>
+              <Term id="term">{term.term}</Term>
+              {isUserSet && <RatioDots ratio={term.ratio} />}
               <Line />
               <Term id="definition">{term.definition}</Term>
             </SetWrapper>
@@ -227,7 +218,10 @@ const ButtonsWrapper = styled.div`
 
   @media (min-width: 768px) {
     justify-content: ${props =>
-      props.iseditable ? "space-between" : "flex-start"};
+      props.iseditable
+        ? "space-between"
+        : "flex-start"
+      };
     margin: 40px 0 60px;
   }
 `;
@@ -284,23 +278,6 @@ const ListItem = styled.li`
   }
 `;
 
-const SetWrapper = styled(BlockElement)`
-  padding: 1.6rem 2rem;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(2, min-content);
-  grid-row-gap: 2px;
-  align-content: center;
-
-  @media (min-width: 768px) {
-    padding: 2rem 0;
-    grid-template-columns: 1fr 2px 1fr;
-    grid-template-rows: 1fr;
-    align-items: center;
-  }
-`;
-
 const Counter = styled.span`
   left: ${props => (props.isLessThanTen ? "-8vw" : "-10vw")};
   color: ${colors.azure};
@@ -316,37 +293,72 @@ const Counter = styled.span`
   }
 `;
 
-const TermWrapper = styled.div`
+const SetWrapper = styled(BlockElement)`
   display: grid;
-  grid-template-columns: 1fr min-content;
-  grid-template-rows: 1fr;
-  grid-column-gap: 1.5rem;
+  align-content: start;
+  padding: 1.6rem 2rem;
+  height: 100%;
+
+  ${({ isUserSet }) =>
+    isUserSet
+      ? css`
+          grid-template-columns: 1fr 5rem;
+          grid-template-rows: min-content min-content;
+          grid-row-gap: 3px;
+          grid-column-gap: 1.5rem;
+        `
+      : css`
+          grid-template-columns: 1fr;
+          grid-template-rows: min-content min-content;
+          grid-row-gap: 3px;
+        `};
 
   @media (min-width: 768px) {
-    padding-right: 3.5rem;
+    padding: 2rem 3.5rem;
+    grid-template-rows: 1fr;
     align-items: center;
+
+    ${({ isUserSet }) =>
+      isUserSet
+        ? css`
+            grid-template-columns: 1fr 6rem 2px 1fr;
+            grid-column-gap: 3.5rem;
+          `
+        : css`
+            grid-template-columns: 1fr 3.5rem 1fr;
+            grid-column-gap: 0;
+          `};
   }
 `;
 
 const Term = styled.p`
   font-weight: ${props =>
-    props.id === "term" ? `${fonts.bold}` : `${fonts.semiBold}`};
-  font-size: ${props => (props.id === "term" ? "1.6rem" : "1.4rem")};
+    props.id === "term"
+      ? `${fonts.bold}`
+      : `${fonts.semiBold}`
+  };
+  font-size: ${props =>
+    props.id === "term"
+      ? "1.6rem"
+      : "1.4rem"
+  };
   color: ${props =>
-    props.id === "term" ? `${colors.white}` : `${colors.lightGray}`};
+    props.id === "term"
+      ? `${colors.white}`
+      : `${colors.lightGray}`
+  };
   margin: 0;
   white-space: pre-line;
   user-select: text;
-
-  @media (min-width: 768px) {
-    padding: 0 3.5rem;
-  }
 `;
 
 const Line = styled.div`
+  grid-column: span 2;
+
   @media (min-width: 768px) {
     background: ${colors.darkGray};
-    width: 100%;
+    grid-column: span 1;
+    width: 2px;
     height: 2rem;
   }
 `;
