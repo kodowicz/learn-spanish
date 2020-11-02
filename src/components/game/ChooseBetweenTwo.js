@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { colors } from '../../assets/styles/GlobalStyles';
-import { moveBackards, pulseShadow } from '../../assets/styles/GlobalKeyframes';
-
+import React, { Component } from "react";
+import styled, { css, keyframes } from "styled-components";
+import { colors } from "../../assets/styles/GlobalStyles";
+import { moveBackards, pulseShadow } from "../../assets/styles/GlobalKeyframes";
 
 class ChooseBetweenTwo extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      isChosen: false,
       isInSpanish: true,
       term: "",
       options: [],
@@ -17,20 +15,20 @@ class ChooseBetweenTwo extends Component {
         left: 0,
         top: 0
       }
-    }
+    };
 
-    this.termRef = React.createRef()
+    this.termRef = React.createRef();
   }
 
   componentDidMount() {
     this.createGame();
   }
 
-  shuffleOptions = (array) => {
+  shuffleOptions = array => {
     return array.sort(() => Math.random() - 0.5);
-  }
+  };
 
-  createGame() {
+  createGame = () => {
     this.setState((prevState, props) => {
       const { item, terms } = props;
       const styles = this.termRef.current;
@@ -41,14 +39,14 @@ class ChooseBetweenTwo extends Component {
       const startingPosition = {
         left: styles.offsetLeft,
         top: styles.offsetTop
-      }
+      };
 
       while (options.length < 2) {
         const index = Math.floor(Math.random() * terms.length);
         const id = terms[index].id;
-        const isTaken = options.some(element => element === id)
+        const isTaken = options.some(element => element === id);
         if (!isTaken) {
-          options.push(id)
+          options.push(id);
         }
       }
 
@@ -57,53 +55,52 @@ class ChooseBetweenTwo extends Component {
         term,
         startingPosition,
         options: this.shuffleOptions(options)
-      }
-    })
+      };
+    });
   }
 
-  handleChosenAnswer = (answer) => {
-    this.setState({
-      isChosen: true
-    }, () => {
-      const { item, showGameAnswer } = this.props;
-      const correctAnswer = item.id;
+  handleChosenAnswer = answer => {
+    const { item, showGameAnswer } = this.props;
+    const correctAnswer = item.id;
 
-      if (answer === correctAnswer) {
-        showGameAnswer(item, 'correct');
-      } else {
-        showGameAnswer(item, 'wrong');
-      }
-    })
-  }
+    if (answer === correctAnswer) {
+      showGameAnswer(item, "correct");
+    } else {
+      showGameAnswer(item, "wrong");
+    }
+  };
 
   render() {
     const { terms, isDesktop } = this.props;
-    const { isChosen, isInSpanish, term, options, startingPosition } = this.state;
+    const {
+      isInSpanish,
+      term,
+      options,
+      startingPosition
+    } = this.state;
 
     return (
-      <GameWrapper isChosen={isChosen}>
-        <Term
-          ref={this.termRef}>
-          {term}
-        </Term>
+      <GameWrapper>
+        <Term ref={this.termRef}>{term}</Term>
 
         {options.map((termid, index) => {
           const elementid = terms.findIndex(element => element.id === termid);
           return (
-            <div
-              key={termid}
-              onClick={() => this.handleChosenAnswer(termid)}>
+            <div key={termid} onClick={() => this.handleChosenAnswer(termid)}>
               <DefinitionOption
                 index={index}
                 isDesktop={isDesktop}
-                startingPosition={startingPosition}>
-                { isInSpanish ? terms[elementid].definition : terms[elementid].term }
+                startingPosition={startingPosition}
+              >
+                {isInSpanish
+                  ? terms[elementid].definition
+                  : terms[elementid].term}
               </DefinitionOption>
             </div>
-          )
+          );
         })}
       </GameWrapper>
-    )
+    );
   }
 }
 
@@ -115,7 +112,7 @@ class DefinitionOption extends Component {
         left: 0,
         top: 0
       }
-    }
+    };
     this.optionRef = React.createRef();
   }
 
@@ -124,12 +121,16 @@ class DefinitionOption extends Component {
       const { startingPosition, isDesktop } = props;
       const styles = this.optionRef.current;
       const transformStart = {
-        left: isDesktop ? (startingPosition.left - styles.offsetLeft - (styles.offsetWidth / 2)) : 0,
-        top: isDesktop ? 0 : (startingPosition.top - styles.offsetTop - (styles.offsetHeight / 2))
+        left: isDesktop
+          ? startingPosition.left - styles.offsetLeft - styles.offsetWidth / 2
+          : 0,
+        top: isDesktop
+          ? 0
+          : startingPosition.top - styles.offsetTop - styles.offsetHeight / 2
       };
 
-      return { transformStart }
-    })
+      return { transformStart };
+    });
   }
 
   render() {
@@ -142,7 +143,8 @@ class DefinitionOption extends Component {
         <Definition
           delay={delay}
           transformStart={transformStart}
-          ref={this.optionRef}>
+          ref={this.optionRef}
+        >
           {children}
         </Definition>
       </>
@@ -150,9 +152,8 @@ class DefinitionOption extends Component {
   }
 }
 
-
 const GameWrapper = styled.div`
-  display: ${({ isChosen }) => isChosen ? 'none' : 'grid'};
+  display: grid;
   height: 70vh;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(3, 1fr);
@@ -164,7 +165,10 @@ const GameWrapper = styled.div`
 
   @media (min-width: 768px) {
     place-content: center;
-    grid-template-columns: minmax(auto, 30rem) minmax(auto, 30rem) minmax(auto, 30rem);
+    grid-template-columns: minmax(auto, 30rem) minmax(auto, 30rem) minmax(
+        auto,
+        30rem
+      );
     grid-template-rows: 1fr;
     grid-column-gap: 4rem;
   }
@@ -179,7 +183,7 @@ const Term = styled.span`
   @media (min-width: 768px) {
     max-width: 30rem;
     grid-row: 1 / 2;
-    grid-column: 2 / 3
+    grid-column: 2 / 3;
   }
 `;
 
@@ -187,7 +191,7 @@ const Definition = styled.p`
   color: ${colors.lightGray};
 
   ${({ transformStart, delay }) => css`
-  animation: ${moveBackards(transformStart)} 0.5s ${delay * 0.3}s both;
+    animation: ${moveBackards(transformStart)} 0.5s ${delay * 0.3}s both;
   `};
 
   font-size: 2rem;
@@ -198,7 +202,7 @@ const Definition = styled.p`
 
   &::before {
     animation: ${pulseShadow} 3s infinite 2s;
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -213,6 +217,6 @@ const Definition = styled.p`
   @media (min-width: 768px) {
     max-width: 30rem;
   }
-`
+`;
 
-export default ChooseBetweenTwo
+export default ChooseBetweenTwo;

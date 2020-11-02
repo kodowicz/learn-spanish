@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { colors } from '../../assets/styles/GlobalStyles';
-import { popIn, pulse, moveBackards, pulseShadow } from '../../assets/styles/GlobalKeyframes';
-
+import React, { Component } from "react";
+import styled, { css } from "styled-components";
+import { colors } from "../../assets/styles/GlobalStyles";
+import { popIn, pulse, moveBackards, pulseShadow } from "../../assets/styles/GlobalKeyframes";
 
 class ChooseBetweenFour extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      isChosen: false,
       isInSpanish: true,
       term: "",
       options: [],
@@ -17,20 +15,20 @@ class ChooseBetweenFour extends Component {
         left: 0,
         top: 0
       }
-    }
+    };
 
-    this.termRef = React.createRef()
+    this.termRef = React.createRef();
   }
 
   componentDidMount() {
     this.createGame();
   }
 
-  shuffleOptions = (array) => {
+  shuffleOptions = array => {
     return array.sort(() => Math.random() - 0.5);
-  }
+  };
 
-  createGame() {
+  createGame = () => {
     this.setState((prevState, props) => {
       const { item, terms } = props;
       const styles = this.termRef.current;
@@ -41,14 +39,14 @@ class ChooseBetweenFour extends Component {
       const startingPosition = {
         left: styles.offsetLeft,
         top: styles.offsetTop
-      }
+      };
 
       while (options.length < 4) {
         const index = Math.floor(Math.random() * terms.length);
         const id = terms[index].id;
-        const isTaken = options.some(element => element === id)
+        const isTaken = options.some(element => element === id);
         if (!isTaken) {
-          options.push(id)
+          options.push(id);
         }
       }
 
@@ -57,52 +55,52 @@ class ChooseBetweenFour extends Component {
         term,
         startingPosition,
         options: this.shuffleOptions(options)
-      }
-    })
+      };
+    });
   }
 
-  handleChosenAnswer = (answer) => {
-    this.setState({
-      isChosen: true
-    }, () => {
-      const { item, showGameAnswer } = this.props;
-      const correctAnswer = item.id;
+  handleChosenAnswer = answer => {
+    const { item, showGameAnswer } = this.props;
+    const correctAnswer = item.id;
 
-      if (answer === correctAnswer) {
-        showGameAnswer(item, 'correct');
-      } else {
-        showGameAnswer(item, 'wrong');
-      }
-    })
-  }
+    if (answer === correctAnswer) {
+      showGameAnswer(item, "correct");
+    } else {
+      showGameAnswer(item, "wrong");
+    }
+  };
 
   render() {
     const { terms } = this.props;
-    const { isChosen, isInSpanish, term, options, startingPosition } = this.state;
+    const {
+      isChosen,
+      isInSpanish,
+      term,
+      options,
+      startingPosition
+    } = this.state;
 
     return (
-      <GameWrapper isChosen={isChosen}>
-        <Term
-          ref={this.termRef}>
-          {term}
-        </Term>
+      <GameWrapper>
+        <Term ref={this.termRef}>{term}</Term>
 
         {options.map((termid, index) => {
           const elementid = terms.findIndex(element => element.id === termid);
           return (
-            <div
-              key={termid}
-              onClick={() => this.handleChosenAnswer(termid)}>
+            <div key={termid} onClick={() => this.handleChosenAnswer(termid)}>
               <DefinitionOption
                 index={index}
-                startingPosition={startingPosition}>
-                { isInSpanish ? terms[elementid].definition : terms[elementid].term }
+                startingPosition={startingPosition}
+              >
+                {isInSpanish
+                  ? terms[elementid].definition
+                  : terms[elementid].term}
               </DefinitionOption>
             </div>
-          )
+          );
         })}
       </GameWrapper>
-    )
+    );
   }
 }
 
@@ -114,7 +112,7 @@ class DefinitionOption extends Component {
         left: 0,
         top: 0
       }
-    }
+    };
     this.optionRef = React.createRef();
   }
 
@@ -123,12 +121,13 @@ class DefinitionOption extends Component {
       const { startingPosition } = props;
       const styles = this.optionRef.current;
       const transformStart = {
-        left: startingPosition.left - styles.offsetLeft - (styles.offsetWidth / 2),
-        top: startingPosition.top - styles.offsetTop - (styles.offsetHeight / 2)
+        left:
+          startingPosition.left - styles.offsetLeft - styles.offsetWidth / 2,
+        top: startingPosition.top - styles.offsetTop - styles.offsetHeight / 2
       };
 
-      return { transformStart }
-    })
+      return { transformStart };
+    });
   }
 
   render() {
@@ -140,7 +139,8 @@ class DefinitionOption extends Component {
         <Definition
           delay={delay}
           transformStart={transformStart}
-          ref={this.optionRef}>
+          ref={this.optionRef}
+        >
           {this.props.children}
         </Definition>
       </>
@@ -148,15 +148,14 @@ class DefinitionOption extends Component {
   }
 }
 
-
 const GameWrapper = styled.div`
-  display: ${({ isChosen }) => isChosen ? 'none' : 'grid'};
+  display: grid;
   height: 70vh;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-gap: 4rem 10vw;
   padding: 20vh 10vw 0 10vw;
-  place-items: center
+  place-items: center;
 `;
 
 const Term = styled.span`
@@ -183,7 +182,7 @@ const Definition = styled.p`
 
   &::before {
     animation: ${pulse} 3s infinite 2s;
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -198,6 +197,6 @@ const Definition = styled.p`
   @media (min-width: 768px) {
     max-width: 30rem;
   }
-`
+`;
 
-export default ChooseBetweenFour
+export default ChooseBetweenFour;

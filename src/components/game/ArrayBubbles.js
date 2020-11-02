@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
-import styled, { css, keyframes } from 'styled-components';
-import { colors, fonts } from '../../assets/styles/GlobalStyles';
-import { shake, pulse, popIn, prompt, moveForwards } from '../../assets/styles/GlobalKeyframes';
-
+import React, { Component } from "react";
+import styled, { css } from "styled-components";
+import { colors, fonts } from "../../assets/styles/GlobalStyles";
+import { shake, pulse, popIn, prompt, moveForwards } from "../../assets/styles/GlobalKeyframes";
 
 class ArrayBubbles extends Component {
   constructor(props) {
@@ -11,24 +10,17 @@ class ArrayBubbles extends Component {
     this.state = {
       counter: 0,
       index: 0,
-      nextBubble: 0,
       tabIndex: 0,
       promptingTime: 5000,
       correctAnswer: "",
+      userAnswer: "",
       definition: "",
-      prompting: "",
       isCorrect: false,
-      isFinished: false,
       isWrong: false,
       isPrompting: false,
       boundary: {},
-      currentLetter: {
-        wordIndex: 0,
-        letterIndex: 0
-      },
       excludedIndexes: [],
       bubbles: [],
-      letters: [],
       groupedWords: [],
       bubblesPositions: [
         [
@@ -47,21 +39,21 @@ class ArrayBubbles extends Component {
           { left: 0, top: 0 }
         ],
         [
-          {left: 0.494, top: 0.535},
-          { left: 0.134, top: 0.42},
-          { left: 0.652, top: 0.36},
-          { left: 0.334, top: 0.37},
-          { left: 0.45, top: 0.115},
-          { left: 0.71, top: 0.68},
-          { left: 0.23, top: 0.06},
-          { left: 0.27, top: 0.68},
-          { left: 0.62, top: 0.03},
-          { left: 0.85, top: 0.4},
-          { left: 0, top: 0},
-          { left: 0.83, top: 0.06},
-          { left: 0, top: 0.68}
+          { left: 0.494, top: 0.535 },
+          { left: 0.134, top: 0.42 },
+          { left: 0.652, top: 0.36 },
+          { left: 0.334, top: 0.37 },
+          { left: 0.45, top: 0.115 },
+          { left: 0.71, top: 0.68 },
+          { left: 0.23, top: 0.06 },
+          { left: 0.27, top: 0.68 },
+          { left: 0.62, top: 0.03 },
+          { left: 0.85, top: 0.4 },
+          { left: 0, top: 0 },
+          { left: 0.83, top: 0.06 },
+          { left: 0, top: 0.68 }
         ],
-         [
+        [
           { left: 0.206, top: 0.36 },
           { left: 0.606, top: 0.66 },
           { left: 0.01, top: 0.315 },
@@ -77,235 +69,270 @@ class ArrayBubbles extends Component {
           { left: 0, top: 0.65 }
         ]
       ]
-    }
+    };
 
     this.boundaryRef = React.createRef();
   }
 
   componentDidMount() {
     this.createGame();
-    this.prompting = setTimeout(this.promptingTimer, this.state.promptingTime)
+    this.prompting = setTimeout(this.promptingTimer, this.state.promptingTime);
   }
 
-  createGame() {
+  componentDidUpdate(prevProps, prevState) {
+    const { userAnswer, counter, correctAnswer } = this.state;
+    const { item, showGameAnswer } = prevProps;
+
+    if (prevState.counter !== counter && counter === 3) {
+      window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
+    }
+
+    if (prevState.userAnswer !== userAnswer) {
+      const isFinished = userAnswer === correctAnswer;
+
+      if (isFinished) {
+        window.setTimeout(() => showGameAnswer(item, "correct"), 500);
+      }
+    }
+  }
+
+  createGame = () => {
     this.setState((state, props) => {
-      const { item: { term, definition }} = props;
-      let prevIndex = 0;
       let nextIndex = 0;
       let tabIndex = 0;
-      const excludedIndexes = this.getExcludedIndexes(term);
-      const letters = this.createLetters(term, excludedIndexes);
+      const correctAnswer = props.item.term;
+      const lastWordIndex = correctAnswer.length - 1;
+      const excludedIndexes = this.getExcludedIndexes(correctAnswer);
+      const letters = this.createLetters(correctAnswer, excludedIndexes);
       const boundary = this.boundaryRef.current.getBoundingClientRect();
-      const groupedWords = this.createGroupedWords(letters, excludedIndexes);
-      const currentLetter = this.findCurrentLetter(groupedWords);
+      const groupedWords = this.createGroupedWords(
+        correctAnswer,
+        excludedIndexes
+      );
+
       while (excludedIndexes.indexOf(nextIndex) !== -1) {
         nextIndex++;
       }
 
-      while (prevIndex < nextIndex) {
-        prevIndex++
-      }
+      const userAnswer = correctAnswer.slice(0, nextIndex);
 
-      let bubbles = this.createBubbles(term, excludedIndexes);
-      const prompting = bubbles[tabIndex].text;
+      let bubbles = this.createBubbles(correctAnswer, excludedIndexes);
 
       return {
-        currentLetter,
-        definition,
-        prompting,
+        correctAnswer,
+        userAnswer,
         boundary,
         excludedIndexes,
-        letters,
         groupedWords,
         index: nextIndex,
-        correctAnswer: term,
-        bubbles: this.shuffleOptions(bubbles),
-      }
-    })
+        definition: props.item.definition,
+        bubbles: this.shuffleOptions(bubbles)
+      };
+    });
   }
 
-  chunkString = (reducedStr, index, chunkLength) => {
-  	let bubbles = [];
-
-  	while (index < reducedStr.length) {
-  		chunkLength.forEach(length => {
-  			let chunk = reducedStr.substring(index, index + length);
-
-  			if (chunk) {
-  					bubbles.push(chunk);
-  					index += chunk.length;
-  			}
-  		});
-  	}
-
-  	bubbles = bubbles.flatMap(bubble => bubble.trim().split(" "));
-
-  	return bubbles
-  }
-
-  createBubbles = (str, excludedIndexes) => {
+  chunkString = reducedStr => {
+    let bubbles = [];
     let index = 0;
-    let chunkLength = [2, 3];
+
+    while (index < reducedStr.length) {
+      const chunkLength = Math.random() > 0.5 ? [2, 3] : [3, 2];
+
+      chunkLength.forEach(length => {
+        let chunk = reducedStr.substring(index, index + length);
+
+        if (chunk) {
+          bubbles.push(chunk);
+          index += chunk.length;
+        }
+      });
+    }
+
+    bubbles = bubbles.flatMap(bubble => bubble.trim().split(" "));
+
+    return bubbles;
+  };
+
+  createBubbles = str => {
     let bubbles = [];
     const isLong = str.length < 10 ? true : false;
     const isShort = str.length < 5 ? true : false;
-    const isSingle = isShort ?
-      true :
-      Math.random() > 0.5 ? true : false;
-
-    let reducedStr = str
-    .split("")
-    .map((letter, index) =>
-      excludedIndexes.some(char => char === index) ?
-        letter === " " ? letter : " "
-        :
-        letter
-    )
-    .join("");
+    const isSingle = isShort ? true : Math.random() > 0.5 ? true : false;
+    let regex = /[~`_$&+,:;=?@#|"'<>.^* (){}[\]\\%!-/\s]/g;
 
     if (isSingle && isLong) {
-      bubbles = reducedStr.replace(/ /g, "").split("");
+      bubbles = str.replace(regex, "").split("");
     } else {
-      bubbles = this.chunkString(reducedStr, index, chunkLength);
+      let arrayOfString = str.split(regex).filter(str => str);
+      bubbles = arrayOfString.flatMap(str => this.chunkString(str));
     }
 
     bubbles = bubbles.map((text, index) => ({ text, index }));
 
-    return bubbles
-  }
+    return bubbles;
+  };
 
   createLetters = (term, excludedIndexes) => {
     let letters = [];
 
-    letters = term.split("").map((letter, index) =>
-      excludedIndexes.some(i => i === index) ? letter : ""
-    );
+    letters = term
+      .split("")
+      .map(
+        (letter, index) =>
+          excludedIndexes.some(i => i === index) ? letter : ""
+      );
 
     return letters;
   };
 
-  createGroupedWords = (array, excludedIndexes) => {
+  createGroupedWords = (text, excludedIndexes) => {
+    let array = text.split("");
     let groupedWords = [];
     let prevIndex = 0;
+    let lastWordIndex = text.length - 1;
 
     if (excludedIndexes.length) {
-      array.forEach((letter, nextIndex) => {
-        const lastIndex = excludedIndexes.slice(-1)[0];
+      const lastIndex = excludedIndexes.slice(-1)[0];
 
+      array.forEach((letter, nextIndex) => {
         if (excludedIndexes.includes(nextIndex)) {
           let dashes = [...array];
           let subarray = [...dashes.slice(prevIndex, nextIndex)];
+          subarray = subarray.map(letter => ({
+            letter,
+            isVisible: false
+          }));
+          let excludedLetter = {
+            letter,
+            isVisible: true
+          };
+          groupedWords.push(subarray, [excludedLetter]);
+          prevIndex = nextIndex + 1;
 
-          groupedWords.push(subarray, [letter]);
-          prevIndex = nextIndex + 1
-
-          if (lastIndex === nextIndex) {
-            let lastSubarrayLength = (array.length - 1) - lastIndex;
+          if (lastIndex === nextIndex && lastIndex !== lastWordIndex) {
+            let lastSubarrayLength = array.length - 1 - lastIndex;
             let lastSubarray = [...array.slice(-lastSubarrayLength)];
+            lastSubarray = lastSubarray.map(letter => ({
+              letter,
+              isVisible: false
+            }));
 
-            groupedWords.push(lastSubarray)
+            groupedWords.push(lastSubarray);
           }
         }
-      })
-
+      });
     } else {
-      groupedWords.push(array);
+      let extendedArray = array.map(letter => ({
+        letter,
+        isVisible: false
+      }));
+      groupedWords.push(extendedArray);
     }
 
-    return groupedWords.filter(subarray => subarray.length)
-  }
+    return groupedWords.filter(subarray => subarray.length);
+  };
 
-  findCurrentLetter = (groupedWords) => {
-    let wordIndex = groupedWords.findIndex(word => word.some(letter => !letter));
-    let letterIndex = groupedWords[wordIndex]?.findIndex(letter => !letter);
-
-    return {
-      wordIndex,
-      letterIndex
-    }
-  }
-
-  getExcludedIndexes = (word) => {
+  getExcludedIndexes = word => {
     // it won't catch special char like
-    const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g
+    const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
     const array = [];
     let match;
 
     while ((match = regex.exec(word)) != null) {
-      array.push(match.index)
+      array.push(match.index);
     }
 
-    return array
-  }
+    return array;
+  };
 
-  shuffleOptions = (array) => {
-    let counter = array.length - 1;
-    let newOrder = [...array];
+  shuffleOptions = array => {
+    const newOrder = [...array];
+    return newOrder.sort(() => Math.random() - 0.5);
+  };
 
-    while (counter > 0) {
-      let index = Math.floor(Math.random() * counter);
-      let temp = newOrder[counter];
-      newOrder[counter] = newOrder[index];
-      newOrder[index] = temp;
-      counter--;
-    }
+  revealLetters = (currentIndex, groupedWords) => {
+    let leftLetters = currentIndex;
 
-    return newOrder;
-  }
+    return groupedWords.map(word => {
+      return word.map(obj => {
+        if (leftLetters) {
+          if (!obj.isVisible) {
+            leftLetters--;
+            return Object.assign({}, obj, { isVisible: true });
+          }
+        }
+        return obj;
+      });
+    });
+  };
 
-  handlePicking = (event) => {
+  handlePicking = event => {
     const pickedBubble = event.target.id;
-    const pickedIndex = event.target.tabIndex
+    const pickedIndex = event.target.tabIndex;
     let bubbleLength = pickedBubble.length;
 
-    this.setState((state) => {
-      const { index, promptingTime, prompting, correctAnswer, excludedIndexes, letters, bubbles } = state;
-      let tabIndex = state.tabIndex;
-      const correctBubble = bubbles.find(bubble => bubble.index === tabIndex)?.text;
+    this.setState(prevState => {
+      const {
+        index,
+        promptingTime,
+        correctAnswer,
+        userAnswer,
+        excludedIndexes
+      } = prevState;
+      let tabIndex = prevState.tabIndex;
+      let bubbles = prevState.bubbles;
+      const groupedWords = this.revealLetters(
+        bubbleLength,
+        prevState.groupedWords
+      );
+      const correctBubble = bubbles.find(bubble => bubble.index === tabIndex)
+        ?.text;
 
-      if ((pickedIndex === tabIndex) || (pickedBubble === correctBubble)) {
+      if (pickedBubble === correctBubble) {
         const counter = 0;
-        const bubbleIndex = bubbles.findIndex(bubble => bubble.index === pickedIndex);
-        let nextIndex = index + pickedBubble.length;
-        letters.splice(index, pickedBubble.length, ...pickedBubble);
+        const bubbleIndex = bubbles.findIndex(
+          bubble => bubble.index === pickedIndex
+        );
 
         // remove picked bubble
         if (pickedIndex === tabIndex) {
           bubbles.splice(bubbleIndex, 1, {});
         } else {
-          const suitableBubble = bubbles.findIndex(bubble => bubble.index === tabIndex);
-          bubbles.splice(suitableBubble, 1, {})
+          const pickedBubbleIndex = bubbles.findIndex(
+            bubble => bubble.index === pickedIndex
+          );
+          const suitableBubbleIndex = bubbles.findIndex(
+            bubble => bubble.index === tabIndex
+          );
+          bubbles.splice(pickedBubbleIndex, 1, {}); // remove picked bubble
+          bubbles[suitableBubbleIndex].index = pickedIndex; // change index
         }
 
+        // user answer with excluded letters
+        let nextIndex = index + pickedBubble.length;
         while (excludedIndexes.indexOf(nextIndex) !== -1) {
           nextIndex++;
-        };
+        }
+        const userAnswer = correctAnswer.slice(0, nextIndex);
 
         tabIndex++;
 
-        const groupedWords = this.createGroupedWords(letters, excludedIndexes);
-        const currentLetter = this.findCurrentLetter(groupedWords);
-
         // prompting
         clearTimeout(this.prompting);
-        const prompting = bubbles[tabIndex]?.text;
         this.prompting = setTimeout(this.promptingTimer, promptingTime);
 
         return {
           counter,
           tabIndex,
-          currentLetter,
-          prompting,
+          userAnswer,
           bubbles,
-          letters,
           groupedWords,
           index: nextIndex,
           isCorrect: true,
           isPrompting: false
-        }
-
+        };
       } else {
-        const counter = state.counter + 1;
+        const counter = prevState.counter + 1;
 
         return {
           counter,
@@ -313,60 +340,28 @@ class ArrayBubbles extends Component {
         };
       }
     });
-  }
+  };
 
   handleAnswer = () => {
-    this.setState((state) => {
-      const { letters, correctAnswer, counter } = this.state;
-      const reducedAnswer = correctAnswer.replace(/ |\n/g, "");
-      const reducedUserAnswer = letters.join("").replace(/ |\n/g, "")
-      const isFinished = reducedUserAnswer === reducedAnswer;
-
-      if (isFinished || counter === 3) {
-        return {
-          isFinished: true
-        }
-      } else {
-        return {
-          isCorrect: false,
-          isWrong: false
-        }
-      }
-    }, () => {
-      const { item, showGameAnswer } = this.props;
-      const { isFinished, counter } = this.state;
-
-      if (isFinished) {
-        if (counter === 3) {
-          showGameAnswer(item, 'wrong');
-        } else {
-          showGameAnswer(item, 'correct');
-        }
-      }
+    this.setState({
+      isCorrect: false,
+      isWrong: false
     });
   };
 
   promptingTimer = () => {
-    this.setState((state) => {
-      const { tabIndex, bubbles } = state;
-      const prompting = bubbles[tabIndex].text;
-
-      return {
-        prompting,
-        isPrompting: true
-      }
+    this.setState({
+      isPrompting: true
     });
-  }
+  };
 
   render() {
     const {
-      currentLetter,
-      prompting,
       definition,
+      tabIndex,
       boundary,
       bubbles,
       bubblesPositions,
-      letters,
       groupedWords,
       isPrompting,
       isWrong,
@@ -380,44 +375,48 @@ class ArrayBubbles extends Component {
         <Definition>{definition}</Definition>
 
         <BubblesWrapper ref={this.boundaryRef}>
-          { bubbles.map((bubble, index) => {
-            const isShaken = isPrompting && (bubble.index === this.state.tabIndex);
+          {bubbles.map(({ text, index }, bubbleIndex) => {
+            const isShaken =
+              isPrompting && index === tabIndex;
 
             return (
               <BubbleComponent
-                id={bubble.text}
-                key={index}
-                tabIndex={bubble.index}
-                index={bubble.index}
+                id={text}
+                key={bubbleIndex}
+                tabIndex={index}
+                index={index}
                 boundary={boundary}
-                position={bubblesPositions[randomIndex][index]}
+                position={bubblesPositions[randomIndex][bubbleIndex]}
                 boundaryRef={this.boundaryRef.current}
                 isShaken={isShaken}
-                handlePicking={this.handlePicking}>
-                {bubble.text}
+                handlePicking={this.handlePicking}
+              >
+                {text}
               </BubbleComponent>
-            )
+            );
           })}
         </BubblesWrapper>
 
         <AnswerWrapper
           isWrong={isWrong}
           isCorrect={isCorrect}
-          onAnimationEnd={this.handleAnswer}>
+          onAnimationEnd={this.handleAnswer}
+        >
           <Letters>
-            { groupedWords.map((word, wordIndex) =>
+            {groupedWords.map((word, wordIndex) => (
               <Word key={wordIndex}>
-                { word.map((letter, letterIndex) =>
+                {word.map(({ letter, isVisible }, letterIndex) => (
                   <Letter
                     letter={letter}
                     index={letterIndex}
+                    isVisible={isVisible}
                     key={letterIndex}
-                    isBlock={/\n/.test(letter)}>
+                  >
                     {letter}
                   </Letter>
-                )}
+                ))}
               </Word>
-            )}
+            ))}
           </Letters>
         </AnswerWrapper>
       </GameWrapper>
@@ -434,9 +433,9 @@ class BubbleComponent extends React.Component {
       startOffsetLeft: 0,
       offsetTop: 0,
       offsetLeft: 0
-    }
+    };
 
-    this.bubbleRef = React.createRef()
+    this.bubbleRef = React.createRef();
   }
 
   componentDidMount() {
@@ -445,44 +444,59 @@ class BubbleComponent extends React.Component {
 
     const startOffset = {
       left: Math.floor(boundary.width / 2 - bubble.offsetWidth / 2),
-      top: Math.floor(boundary.height / 2  - bubble.offsetHeight / 2)
-    }
+      top: Math.floor(boundary.height / 2 - bubble.offsetHeight / 2)
+    };
 
     const offset = {
       left: boundary.width * position.left,
       top: boundary.height * position.top
-    }
+    };
 
     this.setState({
       offsetLeft: offset.left,
       offsetTop: offset.top,
       startOffsetLeft: startOffset.left,
       startOffsetTop: startOffset.top
-    })
+    });
   }
 
   render() {
-    const { startOffsetLeft, startOffsetTop, offsetLeft, offsetTop } = this.state;
-    const { id, index, tabIndex, isShaken, children, handlePicking } = this.props;
+    const {
+      startOffsetLeft,
+      startOffsetTop,
+      offsetLeft,
+      offsetTop
+    } = this.state;
+    const {
+      id,
+      index,
+      tabIndex,
+      isShaken,
+      children,
+      handlePicking
+    } = this.props;
 
     return (
-      <Bubble
+      <BubbleWrapper
         id={id}
-        index={index}
-        tabIndex={tabIndex}
         ref={this.bubbleRef}
-        isShaken={isShaken}
         startOffsetLeft={startOffsetLeft}
         startOffsetTop={startOffsetTop}
         offsetLeft={offsetLeft}
         offsetTop={offsetTop}
-        onClick={handlePicking}>
-        {children}
-      </Bubble>
+      >
+        <Bubble
+          id={id}
+          tabIndex={tabIndex}
+          onClick={handlePicking}
+          isShaken={isShaken}
+        >
+          {children}
+        </Bubble>
+      </BubbleWrapper>
     );
   }
 }
-
 
 const GameWrapper = styled.div`
   padding-top: 20vh;
@@ -491,15 +505,11 @@ const GameWrapper = styled.div`
 `;
 
 const Definition = styled.p`
-  animation: ${popIn} .3s linear 0.5s forwards;
+  animation: ${popIn} 0.3s linear 0.5s forwards;
   font-size: 3rem;
   text-align: center;
   margin: 0 1.5rem 4rem;
   opacity: 0;
-
-  @media (min-width: 768px) {
-    font-size: 4rem;
-  }
 `;
 
 const BubblesWrapper = styled.div`
@@ -518,11 +528,10 @@ const BubbleWrapper = styled.div`
     css`
       animation-name: ${moveForwards(startOffsetLeft, startOffsetTop, offsetLeft, offsetTop)};
       animation-duration: 0.4s;
-      animation-delay: ${0.05 + index*0.05}s;
+      animation-delay: ${0.05 + index * 0.05}s;
       animation-fill-mode: both;
-    `
-  };
-  visibility: ${({ id }) => !id && 'hidden'};
+    `};
+  visibility: ${({ id }) => !id && "hidden"};
   width: 5.5rem;
   height: 5.5rem;
   position: absolute;
@@ -536,15 +545,15 @@ const BubbleWrapper = styled.div`
 `;
 
 const Bubble = styled.div`
-  ${({ isShaken }) => isShaken &&
+  ${({ isShaken }) =>
+    isShaken &&
     css`
       animation-name: ${prompt};
       animation-duration: 3s;
       animation-fill-mode: both;
       animation-iteration-count: infinite;
       animation-timing-function: linear;
-    `
-  };
+    `};
 
   font-weight: ${fonts.bold};
   color: ${colors.blue};
@@ -560,19 +569,21 @@ const Bubble = styled.div`
 `;
 
 const AnswerWrapper = styled.div`
-  ${({ isWrong }) => isWrong && css`
-  animation: ${shake} 0.5s linear;
-  `};
+  ${({ isWrong }) =>
+    isWrong &&
+    css`
+      animation: ${shake} 0.5s linear;
+    `};
 
-  ${({ isCorrect }) => isCorrect && css`
-  animation: ${pulse} 0.4s linear;
-  `};
+  ${({ isCorrect }) =>
+    isCorrect &&
+    css`
+      animation: ${pulse} 0.4s linear;
+    `};
 
   position: relative;
   border: 1px solid white;
   border-radius: 4rem;
-  min-height: 5rem;
-  height: auto;
   display: flex;
   align-items: center;
 
@@ -592,28 +603,31 @@ const Letters = styled.div`
 
 const Word = styled.div`
   display: inline-block;
-  position: relative
+  position: relative;
 `;
 
 const Letter = styled.span`
-  width: ${({ letter }) => letter === ' ' && '1rem'};
+  width: ${({ letter }) => letter === " " && "1rem"};
+  height: 3rem;
 
-  ${({ isBlock }) => isBlock && css`
-    display: block;
-    height: 1rem;
-  `};
+  ${({ isVisible }) =>
+    !isVisible &&
+    css`
+      color: transparent;
+    `};
 
-  ${({ letter }) => !letter && css`
-    height: calc(2.4rem);
-    width: 1rem;
-    margin: 0 0.2rem;
-    border-bottom: 1px solid white;
-  `};
-
+  ${({ letter }) =>
+    letter === " "
+      ? css`
+          width: 1rem;
+          border: none;
+        `
+      : css`
+          border-bottom: 1px solid white;
+        `};
   font-size: 2.4rem;
-  height: calc(2.2rem * 1.345);
   display: inline-block;
   transition: transform 0.1s ease-out;
-`
+`;
 
-export default ArrayBubbles
+export default ArrayBubbles;

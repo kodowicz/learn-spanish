@@ -16,7 +16,7 @@ class SelectFalseOrTrue extends Component {
     this.createGame();
   }
 
-  createGame() {
+  createGame = () => {
     this.setState((prevState, props) => {
       const { item, terms } = props;
       const term = item.term;
@@ -45,45 +45,46 @@ class SelectFalseOrTrue extends Component {
     })
   }
 
-  handleAnimationEnd = () => {
-    if (this.state.answer) {
-      this.setState({
-        isFinished: true
-      }, () => {
-        const { item, showGameAnswer } = this.props;
-        const { answer, comparisonItem } = this.state;
-        const correctAnswer = item.id === comparisonItem.id;
-        const userAnswer = answer === 'correct' ? true : false;
+  handleAnimationEnd = (event) => {
+    if (event.animationName === flipOut.name) {
+      const { item, showGameAnswer } = this.props;
+      const { answer, comparisonItem } = this.state;
+      const correctAnswer = item.id === comparisonItem.id;
+      const userAnswer = answer === 'correct' ? true : false;
 
-        if (userAnswer === correctAnswer) {
-          showGameAnswer(item, 'correct');
-        } else {
-          showGameAnswer(item, 'wrong');
-        }
-      })
+      if (userAnswer === correctAnswer) {
+        showGameAnswer(item, 'correct');
+      } else {
+        showGameAnswer(item, 'wrong');
+      }
     }
   }
 
   render() {
-    const { term, isChosen, isFinished, comparisonItem } = this.state;
+    const { term, isChosen, comparisonItem } = this.state;
 
     return (
-      <GameWrapper isFinished={isFinished}>
+      <GameWrapper>
         <Question
           isChosen={isChosen}
           onAnimationEnd={this.handleAnimationEnd}>
           <Term>{term}</Term>
           <Definition>{comparisonItem.definition}</Definition>
         </Question>
+
         <ButtonsWrapper>
           <Button
             id="wrong"
-            onClick={this.handleChosenAnswer}>
-            false</Button>
+            onClick={this.handleChosenAnswer}
+          >
+            false
+          </Button>
           <Button
             id="correct"
-            onClick={this.handleChosenAnswer}>
-            true</Button>
+            onClick={this.handleChosenAnswer}
+          >
+            true
+          </Button>
         </ButtonsWrapper>
       </GameWrapper>
     )
@@ -92,7 +93,6 @@ class SelectFalseOrTrue extends Component {
 
 
 const GameWrapper = styled.div`
-  display: ${({ isFinished }) => isFinished ? 'none' : 'block'};
   padding-top: 20vh;
   width: 70vw;
   max-width: 30rem;

@@ -73,7 +73,7 @@ class TypeMeaning extends Component {
 
     if (prevState.inputValue !== inputValue) {
       const { item, showGameAnswer } = prevProps;
-      const isFinished = inputValue === correctAnswer;
+      const isFinished = inputValue.toLowerCase() === correctAnswer.toLowerCase();
 
       if (counter === 3) {
         window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
@@ -229,7 +229,7 @@ class TypeMeaning extends Component {
   };
 
   handleTyping = event => {
-    const inputValue = event.target.value;
+    const inputValue = event.target.value.toLowerCase();
 
     this.setState(prevState => {
       const {
@@ -246,9 +246,9 @@ class TypeMeaning extends Component {
 
       if (!isFinished) {
         const correctLetters = correctAnswer.slice(0, valueIndex);
-        const exchanged = this.switchSpecialLetters(inputValue, correctLetters);
+        const exchanged = this.switchSpecialLetters(inputValue, correctLetters.toLowerCase());
 
-        if (exchanged || inputValue === correctLetters) {
+        if (exchanged || inputValue === correctLetters.toLowerCase()) {
           if (prevState.valueIndex < valueIndex) {
             counter = 0;
           }
