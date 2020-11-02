@@ -19,6 +19,7 @@ const PlaySet = ({
   answer,
   correctItem,
   isCancelOpen,
+  isCompleted,
   isAnimated,
   isGameOverOpen,
   cancelSesion,
@@ -44,6 +45,7 @@ const PlaySet = ({
   if (isGameOverOpen) {
     return <GameOverOverlay setid={setid} finishGame={finishGame} />;
   } else {
+
     return (
       <>
         <GameTimer
@@ -67,6 +69,7 @@ const PlaySet = ({
             )}
             <Game
               setid={setid}
+              isCompleted={isCompleted}
               isHidden={isCancelOpen}
               terms={terms}
               answer={answer}
@@ -79,22 +82,37 @@ const PlaySet = ({
   }
 };
 
-const Game = ({ setid, isHidden, terms, showGameAnswer }) => {
+const Game = ({ setid, isCompleted, isHidden, terms, showGameAnswer }) => {
   const [item, setItem] = useState({});
   const [game, setgame] = useState(0);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isDesktop = window.innerWidth >= 768;
 
   useEffect(() => {
-    const isDesktop = window.innerWidth >= 768;
-    const filtredTerms = terms.filter(item => !item.isMastered);
-    const randomIndex = Math.floor(Math.random() * filtredTerms.length);
-    const item = filtredTerms[randomIndex];
-    const game = pickGame(item.ratio, item.term.length > 20);
+    let item = {};
+    let ratio = 0;
+
+    if (isCompleted) {
+      item = getRandomItem(terms);
+      ratio = Math.floor(Math.random() * 6);
+
+    } else {
+      const filtredTerms = terms.filter(item => !item.isMastered);
+      item = getRandomItem(filtredTerms);
+      ratio = item.ratio;
+    }
+
+    const game = pickGame(ratio, item.term.length > 20);
 
     setItem(item);
     setgame(game);
-    setIsDesktop(isDesktop);
   }, []);
+
+  function getRandomItem(array) {
+    const randomIndex = Math.floor(Math.random() * array.length);
+    const item = array[randomIndex];
+
+    return item;
+  }
 
   function pickGame(ratio, isTooLong) {
     let game;
@@ -107,7 +125,7 @@ const Game = ({ setid, isHidden, terms, showGameAnswer }) => {
       game = Math.floor(Math.random() * 2) + 3;
 
       if (isTooLong && game === 3) {
-        game--;
+        game++;
       }
     }
 
@@ -117,7 +135,13 @@ const Game = ({ setid, isHidden, terms, showGameAnswer }) => {
   function randomGame(ratio) {
     switch (game) {
       case 5:
-        return <TypeMeaning item={item} showGameAnswer={showGameAnswer} />;
+        return (
+          <TypeMeaning
+            item={item}
+            showGameAnswer={showGameAnswer}
+            isDesktop={isDesktop}
+          />
+        );
 
       case 4:
         return <ArrayLetters item={item} showGameAnswer={showGameAnswer} />;

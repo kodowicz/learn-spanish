@@ -1,8 +1,4 @@
-export const createPlaySet = setid => (
-  dispatch,
-  getState,
-  { getFirebase, getFirestore }
-) => {
+export const createPlaySet = setid => ( dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -72,11 +68,7 @@ export const showGameAnswer = (item, answer) => ({
   answer
 });
 
-export const cleanGameAnswer = (item, isCorrect) => (
-  dispatch,
-  getState,
-  { getFirebase, getFirestore }
-) => {
+export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
@@ -84,15 +76,21 @@ export const cleanGameAnswer = (item, isCorrect) => (
   const newRatio = isCorrect ? item.ratio + 1 : item.ratio - 1;
   const minRatio = 0;
   const maxRatio = 5;
-  let knowledge;
   let isMastered = item.ratio === 5 ? true : false;
+  let knowledge;
+  let isCompleted;
 
+  const setRef = firestore.doc(`users/${user}/learn/${set}`)
   const docRef = firestore.doc(`users/${user}/learn/${set}/game/${item.id}`);
   const knowledgeRef = firestore.doc(`users/${user}/learn/${set}`);
+  const userRef = firestore.doc(`users/${user}`);
 
-  // cloud functions
+  setRef.get().then(doc => {
+    isCompleted = doc.data().isCompleted
+  });
+
   knowledgeRef.get().then(doc => {
-    const { knowledge: prevKnowledge } = doc.data();
+    const { amount, knowledge: prevKnowledge } = doc.data();
 
     if (prevKnowledge) {
       if (newRatio >= minRatio && newRatio <= maxRatio) {
@@ -104,6 +102,21 @@ export const cleanGameAnswer = (item, isCorrect) => (
       knowledge = isCorrect ? 1 : 0;
     }
 
+    // mastered all terms
+    if (knowledge == amount * 5 && isMastered && !isCompleted) {
+      setRef.update({
+        isCompleted: true
+      })
+      userRef.update({
+        notification: "Congrats! You know every term!"
+      })
+
+    } else if (newRatio < item.ratio && isCompleted) {
+      setRef.update({
+        isCompleted: false
+      })
+    }
+    
     knowledgeRef.update({
       knowledge
     });

@@ -12,7 +12,8 @@ import {
 import {
   createPlaySet,
   showGameAnswer,
-  cleanGameAnswer
+  cleanGameAnswer,
+  setAnimationEnd
 } from "../store/actions/playSetActions";
 
 import PlaySet from "../pages/PlaySet";
@@ -25,6 +26,8 @@ const PlaySetContainer = props => {
       answer={props.answer}
       correctItem={props.correctItem}
       isCancelOpen={props.isCancelOpen}
+      isCompleted={props.isCompleted}
+      isAnimated={props.isAnimated}
       isGameOverOpen={props.isGameOverOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
@@ -33,6 +36,7 @@ const PlaySetContainer = props => {
       showGameAnswer={props.showGameAnswer}
       cleanGameAnswer={props.cleanGameAnswer}
       changeKnowledge={props.changeKnowledge}
+      setAnimationEnd={props.setAnimationEnd}
       finishGame={props.finishGame}
     />
   ) : (
@@ -42,16 +46,19 @@ const PlaySetContainer = props => {
 
 const mapStateToProps = (state, ownProps) => {
   const terms = state.firestore.ordered.playTerms;
-  const details = state.firestore.ordered.playDetails;
-  const isFullyFetched = terms?.length == details?.[0]?.amount;
+  const details = state.firestore.data.playDetails;
+  const isFullyFetched = terms?.length == details?.amount;
+  const isCompleted = details?.isCompleted;
 
   return {
     terms,
+    isCompleted,
     isLoaded: isLoaded(terms, details) && isFullyFetched,
     setid: ownProps.match.params.id,
     uid: state.firebase.auth.uid,
     answer: state.gameAnswer.answer,
     correctItem: state.gameAnswer.item,
+    isAnimated: state.gameAnswer.isAnimated,
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     isCancelOpen: state.isOverlayOpen.isCancelled,
@@ -70,6 +77,7 @@ export default compose(
       cancelSesion,
       showGameAnswer,
       cleanGameAnswer,
+      setAnimationEnd,
       finishGame
     }
   ),
