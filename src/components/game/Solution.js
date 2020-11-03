@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import styled, { css, keyframes } from "styled-components";
+import styled, { css } from "styled-components";
 import { colors } from "../../assets/styles/GlobalStyles";
 import { zoomInOut, fadeInOut } from "../../assets/styles/GlobalKeyframes";
+
+import Speech from "../speech/Speech";
 import good from "../../assets/images/good.svg";
 import wrong from "../../assets/images/wrong.svg";
 
 const Solution = ({
   answer,
   correctItem,
+  voices,
+  settings,
   cleanGameAnswer,
   setAnimationEnd
 }) => {
@@ -38,6 +42,11 @@ const Solution = ({
           <Definition>{correctItem.definition}</Definition>
         </ItemWrapper>
       )}
+      <Speech
+        settings={settings}
+        voices={voices}
+        text={correctItem.term}
+      />
     </>
   );
 };

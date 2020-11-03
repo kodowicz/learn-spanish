@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
+import { SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import GameOverOverlay from "../components/overlay/GameOverOverlay";
 import ChooseBetweenTwo from "../components/game/ChooseBetweenTwo";
@@ -30,6 +31,30 @@ const PlaySet = ({
   setCurrentSetId,
   finishGame
 }) => {
+  const [voices, setVoices] = useState([]);
+  const settings = {
+    langs: [
+      "Microsoft Elvira Online (Natural) - Spanish (Spain)",
+      "Google español de Estados Unidos",
+      "Mónica"
+    ],
+    pitch: 1,
+    rate: 1,
+    volume: 1
+  }
+
+  useEffect(
+    () => {
+      if (!voices.length) {
+        const speechSynthesis = new SpeechVoices();
+        const voices = speechSynthesis.getVoices();
+
+        setVoices(voices)
+      }
+    },
+    [voices]
+  );
+
   useEffect(() => {
     changeLocation("learn");
     setCurrentSetId(setid);
@@ -59,6 +84,8 @@ const PlaySet = ({
           <Solution
             answer={answer}
             correctItem={correctItem}
+            settings={settings}
+            voices={voices}
             cleanGameAnswer={cleanGameAnswer}
             setAnimationEnd={setAnimationEnd}
           />

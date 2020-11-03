@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import {
   FrontCard,
@@ -21,6 +22,30 @@ const LearnSet = ({
   changeLocation,
   changeLastLocation
 }) => {
+  const [voices, setVoices] = useState([]);
+  const settings = {
+    langs: [
+      "Microsoft Elvira Online (Natural) - Spanish (Spain)",
+      "Google español de Estados Unidos",
+      "Mónica"
+    ],
+    pitch: 1,
+    rate: 1,
+    volume: 1
+  }
+
+  useEffect(
+    () => {
+      if (!voices.length) {
+        const speechSynthesis = new SpeechVoices();
+        const voices = speechSynthesis.getVoices();
+
+        setVoices(voices)
+      }
+    },
+    [voices]
+  );
+
   useEffect(() => {
     setCurrentSetId(setid);
     createLearnSet(setid);
@@ -40,6 +65,8 @@ const LearnSet = ({
           setid={setid}
           terms={terms}
           isOverlayOpen={isOverlayOpen}
+          settings={settings}
+          voices={voices}
           cancelSesion={cancelSesion}
           shuffleCard={shuffleCard}
           throwoutCard={throwoutCard}
@@ -60,6 +87,8 @@ const Flashcards = ({
   setid,
   terms,
   isOverlayOpen,
+  settings,
+  voices,
   cancelSesion,
   shuffleCard,
   throwoutCard,
@@ -86,6 +115,8 @@ const Flashcards = ({
               layerIndex={term.layerIndex}
               term={term}
               moveEnabled={true}
+              settings={settings}
+              voices={voices}
               shuffleCard={shuffleCard}
               throwoutCard={throwoutCard}
             />
@@ -143,8 +174,8 @@ const Cards = styled.div`
   height: 100vh;
   position: absolute;
   place-content: center;
-  grid-template-rows: 300px;
-  grid-template-columns: 220px;
+  grid-template-rows: 30rem;
+  grid-template-columns: 22rem;
   cursor: grab;
 
   @media (min-width: 768px) {
