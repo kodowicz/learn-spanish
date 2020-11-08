@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { css, createGlobalStyle } from "styled-components";
 import { Link } from "react-router-dom";
+import sort from "../images/sort.svg";
 
 export const colors = {
   white: "#FFFFFF",
@@ -99,12 +100,14 @@ export const BlockElement = styled.div`
 `;
 
 const mutualButton = {
+  fontFamily: fonts.family,
   display: "block",
   width: "13rem",
   height: "4rem",
   fontSize: "1.4rem",
   borderRadius: "50px",
-  transition: "transform 0.2s"
+  transition: "transform 0.2s",
+  cursor: "pointer"
 };
 
 export const Button = styled.button`
@@ -114,10 +117,8 @@ export const Button = styled.button`
   margin: ${props => (props.center ? "0 auto" : 0)};
   color: ${({ color }) => color || `${colors.white}`};
   border: 1px solid ${({ color }) => color || `${colors.white}`};
-  font-family: ${fonts.family};
   text-align: center;
   background: transparent;
-  cursor: pointer;
 
   &:focus {
     transform: translateY(2px);
@@ -156,6 +157,34 @@ export const LinkButton = props => (
   <Anchor to={props.to} center={props.center} color={props.color}>
     <AnchorWrapper>{props.children}</AnchorWrapper>
   </Anchor>
+);
+
+const SortButton = styled.button`
+  ${css({
+    ...mutualButton
+  })};
+
+  color: ${colors.white};
+  display: flex;
+  align-items: center;
+  height: min-content;
+  width: max-content;
+  background: none;
+  border: none;
+  padding: 0;
+`;
+
+const SortImg = styled.img`
+  width: 2rem;
+  height: 2rem;
+  padding-left: 3px;
+`;
+
+export const Switcher = props => (
+  <SortButton onClick={props.handleSwitch}>
+    <span>{props.sortedBy}</span>
+    <SortImg src={sort} alt="" />
+  </SortButton>
 );
 
 const mutualInputs = {

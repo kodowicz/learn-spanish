@@ -12,27 +12,27 @@ export class FrontCard extends Component {
     this.cardRef = React.createRef();
 
     this.state = {
-      id: null,
+      id: undefined,
+      rotateFront: 0,
+      rotateBack: -180,
+      backAmplitude: 40,
+      horizontalAmp: 100,
+      verticalAmp: 50,
       isFlipped: true,
       isMoved: false,
       isClicked: false,
       isSpeaking: false,
       toggle: false,
+      moveLeft: false,
+      moveRight: false,
       cardCenter: {},
       point: { x: 0, y: 0 },
       position: { x: 0, y: 0 },
-      rotateFront: 0,
-      rotateBack: -180,
       transformCard: { x: 0, y: 0, rotate: 0 },
-      moveLeft: false,
-      moveRight: false,
-      backAmplitude: 40,
-      horizontalAmp: 100,
-      verticalAmp: 50
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     const cardCenter = this.cardRef.current.getBoundingClientRect();
     const horizontalAmp = this.props.moveEnabled ? 100 : 35;
     this.setState({
@@ -134,15 +134,9 @@ export class FrontCard extends Component {
 
     if (cardCenter.left - cardPosition.left > backAmplitude && isMoved) {
       this.moveLeft();
-      this.setState({
-        isSpeaking: true
-      })
 
     } else if (cardPosition.right - cardCenter.right > backAmplitude && isMoved) {
       this.moveRight();
-      this.setState({
-        isSpeaking: true
-      })
 
     } else {
       this.setState({
@@ -157,20 +151,12 @@ export class FrontCard extends Component {
   };
 
   moveLeft = () => {
-    const { term, shuffleCard, moveEnabled } = this.props;
-
-    if (moveEnabled) {
+    if (this.props.moveEnabled) {
       this.setState({
-        moveLeft: true
+        moveLeft: true,
+        isSpeaking: true
       });
 
-      this.cardRef.current.addEventListener(
-        "animationend",
-        function() {
-          shuffleCard(term);
-        },
-        false
-      );
     } else {
       this.setState({
         transformCard: {
@@ -183,20 +169,21 @@ export class FrontCard extends Component {
   };
 
   moveRight = () => {
-    const { term, throwoutCard } = this.props;
-
     this.setState({
-      moveRight: true
+      moveRight: true,
+      isSpeaking: true
     });
-
-    this.cardRef.current.addEventListener(
-      "animationend",
-      function() {
-        throwoutCard(term.id);
-      },
-      false
-    );
   };
+
+  handleAnimationEnd = (event) => {
+    const { item, throwoutCard, shuffleCard } = this.props;
+
+    if (event.animationName === throwOut.name) {
+      throwoutCard(item.id);
+    } else {
+      shuffleCard(item)
+    }
+  }
 
   render() {
     const {
@@ -206,19 +193,19 @@ export class FrontCard extends Component {
       transformCard,
       moveLeft,
       moveRight,
+      isClicked,
       isSpeaking
     } = this.state;
-    const { layerIndex, term } = this.props;
+    const { layerIndex, item, sortedBy, settings, voices } = this.props;
+    const term = sortedBy ? item.term : item.definition;
+    const definition = sortedBy ? item.definition : item.term;
 
     return (
       <>
-        {isSpeaking &&
-          <Speech
-            settings={this.props.settings}
-            voices={this.props.voices}
-            text={term.term}
-          />
+        { isSpeaking &&
+          <Speech settings={settings} voices={voices} text={item.term} />
         }
+
         <FrontWrapper
           ref={this.cardRef}
           flip={toggle}
@@ -226,8 +213,9 @@ export class FrontCard extends Component {
           transformation={transformCard}
           moveLeft={moveLeft}
           moveRight={moveRight}
-          isClicked={this.state.isClicked}
+          isClicked={isClicked}
           onClick={this.flipCard}
+          onAnimationEnd={this.handleAnimationEnd}
           onTransitionEnd={this.animateCard}
           onTouchMove={this.moveCard}
           onTouchStart={this.startMoving}
@@ -238,7 +226,7 @@ export class FrontCard extends Component {
         >
           <Front rotate={rotateFront}>
             <Top>
-              <Term>{term.term}</Term>
+              <Term>{term}</Term>
             </Top>
             <Bottom>
               <Tap>tap to flip</Tap>
@@ -247,7 +235,7 @@ export class FrontCard extends Component {
 
           <Back rotate={rotateBack} onTouchMove={this.moveCard}>
             <Top>
-              <Term>{term.definition}</Term>
+              <Term>{definition}</Term>
             </Top>
             <Bottom>
               <Tap>tap to flip</Tap>
@@ -259,27 +247,32 @@ export class FrontCard extends Component {
   }
 }
 
-export const BackCard = ({ term }) => (
-  <BackWrapper>
-    <Front>
-      <Top>
-        <Term>{term.term}</Term>
-      </Top>
-      <Bottom>
-        <Tap>tap to flip</Tap>
-      </Bottom>
-    </Front>
+export const BackCard = ({ item, sortedBy }) => {
+  const term = sortedBy ? item.term : item.definition;
+  const definition = sortedBy ? item.definition : item.term;
 
-    <Back>
-      <Top>
-        <Term>{term.definition}</Term>
-      </Top>
-      <Bottom>
-        <Tap>tap to flip</Tap>
-      </Bottom>
-    </Back>
-  </BackWrapper>
-);
+  return (
+    <BackWrapper>
+      <Front>
+        <Top>
+          <Term>{term}</Term>
+        </Top>
+        <Bottom>
+          <Tap>tap to flip</Tap>
+        </Bottom>
+      </Front>
+
+      <Back>
+        <Top>
+          <Term>{definition}</Term>
+        </Top>
+        <Bottom>
+          <Tap>tap to flip</Tap>
+        </Bottom>
+      </Back>
+    </BackWrapper>
+  );
+};
 
 export const Congratulations = ({ setid, layerIndex, createLearnSet }) => (
   <CongratsWrapper layerIndex={layerIndex}>
@@ -475,10 +468,10 @@ const Term = styled.div`
 `;
 
 const Tap = styled.button`
+  font-family: ${fonts.family};
+  color: ${colors.navy};
   text-transform: uppercase;
   background: none;
   border: none;
-  color: ${colors.navy};
   font-size: 1.2rem;
-  font-family: ${fonts.family};
 `;

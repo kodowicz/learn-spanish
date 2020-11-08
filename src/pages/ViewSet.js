@@ -6,8 +6,7 @@ import MethodChoiceOverlay from "../components/overlay/MethodChoiceOverlay";
 import { Content } from "../components/Background";
 import ProgressBar from "../components/ProgressBar";
 import RatioDots from "../components/RatioDots";
-import sort from "../assets/images/sort.svg";
-import { LinkButton, Button, BlockElement, colors, fonts } from "../assets/styles/GlobalStyles";
+import { LinkButton, Button, BlockElement, Switcher, colors, fonts } from "../assets/styles/GlobalStyles";
 
 const ViewSet = ({
   match,
@@ -147,11 +146,12 @@ const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
     <TermListWrapper>
       <ListLable>
         <SubTitle>terms</SubTitle>
-        <SortButton onClick={() => sortTerms()}>
-          <span>{sortedBy ? "alphabetical" : "original"}</span>
-          <SortImg src={sort} alt="" />
-        </SortButton>
+        <Switcher
+          sortedBy={sortedBy ? "alphabetical" : "original"}
+          handleSwitch={sortTerms}
+        />
       </ListLable>
+
       <List>
         {terms.map((term, index) => (
           <ListItem key={term.id}>
@@ -254,25 +254,6 @@ const SubTitle = styled.h2`
   color: ${colors.white};
   font-size: 1.6rem;
   margin: 0;
-`;
-
-const SortButton = styled.button`
-  color: ${colors.white};
-  font-family: ${fonts.family};
-  font-size: 1.4rem;
-  background: none;
-  height: min-content;
-  border: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-`;
-
-const SortImg = styled.img`
-  width: 2rem;
-  height: 2rem;
-  padding-left: 3px;
 `;
 
 const List = styled.ul`

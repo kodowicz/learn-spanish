@@ -94,11 +94,12 @@ const mapStateToProps = (state, ownProps) => {
     author,
     setDetails,
     isUserSet,
+    terms: orderedTerms,
+    sortedBy: state.sortedBy,
     signedUser: state.firebase.auth.uid,
     lastLocation: state.navigation.lastLocation,
     isEditSubmited: state.isEditSubmited,
     isOverlayOpen: state.isOverlayOpen.isChosen,
-    terms: orderedTerms,
     isLoaded: userProgress
       ? isLoaded(terms, setDetails, userProgress)
       : isLoaded(terms, setDetails)

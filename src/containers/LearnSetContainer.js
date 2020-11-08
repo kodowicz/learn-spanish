@@ -18,7 +18,6 @@ import {
 
 import LearnSet from '../pages/LearnSet';
 
-
 const LearnSetContainer = (props) => {
   return props.isLoaded ?
     <LearnSet
@@ -54,8 +53,8 @@ const layerCards = (terms) => {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const terms = state.firestore.ordered.learnTerms;
-  const amount = state.firestore.data.learnDetails?.amount;
+  const terms = state.firestore.ordered.learnTerms || [];
+  const amount = state.firestore.data.learnDetails?.amount || 0;
 
   return {
     amount,
@@ -65,8 +64,8 @@ const mapStateToProps = (state, ownProps) => {
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     isOverlayOpen: state.isOverlayOpen.isCancelled,
-    terms: terms ? layerCards(terms) : undefined,
-    isLoaded: isLoaded(terms) && Boolean(terms.length)
+    terms: layerCards(terms),
+    isLoaded: isLoaded(terms)
   }
 }
 

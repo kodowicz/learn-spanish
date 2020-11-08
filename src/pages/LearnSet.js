@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import { FrontCard, BackCard, Congratulations } from "../components/dashboard/Flashcard";
+import { Switcher } from "../assets/styles/GlobalStyles";
 
 const LearnSet = ({
   amount,
@@ -20,6 +21,7 @@ const LearnSet = ({
   setContentHeight
 }) => {
   const [voices, setVoices] = useState([]);
+  const [sortedBy, setSortedBy] = useState(true);
   const settings = {
     langs: [
       "Microsoft Elvira Online (Natural) - Spanish (Spain)",
@@ -46,7 +48,7 @@ const LearnSet = ({
     },
     [isOverlayOpen]
   );
-  
+
   useEffect(
     () => {
       if (!voices.length) {
@@ -59,18 +61,24 @@ const LearnSet = ({
     [voices]
   );
 
-
   return (
     <Content ref={contentRef}>
-      <Counter>
-        {leftTerms} / {amount}
-      </Counter>
+      { !isOverlayOpen &&
+        <InfoBar>
+          <span>{leftTerms} / {amount}</span>
+          <Switcher
+            sortedBy={sortedBy ? "spanish" : "english"}
+            handleSwitch={() => setSortedBy(!sortedBy)}
+          />
+        </InfoBar>
+      }
       <Cards>
         <Flashcards
           amount={amount}
           leftTerms={leftTerms}
           setid={setid}
           terms={terms}
+          sortedBy={sortedBy}
           isOverlayOpen={isOverlayOpen}
           settings={settings}
           voices={voices}
@@ -93,6 +101,7 @@ const Flashcards = ({
   leftTerms,
   setid,
   terms,
+  sortedBy,
   isOverlayOpen,
   settings,
   voices,
@@ -120,7 +129,8 @@ const Flashcards = ({
             <FrontCard
               key={term.id}
               layerIndex={term.layerIndex}
-              term={term}
+              item={term}
+              sortedBy={sortedBy}
               moveEnabled={true}
               settings={settings}
               voices={voices}
@@ -130,7 +140,12 @@ const Flashcards = ({
           );
         } else if (term.layerIndex === -1) {
           return (
-            <BackCard key={term.id} layerIndex={term.layerIndex} term={term} />
+            <BackCard
+              key={term.id}
+              layerIndex={term.layerIndex}
+              item={term}
+              sortedBy={sortedBy}
+            />
           );
         } else {
           return <div key={term.id} />;
@@ -142,8 +157,11 @@ const Flashcards = ({
           <FrontCard
             key={terms[0].id}
             layerIndex={terms[0].layerIndex}
-            term={terms[0]}
+            item={terms[0]}
+            sortedBy={sortedBy}
             moveEnabled={false}
+            settings={settings}
+            voices={voices}
             shuffleCard={shuffleCard}
             throwoutCard={throwoutCard}
           />
@@ -166,14 +184,19 @@ const Content = styled.div`
   height: 100%;
 `;
 
-const Counter = styled.span`
-  position: absolute;
+const InfoBar = styled.div`
+  position: fixed;
+  z-index: 1;
   top: 7rem;
-  left: 7vw;
+  left: 0;
+  padding: 0 7vw;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 
   @media (min-width: 768px) {
-    left: 50%;
-    transform: translateX(-50%);
+    padding: 0 3rem;
   }
 `;
 
