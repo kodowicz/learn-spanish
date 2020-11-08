@@ -8,7 +8,8 @@ import { deleteCreateSet } from "../store/actions/deleteSetActions";
 import { notificationError } from "../store/actions/notificationActions";
 import {
   changeLocation,
-  changeLastLocation
+  changeLastLocation,
+  setContentHeight
 } from "../store/actions/navigationActions";
 import {
   setUnsavedName,
@@ -36,6 +37,7 @@ const CreateSetContainer = props => {
       newSetKey={props.newSetKey}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setContentHeight={props.setContentHeight}
       askForDeleting={props.askForDeleting}
       setUnsavedName={props.setUnsavedName}
       updateUnsavedTerm={props.updateUnsavedTerm}
@@ -83,6 +85,7 @@ export default compose(
       deleteCreateSet,
       changeLocation,
       changeLastLocation,
+      setContentHeight,
       askForDeleting,
       notificationError
     }

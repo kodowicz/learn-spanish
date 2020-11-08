@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-
-import { Main, Button, LinkButton, fonts } from "../assets/styles/GlobalStyles";
 import styled from "styled-components";
-import arrow from "../assets/images/arrow.svg";
+
+import { Content } from "../components/Background";
 import Password from "../components/overlay/Password";
 import SetsList from "../components/dashboard/SetsList";
+import { Button, LinkButton, fonts } from "../assets/styles/GlobalStyles";
+import arrow from "../assets/images/arrow.svg";
 
 const ViewProfile = ({
   uid,
@@ -15,6 +16,7 @@ const ViewProfile = ({
   changePassword,
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   notificationError,
   logOut,
   logoutNotification
@@ -24,6 +26,13 @@ const ViewProfile = ({
     changeLastLocation("");
   }, []);
 
+  useEffect(
+    () => {
+      if (isOverlayOpen) setContentHeight(0);
+    },
+    [isOverlayOpen]
+  );
+  
   function handleClick() {
     logOut();
     logoutNotification();
@@ -40,7 +49,12 @@ const ViewProfile = ({
       );
     } else {
       return (
-        <Main width={75} maxWidth={450} desktop={720}>
+        <Content
+          setContentHeight={setContentHeight}
+          width={75}
+          maxWidth={450}
+          desktop={720}
+        >
           <Title>hello {user.username}</Title>
           <UserDetails user={user} openPasswordOverlay={openPasswordOverlay} />
           <Button type="button" center="true" onClick={handleClick}>
@@ -59,12 +73,12 @@ const ViewProfile = ({
               available ones.
             </Info>
           )}
-        </Main>
+        </Content>
       );
     }
   } else {
     return (
-      <Main width={75} maxWidth={450}>
+      <Content setContentHeight={setContentHeight} width={75} maxWidth={450}>
         <Title>hello Stranger</Title>
         <Paragraph>
           To learn, create sets or edit existing ones you have to be signed in.
@@ -72,7 +86,7 @@ const ViewProfile = ({
         <LinkButton to="/signup" center="true">
           sign up
         </LinkButton>
-      </Main>
+      </Content>
     );
   }
 };
@@ -109,7 +123,7 @@ const Title = styled.h1`
 
 const UserWrapper = styled.ul`
   padding: 0;
-  margin: 3rem 0;
+  margin: 3rem auto;
   width: 100%;
   max-width: 350px;
   font-size: 1.4rem;

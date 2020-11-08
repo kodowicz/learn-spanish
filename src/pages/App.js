@@ -12,8 +12,9 @@ import LearnSet from "../containers/LearnSetContainer";
 import PlaySet from "../containers/PlaySetContainer";
 import Search from "../containers/SearchContainer";
 import Notification from "../containers/NotificationContainer";
+import ContentWrapper from "../containers/ContentContainer";
 import NotFoundPage from "./404";
-import Background from "../components/Background";
+import { Background } from "../components/Background";
 import Behavior from "../components/Behavior";
 import { GlobalStyle } from "../assets/styles/GlobalStyles";
 
@@ -23,6 +24,7 @@ const App = () => (
     <Route component={Notification} />
     <Behavior />
     <Background>
+    <ContentWrapper>
       <GlobalStyle />
       <Switch>
         <Route path="/" exact component={HomePage} />
@@ -36,6 +38,7 @@ const App = () => (
         <Route path="/search" component={Search} />
         <Route path="*" component={NotFoundPage} />
       </Switch>
+    </ContentWrapper>
     </Background>
   </BrowserRouter>
 );

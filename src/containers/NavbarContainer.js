@@ -1,29 +1,30 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { deleteSetChanges } from '../store/actions/editSetActions';
-import { createBasicTerms } from '../store/actions/createSetActions';
-import { handleMenu } from '../store/actions/navigationActions';
+import React from "react";
+import { connect } from "react-redux";
+import { deleteSetChanges } from "../store/actions/editSetActions";
+import { createBasicTerms } from "../store/actions/createSetActions";
+import { handleMenu, scrollToTop } from "../store/actions/navigationActions";
 import {
   cancelSesion,
   chooseMethod,
   askForDeleting,
   closeChangePassword
-} from '../store/actions/overlayActions';
+} from "../store/actions/overlayActions";
 
-import NavBar from '../components/navbar/Navbar';
+import NavBar from "../components/navbar/Navbar";
 
-
-const NavbarContainer = (props) => (
+const NavbarContainer = props => (
   <NavBar
     uid={props.uid}
     isOpen={props.isOpen}
     isLogged={props.isLogged}
-    isPageLonger={props.isPageLonger}
+    isPageScrollable={props.isPageScrollable}
+    isScrollTop={props.isScrollTop}
     location={props.location}
     lastLocation={props.lastLocation}
     match={props.match}
     goBack={props.goBack}
     handleMenu={props.handleMenu}
+    scrollToTop={props.scrollToTop}
     cancelSesion={props.cancelSesion}
     chooseMethod={props.chooseMethod}
     askForDeleting={props.askForDeleting}
@@ -34,29 +35,27 @@ const NavbarContainer = (props) => (
 );
 
 const mapStateToProps = (state, ownProps) => {
-  const pageHeight = document.documentElement.scrollHeight;
-  const windowHeight = window.innerHeight;
-  let isPageLonger = false;
-
-  if (pageHeight > windowHeight) {
-    isPageLonger = true
-  }
+  const contentHeight = state.navigation.contentHeight;
+  const viewportHeight = window.innerHeight;
+  let isPageScrollable = contentHeight > viewportHeight;
 
   return {
+    isPageScrollable,
     uid: state.firebase.auth.uid,
-    isPageLonger,
     isOpen: state.navigation.isOpen,
     isLogged: state.navigation.isLogged,
+    isScrollTop: state.navigation.isScrollTop,
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     goBack: ownProps.history.goBack
-  }
+  };
 };
 
 export default connect(
   mapStateToProps,
   {
     handleMenu,
+    scrollToTop,
     cancelSesion,
     chooseMethod,
     askForDeleting,
@@ -64,4 +63,4 @@ export default connect(
     closeChangePassword,
     createBasicTerms
   }
-)(NavbarContainer)
+)(NavbarContainer);

@@ -2,16 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import styled from "styled-components";
 
+import { Content } from "../components/Background";
 import SignIn from "../components/login/SignIn";
 import SignUp from "../components/login/SignUp";
 import Notification from "../components/navbar/Notification";
-import {
-  Main,
-  Button,
-  BasicInput,
-  colors,
-  fonts
-} from "../assets/styles/GlobalStyles";
+import { Button, BasicInput, colors, fonts } from "../assets/styles/GlobalStyles";
 
 const Login = ({
   auth,
@@ -21,7 +16,8 @@ const Login = ({
   signUpError,
   removeNotification,
   changeLocation,
-  changeLastLocation
+  changeLastLocation,
+  setContentHeight
 }) => {
   const [isToggled, setToggle] = useState(false);
 
@@ -51,7 +47,12 @@ const Login = ({
         />
       )}
 
-      <Main width={75} maxWidth={450} desktop={400}>
+      <Content
+        setContentHeight={setContentHeight}
+        width={75}
+        maxWidth={450}
+        desktop={400}
+      >
         <TabList role="tablist" aria-label="login">
           <Switch
             role="tab"
@@ -99,7 +100,7 @@ const Login = ({
             <SignUp auth={auth} signUp={signUp} signUpError={signUpError} />
           )}
         </div>
-      </Main>
+      </Content>
     </>
   );
 };

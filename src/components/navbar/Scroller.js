@@ -1,24 +1,14 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
-import styled from 'styled-components';
-import home from '../../assets/images/home.png';
+import styled from "styled-components";
+import home from "../../assets/images/home.png";
 
-
-const Scroller = () => {
-
-  const handleNavigating = (event) => {
-    window.scrollTo(0, 0);
-  }
-
-  return (
-    <Button
-      onClick={handleNavigating}>
-      <Img src={home} alt=" " />
-    </Button>
-  )
-};
-
+const Scroller = ({ scrollToTop }) => (
+  <Button onClick={() => scrollToTop(true)}>
+    <Img src={home} alt=" " />
+  </Button>
+);
 
 const Button = styled.button`
   position: fixed;
@@ -30,12 +20,12 @@ const Button = styled.button`
   background: none;
   border: none;
   margin: 0;
-  padding: 0
+  padding: 0;
 `;
 
 const Img = styled.img`
   width: 100%;
-  height: 100%
-`
+  height: 100%;
+`;
 
-export default Scroller
+export default Scroller;

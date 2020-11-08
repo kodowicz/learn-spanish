@@ -1,39 +1,36 @@
-import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { searchForSets } from '../store/actions/searchActions';
+import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firestoreConnect } from "react-redux-firebase";
+import { searchForSets } from "../store/actions/searchActions";
 import {
   changeLocation,
-  changeLastLocation
-} from '../store/actions/navigationActions';
+  changeLastLocation,
+  setContentHeight
+} from "../store/actions/navigationActions";
 
-import Search from '../pages/Search';
+import Search from "../pages/Search";
 
-
-const SearchContainer = (props) => (
+const SearchContainer = props => (
   <Search
     value={props.value}
     searchedSets={props.searchedSets}
     changeLocation={props.changeLocation}
     changeLastLocation={props.changeLastLocation}
+    setContentHeight={props.setContentHeight}
     searchForSets={props.searchForSets}
   />
 );
 
-const mapStateToProps = (state) => {
-  const allSets = state.firestore.ordered.allSets;
+const mapStateToProps = state => {
+  const allSets = state.firestore.ordered.allSets || [];
   const value = state.search;
-  const searchedSets = (allSets && value) &&
-    allSets.filter(
-      set => set.name.includes(value)
-    );
-
+  const searchedSets = value && allSets.filter(set => set.name.includes(value));
   return {
     value,
     searchedSets
-  }
-}
+  };
+};
 
 export default compose(
   connect(
@@ -42,10 +39,13 @@ export default compose(
       searchForSets,
       changeLocation,
       changeLastLocation,
+      setContentHeight
     }
   ),
-  firestoreConnect(props => [{
-    collection: 'sets',
-    storeAs: 'allSets'
-  }])
+  firestoreConnect(props => [
+    {
+      collection: "sets",
+      storeAs: "allSets"
+    }
+  ])
 )(SearchContainer);

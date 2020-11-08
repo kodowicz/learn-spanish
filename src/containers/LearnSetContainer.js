@@ -12,6 +12,7 @@ import {
 import {
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   setCurrentSetId
 } from '../store/actions/navigationActions';
 
@@ -28,6 +29,7 @@ const LearnSetContainer = (props) => {
       isOverlayOpen={props.isOverlayOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setContentHeight={props.setContentHeight}
       setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
       shuffleCard={props.shuffleCard}
@@ -74,6 +76,7 @@ export default compose(
     {
       changeLocation,
       changeLastLocation,
+      setContentHeight,
       setCurrentSetId,
       cancelSesion,
       shuffleCard,

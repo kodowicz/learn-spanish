@@ -1,21 +1,23 @@
-import React, { useEffect, useState, useRef } from 'react'
-import Menu from './Menu';
-import Navigation from './Navigation';
-import Scroller from './Scroller';
+import React, { useEffect, useState, useRef } from "react";
+import Menu from "./Menu";
+import Navigation from "./Navigation";
+import Scroller from "./Scroller";
+import { Wrapper } from "../Background";
 
-import styled from 'styled-components';
-import Background from '../Background';
-
+import styled from "styled-components";
+import { Background } from "../Background";
 
 const Navbar = ({
   uid,
-  isPageLonger,
+  isPageScrollable,
   isOpen,
+  isScrollTop,
   isLogged,
   location,
   lastLocation,
   goBack,
   handleMenu,
+  scrollToTop,
   cancelSesion,
   chooseMethod,
   askForDeleting,
@@ -23,55 +25,38 @@ const Navbar = ({
   closeChangePassword,
   createBasicTerms
 }) => {
-
-  const [isScrollTop, setScrolled] = useState();
-  const [isMobile, setMobile] = useState(false);
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [isScrollVisible, setScrollVisible] = useState(false);
+  const isMobile = window.innerWidth < 768;
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
     const isMenuVisible = isMobile ? isOpen : true;
-    const isScrollTop = window.scrollY <= 0 ? true : false;
     const isMenuOpen = isMobile ? isMenuVisible : false;
-    const locationRegex = /(learn)/;
-    const isScrollVisible = !locationRegex.test(location);
 
-    setMobile(isMobile);
     setMenuVisible(isMenuVisible);
-    setScrolled(isScrollTop);
     setMenuOpen(isMenuOpen);
-    setScrollVisible(isScrollVisible);
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleScroll);
-  })
+    window.addEventListener("resize", handleResize);
+  });
 
-  const handleResize = () => {
+  function handleResize() {
     const isMobile = window.innerWidth < 768;
     const isMenuVisible = isMobile ? isOpen : true;
     const isMenuOpen = isMobile ? isMenuVisible : false;
 
-    setMobile(isMobile);
     setMenuVisible(isMenuVisible);
     setMenuOpen(isMenuOpen);
-  };
-  
-  const handleScroll = () => {
-    const isScrollTop = window.scrollY <= 0 ? true : false;
-    setScrolled(isScrollTop);
-  };
+  }
 
   return (
     <>
-      { location &&
+      {location && (
         <Nav isVisible={isMenuOpen}>
-          { isOpen &&
+          {isOpen && (
             <BackgroundWrapper>
               <Background />
             </BackgroundWrapper>
-          }
+          )}
 
           <Navigation
             isMobile={isMobile}
@@ -88,7 +73,7 @@ const Navbar = ({
             closeChangePassword={closeChangePassword}
           />
 
-          { (isOpen || isMenuVisible) &&
+          {(isOpen || isMenuVisible) && (
             <Menu
               uid={uid}
               handleMenu={handleMenu}
@@ -96,18 +81,19 @@ const Navbar = ({
               askForDeleting={askForDeleting}
               createBasicTerms={createBasicTerms}
             />
-          }
+          )}
 
-          {(!isMenuOpen && isPageLonger && !isScrollTop && isScrollVisible) && <Scroller />}
+          {!isMenuOpen &&
+            isPageScrollable &&
+            !isScrollTop && <Scroller scrollToTop={scrollToTop} />}
         </Nav>
-      }
+      )}
     </>
   );
-}
-
+};
 
 const Nav = styled.nav`
-  height: ${({ isVisible }) => isVisible ? '100vh' : '6rem'};
+  height: ${({ isVisible }) => (isVisible ? "100vh" : "6rem")};
   position: fixed;
   top: 0;
   left: 0;
@@ -115,7 +101,7 @@ const Nav = styled.nav`
   z-index: 4;
 
   @media (min-width: 768px) {
-    padding: 0 30px;
+    padding: 0 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -128,7 +114,7 @@ const BackgroundWrapper = styled.div`
   top: 0;
   left: 0;
   height: 100vh;
-  background: rgba(16, 6, 54, 0.6)
-`
+  background: rgba(16, 6, 54, 0.6);
+`;
 
 export default Navbar;

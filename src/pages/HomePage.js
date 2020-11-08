@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import SetsList from "../components/dashboard/SetsList";
-import { LinkButton, Main, fonts } from "../assets/styles/GlobalStyles";
+import { Content } from "../components/Background";
+import { LinkButton, fonts } from "../assets/styles/GlobalStyles";
 
 const HomePage = ({
   userSets,
@@ -10,6 +11,7 @@ const HomePage = ({
   allSets,
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   enableEditSet
 }) => {
   useEffect(() => {
@@ -20,7 +22,12 @@ const HomePage = ({
 
   return (
     <>
-      <Main width={80} maxWidth={450} desktop={720}>
+      <Content
+        setContentHeight={setContentHeight}
+        width={80}
+        maxWidth={450}
+        desktop={720}
+      >
         <Title>Are you ready for a new dose of words?</Title>
 
         {userSets?.length > 0 ? (
@@ -47,7 +54,7 @@ const HomePage = ({
             margin="4rem 0"
           />
         )}
-      </Main>
+      </Content>
     </>
   );
 };

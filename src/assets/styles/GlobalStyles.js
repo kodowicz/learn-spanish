@@ -26,7 +26,6 @@ export const fonts = {
 export const GlobalStyle = createGlobalStyle`
   html {
     font-size: 8px;
-    scroll-behavior: smooth;
 
     @media (min-width: 350px) {
       font-size: 10px;
@@ -41,19 +40,10 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 1.6rem;
     overflow-x: hidden;
     cursor: pointer;
-
-    &::-webkit-scrollbar {
-      width: 0.4em;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: ${colors.darkGray};
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: ${colors.white};
-      border-radius: 5px;
-    }
+    position: fixed;
+    touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
     * {
       user-select: none;
@@ -69,6 +59,24 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+  #root {
+    position: fixed;
+    height: 100%;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0.4em;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: ${colors.darkGray};
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: ${colors.white};
+    border-radius: 5px;
+  }
+
   * {
     scrollbar-color: ${colors.white} ${colors.darkGray};
     scrollbar-width: thin;
@@ -82,19 +90,6 @@ export const GlobalStyle = createGlobalStyle`
   *::-moz-selection {
     background: ${colors.white};
     color: ${colors.blue};
-  }
-`;
-
-export const Main = styled.main`
-  width: ${props => `${props.width}vw`};
-  max-width: ${props => `${props.maxWidth}px`};
-  padding-top: 85px;
-  margin: 0 auto;
-
-  @media (min-width: 768px) {
-    width: ${props => `${props.desktop}px`};
-    max-width: none;
-    padding-top: 100px;
   }
 `;
 

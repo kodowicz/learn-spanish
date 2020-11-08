@@ -12,6 +12,7 @@ import { createEditSet } from "../store/actions/editSetActions";
 import {
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   setCurrentSetId,
   enableEditSet
 } from "../store/actions/navigationActions";
@@ -34,6 +35,7 @@ const ViewSetContainer = props => {
       isOverlayOpen={props.isOverlayOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setContentHeight={props.setContentHeight}
       setCurrentSetId={props.setCurrentSetId}
       sortTerms={props.sortTerms}
       deleteSetChanges={props.deleteSetChanges}
@@ -110,6 +112,7 @@ export default compose(
       removeNewKey,
       changeLocation,
       changeLastLocation,
+      setContentHeight,
       setCurrentSetId,
       sortTerms,
       createEditSet,

@@ -5,7 +5,8 @@ import { firestoreConnect, isLoaded } from "react-redux-firebase";
 import {
   changeLocation,
   changeLastLocation,
-  enableEditSet
+  enableEditSet,
+  setContentHeight
 } from "../store/actions/navigationActions";
 
 import HomePage from "../pages/HomePage";
@@ -19,6 +20,7 @@ const HomePageContainer = props => {
       allSets={props.allSets}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setContentHeight={props.setContentHeight}
       enableEditSet={props.enableEditSet}
     />
   ) : (
@@ -31,7 +33,7 @@ const mapStateToProps = state => {
   const allSets = state.firestore.ordered.allSets;
   const userSets = state.firestore.ordered.userSets;
   const isEmpty = state.firebase.auth.isEmpty;
-  const userSetsId = userSets && Object.keys(state.firestore.data.userSets);
+  const userSetsId = userSets && Object.keys(state.firestore.data.userSets || []);
   const otherSets =
     userSetsId && allSets?.filter(set => !userSetsId.some(id => id === set.id));
 
@@ -52,7 +54,8 @@ export default compose(
     {
       changeLocation,
       changeLastLocation,
-      enableEditSet
+      enableEditSet,
+      setContentHeight
     }
   ),
   firestoreConnect(props => {

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
+import { Content } from "../components/Background";
 import SetsList from "../components/dashboard/SetsList";
-import { Main, Input, fonts } from "../assets/styles/GlobalStyles";
+import { Input, fonts } from "../assets/styles/GlobalStyles";
 
 const Search = ({
   searchedSets,
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   searchForSets
 }) => {
   const [value, setValue] = useState("");
@@ -27,7 +29,12 @@ const Search = ({
   }
 
   return (
-    <Main width={80} maxWidth={450} desktop={720}>
+    <Content
+      setContentHeight={setContentHeight}
+      width={80}
+      maxWidth={450}
+      desktop={720}
+    >
       <Header>What are you looking for?</Header>
 
       <Form onSubmit={handleSubmit}>
@@ -39,7 +46,7 @@ const Search = ({
       </Form>
 
       <MatchedSets value={value} searchedSets={searchedSets} />
-    </Main>
+    </Content>
   );
 };
 

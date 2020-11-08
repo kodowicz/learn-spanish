@@ -3,10 +3,11 @@ import { Redirect } from "react-router-dom";
 import styled, { css } from "styled-components";
 
 import MethodChoiceOverlay from "../components/overlay/MethodChoiceOverlay";
+import { Content } from "../components/Background";
 import ProgressBar from "../components/ProgressBar";
 import RatioDots from "../components/RatioDots";
 import sort from "../assets/images/sort.svg";
-import { LinkButton, Button, Main, BlockElement, colors, fonts } from "../assets/styles/GlobalStyles";
+import { LinkButton, Button, BlockElement, colors, fonts } from "../assets/styles/GlobalStyles";
 
 const ViewSet = ({
   match,
@@ -25,6 +26,7 @@ const ViewSet = ({
   createPlaySet,
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   removeNewKey,
   enableEditSet,
   setCurrentSetId
@@ -39,6 +41,13 @@ const ViewSet = ({
     enableEditSet();
     setCurrentSetId(match.params.id);
   }, []);
+
+  useEffect(
+    () => {
+      if (isOverlayOpen) setContentHeight(0);
+    },
+    [isOverlayOpen]
+  );
 
   // handle if set doesn't exist
   if (terms.length === 0 && !setDetails) return <Redirect to="/404" />;
@@ -55,7 +64,12 @@ const ViewSet = ({
     );
   } else {
     return (
-      <Main width={76} maxWidth={650} desktop={700}>
+      <Content
+        setContentHeight={setContentHeight}
+        width={76}
+        maxWidth={650}
+        desktop={700}
+      >
         <Description
           signedUser={signedUser}
           setDetails={setDetails}
@@ -76,7 +90,7 @@ const ViewSet = ({
           sortedBy={sortedBy}
           sortTerms={sortTerms}
         />
-      </Main>
+      </Content>
     );
   }
 };

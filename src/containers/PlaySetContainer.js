@@ -7,6 +7,7 @@ import { cancelSesion, finishGame } from "../store/actions/overlayActions";
 import {
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   setCurrentSetId
 } from "../store/actions/navigationActions";
 import {
@@ -31,6 +32,7 @@ const PlaySetContainer = props => {
       isGameOverOpen={props.isGameOverOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setContentHeight={props.setContentHeight}
       setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
       showGameAnswer={props.showGameAnswer}
@@ -73,6 +75,7 @@ export default compose(
       createPlaySet,
       changeLocation,
       changeLastLocation,
+      setContentHeight,
       setCurrentSetId,
       cancelSesion,
       showGameAnswer,

@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
-import {
-  FrontCard,
-  BackCard,
-  Congratulations
-} from "../components/dashboard/Flashcard";
+import { FrontCard, BackCard, Congratulations } from "../components/dashboard/Flashcard";
 
 const LearnSet = ({
   amount,
@@ -20,7 +16,8 @@ const LearnSet = ({
   createLearnSet,
   setCurrentSetId,
   changeLocation,
-  changeLastLocation
+  changeLastLocation,
+  setContentHeight
 }) => {
   const [voices, setVoices] = useState([]);
   const settings = {
@@ -32,29 +29,39 @@ const LearnSet = ({
     pitch: 1,
     rate: 1,
     volume: 1
-  }
-
-  useEffect(
-    () => {
-      if (!voices.length) {
-        const speechSynthesis = new SpeechVoices();
-        const voices = speechSynthesis.getVoices();
-
-        setVoices(voices)
-      }
-    },
-    [voices]
-  );
+  };
+  const contentRef = useRef(null);
 
   useEffect(() => {
     setCurrentSetId(setid);
     createLearnSet(setid);
     changeLocation("learn");
     changeLastLocation(`/sets/${setid}`);
+    setContentHeight(contentRef.current.clientHeight);
   }, []);
 
+  useEffect(
+    () => {
+      if (isOverlayOpen) setContentHeight(0);
+    },
+    [isOverlayOpen]
+  );
+  
+  useEffect(
+    () => {
+      if (!voices.length) {
+        const speechSynthesis = new SpeechVoices();
+        const voices = speechSynthesis.getVoices();
+
+        setVoices(voices);
+      }
+    },
+    [voices]
+  );
+
+
   return (
-    <>
+    <Content ref={contentRef}>
       <Counter>
         {leftTerms} / {amount}
       </Counter>
@@ -77,7 +84,7 @@ const LearnSet = ({
           changeLastLocation={changeLastLocation}
         />
       </Cards>
-    </>
+    </Content>
   );
 };
 
@@ -154,6 +161,10 @@ const Flashcards = ({
     }
   }
 };
+
+const Content = styled.div`
+  height: 100%;
+`;
 
 const Counter = styled.span`
   position: absolute;

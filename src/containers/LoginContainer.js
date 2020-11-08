@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
   changeLocation,
-  changeLastLocation
+  changeLastLocation,
+  setContentHeight
 } from '../store/actions/navigationActions';
 import {
   signUp,
@@ -24,6 +25,7 @@ const LoginContainer = (props) => (
     removeNotification={props.cleanErrorNotification}
     changeLocation={props.changeLocation}
     changeLastLocation={props.changeLastLocation}
+    setContentHeight={props.setContentHeight}
   />
 )
 
@@ -42,5 +44,6 @@ export default connect(
     cleanErrorNotification,
     changeLocation,
     changeLastLocation,
+    setContentHeight
   }
 )(LoginContainer);

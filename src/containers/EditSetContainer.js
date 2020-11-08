@@ -9,6 +9,7 @@ import { notificationError } from "../store/actions/notificationActions";
 import {
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   setCurrentSetId
 } from "../store/actions/navigationActions";
 import {
@@ -37,6 +38,7 @@ const EditSetContainer = props => {
       isSetDeleted={props.isSetDeleted}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
+      setContentHeight={props.setContentHeight}
       setCurrentSetId={props.setCurrentSetId}
       askForDeleting={props.askForDeleting}
       createEditSet={props.createEditSet}
@@ -89,6 +91,7 @@ export default compose(
       deleteSetChanges,
       changeLocation,
       changeLastLocation,
+      setContentHeight,
       setCurrentSetId,
       askForDeleting
     }

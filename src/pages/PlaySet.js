@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
 import { SpeechVoices } from "../components/speech/speechSynthesis";
@@ -28,9 +28,11 @@ const PlaySet = ({
   showGameAnswer,
   setAnimationEnd,
   changeLocation,
+  setContentHeight,
   setCurrentSetId,
   finishGame
 }) => {
+  const contentRef = useRef(null);
   const [voices, setVoices] = useState([]);
   const settings = {
     langs: [
@@ -41,7 +43,21 @@ const PlaySet = ({
     pitch: 1,
     rate: 1,
     volume: 1
-  }
+  };
+
+
+  useEffect(() => {
+    changeLocation("learn");
+    setCurrentSetId(setid);
+    setContentHeight(contentRef.current.clientHeight);
+  }, []);
+
+  useEffect(
+    () => {
+      if (isGameOverOpen) setContentHeight(0);
+    },
+    [isGameOverOpen]
+  );
 
   useEffect(
     () => {
@@ -55,11 +71,6 @@ const PlaySet = ({
     [voices]
   );
 
-  useEffect(() => {
-    changeLocation("learn");
-    setCurrentSetId(setid);
-  }, []);
-
   useEffect(
     () => {
       setAnimationEnd(false);
@@ -72,7 +83,7 @@ const PlaySet = ({
   } else {
 
     return (
-      <>
+      <Content ref={contentRef}>
         <GameTimer
           isStopped={isCancelOpen}
           isAnswered={answer}
@@ -104,7 +115,7 @@ const PlaySet = ({
             />
           </>
         )}
-      </>
+      </Content>
     );
   }
 };
@@ -216,6 +227,10 @@ const Game = ({ setid, isCompleted, isHidden, terms, showGameAnswer }) => {
     </GameWrapper>
   );
 };
+
+const Content = styled.div`
+  height: 100%;
+`;
 
 const GameWrapper = styled.div`
   visibility: ${({ isHidden }) => isHidden && "hidden"};

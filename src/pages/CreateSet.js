@@ -2,14 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import styled, { css } from "styled-components";
 
+import { Content } from "../components/Background";
 import TermsList from "../components/dashboard/TermsList";
 import DeleteSetOverlay from "../components/overlay/DeleteSetOverlay";
-import {
-  Button,
-  Main,
-  BasicInput,
-  colors
-} from "../assets/styles/GlobalStyles";
+import { Button, BasicInput, colors } from "../assets/styles/GlobalStyles";
 
 const CreateSet = ({
   uid,
@@ -25,6 +21,7 @@ const CreateSet = ({
   removeUnsavedTerm,
   changeLocation,
   changeLastLocation,
+  setContentHeight,
   submitCreateSet,
   askForDeleting,
   deleteCreateSet,
@@ -38,6 +35,13 @@ const CreateSet = ({
     changeLocation("create");
     changeLastLocation("/");
   }, []);
+
+  useEffect(
+    () => {
+      if (isOverlayOpen) setContentHeight(0);
+    },
+    [isOverlayOpen]
+  );
 
   useEffect(
     () => {
@@ -76,7 +80,7 @@ const CreateSet = ({
     );
   } else {
     return (
-      <Main width={80} desktop={500}>
+      <Content setContentHeight={setContentHeight} width={80} desktop={500}>
         <Form>
           <SetName>
             <NameInput value={topic} maxLength="30" onChange={changeTopic} />
@@ -104,7 +108,7 @@ const CreateSet = ({
 
           <AddButton onClick={addTerm}>add term</AddButton>
         </Form>
-      </Main>
+      </Content>
     );
   }
 };

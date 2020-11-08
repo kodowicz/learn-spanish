@@ -14,14 +14,14 @@ import {
 } from '../store/actions/authActions';
 import {
   changeLocation,
-  changeLastLocation
+  changeLastLocation,
+  setContentHeight
 } from '../store/actions/navigationActions';
 
 import ViewProfile from '../pages/ViewProfile';
 
 
 const ViewProfileContainer = (props) => {
-
   if (props.isLoaded) {
     // user logged
     return (
@@ -38,6 +38,7 @@ const ViewProfileContainer = (props) => {
         logoutNotification={props.logoutNotification}
         changeLocation={props.changeLocation}
         changeLastLocation={props.changeLastLocation}
+        setContentHeight={props.setContentHeight}
       />
     )
   } else if (!props.isLoaded || props.authError === "logout") {
@@ -47,6 +48,7 @@ const ViewProfileContainer = (props) => {
         logOut={props.logOut}
         changeLocation={props.changeLocation}
         changeLastLocation={props.changeLastLocation}
+        setContentHeight={props.setContentHeight}
       />
     )
   } else {
@@ -79,7 +81,8 @@ export default compose(
       notificationError,
       logoutNotification,
       changeLocation,
-      changeLastLocation
+      changeLastLocation,
+      setContentHeight
     }
   ),
   firestoreConnect(props => {
