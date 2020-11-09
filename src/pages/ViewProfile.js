@@ -17,7 +17,7 @@ const ViewProfile = ({
   changeLocation,
   changeLastLocation,
   setContentHeight,
-  notificationError,
+  setNotification,
   logOut,
   logoutNotification
 }) => {
@@ -32,7 +32,7 @@ const ViewProfile = ({
     },
     [isOverlayOpen]
   );
-  
+
   function handleClick() {
     logOut();
     logoutNotification();
@@ -42,7 +42,7 @@ const ViewProfile = ({
     if (isOverlayOpen) {
       return (
         <Password
-          notificationError={notificationError}
+          setNotification={setNotification}
           changePassword={changePassword}
           openPasswordOverlay={openPasswordOverlay}
         />

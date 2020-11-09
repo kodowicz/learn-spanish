@@ -27,7 +27,7 @@ const EditSet = ({
   askForDeleting,
   deleteEditSet,
   deleteSetChanges,
-  notificationError
+  setNotification
 }) => {
   const [topic, setTopic] = useState("");
   const [redirect, setRedirect] = useState(false);
@@ -63,7 +63,7 @@ const EditSet = ({
   function addTerm(event) {
     event.preventDefault();
     if (terms.length === 50) {
-      notificationError("You've reached a limit of terms");
+      setNotification("You've reached a limit of terms");
     } else {
       addNewTerm();
     }
@@ -100,7 +100,7 @@ const EditSet = ({
             askForDeleting={askForDeleting}
             editSetName={editSetName}
             submitSet={submitEditSet}
-            notificationError={notificationError}
+            setNotification={setNotification}
           />
 
           <TermsListWrapper>
@@ -124,7 +124,7 @@ const Buttons = ({
   askForDeleting,
   editSetName,
   submitSet,
-  notificationError
+  setNotification
 }) => {
   function reduceTerms(terms) {
     return terms
@@ -159,9 +159,9 @@ const Buttons = ({
     event.preventDefault();
 
     if (!topic || /^\s$/.test(topic)) {
-      notificationError("You must enter a title to save your set");
+      setNotification("You must enter a title to save your set");
     } else if (reducedTerms.length < 4) {
-      notificationError("You have to create at least 4 terms");
+      setNotification("You have to create at least 4 terms");
     } else {
       editSetName(topic);
       submitSet(reducedTerms);

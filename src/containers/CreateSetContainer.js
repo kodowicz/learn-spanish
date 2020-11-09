@@ -5,7 +5,7 @@ import { compose } from "redux";
 
 import { askForDeleting } from "../store/actions/overlayActions";
 import { deleteCreateSet } from "../store/actions/deleteSetActions";
-import { notificationError } from "../store/actions/notificationActions";
+import { setNotification } from "../store/actions/notificationActions";
 import {
   changeLocation,
   changeLastLocation,
@@ -45,7 +45,7 @@ const CreateSetContainer = props => {
       removeUnsavedTerm={props.removeUnsavedTerm}
       submitCreateSet={props.submitCreateSet}
       deleteCreateSet={props.deleteCreateSet}
-      notificationError={props.notificationError}
+      setNotification={props.setNotification}
     />
   ) : (
     <></>
@@ -87,7 +87,7 @@ export default compose(
       changeLastLocation,
       setContentHeight,
       askForDeleting,
-      notificationError
+      setNotification
     }
   ),
   firestoreConnect(props => {

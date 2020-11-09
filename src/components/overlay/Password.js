@@ -10,7 +10,7 @@ import {
 } from "../../assets/styles/GlobalStyles";
 
 const Password = ({
-  notificationError,
+  setNotification,
   changePassword,
   openPasswordOverlay
 }) => {
@@ -32,7 +32,7 @@ const Password = ({
     event.preventDefault();
 
     if (login.newpassword.length < 6) {
-      notificationError("The password must be 6 characters long or more.");
+      setNotification("The password must be 6 characters long or more.");
     } else {
       changePassword(login);
     }
