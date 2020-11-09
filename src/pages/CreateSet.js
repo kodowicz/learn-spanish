@@ -11,7 +11,7 @@ const CreateSet = ({
   uid,
   setid,
   setName,
-  unsavedSetTerms,
+  terms,
   newSetKey,
   isSetDeleted,
   isOverlayOpen,
@@ -38,17 +38,17 @@ const CreateSet = ({
 
   useEffect(
     () => {
-      if (isOverlayOpen) setContentHeight(0);
-    },
-    [isOverlayOpen]
-  );
-
-  useEffect(
-    () => {
       setTopic(setName);
       setFilled(setName ? true : false);
     },
     [setName]
+  );
+
+  useEffect(
+    () => {
+      if (isOverlayOpen) setContentHeight(0);
+    },
+    [isOverlayOpen]
   );
 
   function changeTopic(event) {
@@ -60,10 +60,10 @@ const CreateSet = ({
 
   function addTerm(event) {
     event.preventDefault();
-    if (unsavedSetTerms.length === 50) {
+    if (terms.length === 50) {
       notificationError("You've reached a limit of terms");
     } else {
-      addNewUnsavedTerm();
+    addNewUnsavedTerm();
     }
   }
 
@@ -81,18 +81,18 @@ const CreateSet = ({
   } else {
     return (
       <Content setContentHeight={setContentHeight} width={80} desktop={500}>
-        <Form>
+        <form>
           <SetName>
             <NameInput value={topic} maxLength="30" onChange={changeTopic} />
             <NameLabel isFilled={isFilled} htmlFor="name">
               Name your set
             </NameLabel>
-            <Border isBig="true" />
+            <Border />
           </SetName>
 
           <Buttons
             topic={topic}
-            terms={unsavedSetTerms}
+            terms={terms}
             askForDeleting={askForDeleting}
             submitSet={submitCreateSet}
             notificationError={notificationError}
@@ -100,14 +100,14 @@ const CreateSet = ({
 
           <TermsListWrapper>
             <TermsList
-              terms={unsavedSetTerms}
+              terms={terms}
               updateTerm={updateUnsavedTerm}
               removeTerm={removeUnsavedTerm}
             />
           </TermsListWrapper>
 
           <AddButton onClick={addTerm}>add term</AddButton>
-        </Form>
+        </form>
       </Content>
     );
   }
@@ -180,11 +180,11 @@ const SetName = styled.div`
 `;
 
 const NameLabel = styled.label`
+  color: ${colors.azure};
   position: absolute;
   bottom: 2px;
   left: 2px;
   font-size: 20px;
-  color: ${colors.azure};
   transition: opacity 0.1s;
   z-index: -1;
 
@@ -196,11 +196,11 @@ const NameLabel = styled.label`
 `;
 
 const NameInput = styled(BasicInput)`
+  outline-color: ${colors.blue};
+  color: ${colors.white};
   padding: 2px;
   width: 100%;
   font-size: 2rem;
-  outline-color: ${colors.blue};
-  color: ${colors.white};
   user-select: auto;
 
   &:focus + ${NameLabel} {
@@ -209,11 +209,11 @@ const NameInput = styled(BasicInput)`
 `;
 
 const Border = styled.div`
-  width: 100%;
-  height: 2px;
   background: ${colors.white};
   position: absolute;
-  bottom: ${props => (props.isBig ? "-2px" : "10px")};
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
   left: 0;
 `;
 
@@ -222,13 +222,7 @@ const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: space-evenly;
   max-width: 300px;
-
-  ${"" /* @media (min-width: 768px) {
-    ${props => props.iseditable ? 'justify-content: space-between' : false };
-  } */};
 `;
-
-const Form = styled.form``;
 
 const TermsListWrapper = styled.div`
   width: 76vw;

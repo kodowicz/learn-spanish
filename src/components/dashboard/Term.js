@@ -198,7 +198,8 @@ const Term = ({
         <DefineTerm>
           <Textarea
             id="term"
-            lang="es"
+            lang="es-ES"
+            maxLength="60"
             value={state.term}
             rows={rows.termRows}
             onChange={handleChange}
@@ -213,7 +214,8 @@ const Term = ({
         <DefineTerm>
           <Textarea
             id="definition"
-            lang="en"
+            lang="en-US"
+            maxLength="60"
             value={state.definition}
             rows={rows.definitionRows}
             onChange={handleChange}

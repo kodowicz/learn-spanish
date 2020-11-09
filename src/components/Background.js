@@ -33,7 +33,7 @@ export const ContentWrapper = ({
 
   function handlePageScroll() {
     const contentRef = wrapperRef.current.firstChild;
-    const pageScroll = contentRef.getBoundingClientRect().top;
+    const pageScroll = contentRef?.getBoundingClientRect().top || 0;
     const isScrollTop = pageScroll === 0;
 
     setPageScroll(isScrollTop);

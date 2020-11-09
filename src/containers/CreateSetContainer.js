@@ -30,8 +30,8 @@ const CreateSetContainer = props => {
       isOverlayOpen={props.isOverlayOpen}
       isSetDeleted={props.isSetDeleted}
       isEditSubmited={props.isEditSubmited}
-      unsavedSetName={props.unsavedSetName}
-      unsavedSetTerms={props.unsavedSetTerms}
+      setName={props.setName}
+      terms={props.terms}
       isTermAdded={props.isTermAdded}
       isNewTerm={props.isNewTerm}
       newSetKey={props.newSetKey}
@@ -53,13 +53,13 @@ const CreateSetContainer = props => {
 };
 
 const mapStateToProps = state => {
-  const unsavedSetTerms = state.firestore.ordered.unsavedTerms;
-  const unsavedSetName = state.firebase.profile.unsavedSet;
+  const terms = state.firestore.ordered.unsavedTerms;
+  const setName = state.firebase.profile.unsavedSet;
   const uid = state.firebase.auth.uid;
 
   return {
-    unsavedSetTerms,
-    unsavedSetName,
+    terms,
+    setName,
     uid,
     isOverlayOpen: state.isOverlayOpen.isDeleted,
     isSetDeleted: state.isSetDeleted,
@@ -69,7 +69,7 @@ const mapStateToProps = state => {
     newSetKey: state.newSetKey,
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
-    isLoaded: uid ? isLoaded(unsavedSetTerms, unsavedSetName) : true
+    isLoaded: uid ? isLoaded(terms, setName) : true
   };
 };
 

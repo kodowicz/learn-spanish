@@ -1,4 +1,4 @@
-export const createPlaySet = setid => ( dispatch, getState, { getFirebase, getFirestore }) => {
+export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -16,37 +16,32 @@ export const createPlaySet = setid => ( dispatch, getState, { getFirebase, getFi
           learnDetailsRef.set({
             name,
             amount,
+            knowledge: 0,
+            isCompleted: false,
             id: learnDetailsRef.id
           });
         });
 
-        setTermsRef.get().then(snap => {
-          snap.docs.forEach(doc => {
-            const {
-              id,
-              term,
-              definition,
-              time,
-              termRows,
-              definitionRows
-            } = doc.data();
+        setTermsRef
+          .get()
+          .then(snap => {
+            snap.docs.forEach(doc => {
+              const { id, term, definition, time, termRows, definitionRows } = doc.data();
 
-            const playSetRef = firestore.doc(
-              `users/${uid}/learn/${setid}/game/${id}`
-            );
+              const playSetRef = firestore.doc(`users/${uid}/learn/${setid}/game/${id}`);
 
-            playSetRef.set({
-              id,
-              term,
-              definition,
-              time,
-              termRows,
-              definitionRows,
-              ratio: 0,
-              isMastered: false
+              playSetRef.set({
+                id,
+                term,
+                definition,
+                time,
+                termRows,
+                definitionRows,
+                ratio: 0,
+                isMastered: false
+              });
             });
           });
-        });
       }
     })
     .then(() => {
@@ -76,51 +71,54 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
   const newRatio = isCorrect ? item.ratio + 1 : item.ratio - 1;
   const minRatio = 0;
   const maxRatio = 5;
-  let isMastered = item.ratio === 5 ? true : false;
+  let isMastered = item.ratio === 5 ? (newRatio === 6 ? true : false) : false;
   let knowledge;
-  let isCompleted;
+  let wasCompleted;
 
-  const setRef = firestore.doc(`users/${user}/learn/${set}`)
-  const docRef = firestore.doc(`users/${user}/learn/${set}/game/${item.id}`);
-  const knowledgeRef = firestore.doc(`users/${user}/learn/${set}`);
   const userRef = firestore.doc(`users/${user}`);
+  const setRef = firestore.doc(`users/${user}/learn/${set}`);
+  const itemsRef = firestore.collection(`users/${user}/learn/${set}/game`);
+  const docRef = firestore.doc(`users/${user}/learn/${set}/game/${item.id}`);
 
-  setRef.get().then(doc => {
-    isCompleted = doc.data().isCompleted
-  });
+  setRef
+    .get()
+    .then(doc => {
+      const { amount, isCompleted, knowledge: prevKnowledge } = doc.data();
+      wasCompleted = isCompleted;
 
-  knowledgeRef.get().then(doc => {
-    const { amount, knowledge: prevKnowledge } = doc.data();
-
-    if (prevKnowledge) {
-      if (newRatio >= minRatio && newRatio <= maxRatio) {
-        knowledge = prevKnowledge + (isCorrect ? 1 : -1);
+      if (prevKnowledge) {
+        if (newRatio >= minRatio && newRatio <= maxRatio) {
+          knowledge = prevKnowledge + (isCorrect ? 1 : -1);
+        } else {
+          knowledge = prevKnowledge;
+        }
       } else {
-        knowledge = prevKnowledge;
+        knowledge = isCorrect ? 1 : 0;
       }
-    } else {
-      knowledge = isCorrect ? 1 : 0;
-    }
 
-    // mastered all terms
-    if (knowledge == amount * 5 && isMastered && !isCompleted) {
-      setRef.update({
-        isCompleted: true
-      })
-      userRef.update({
-        notification: "Congrats! You know every term!"
-      })
+      itemsRef
+        .get()
+        .then(snapshot => {
+          const isCompleted = snapshot.docs.every(doc => doc.data().isMastered);
 
-    } else if (newRatio < item.ratio && isCompleted) {
-      setRef.update({
-        isCompleted: false
-      })
-    }
-    
-    knowledgeRef.update({
-      knowledge
+          if (isCompleted) {
+            setRef.update({
+              isCompleted: true
+            });
+
+            if (!wasCompleted) {
+              userRef.update({
+                notification: "Congrats! You know every term!"
+              });
+            }
+          } else {
+            setRef.update({
+              knowledge,
+              isCompleted: false
+            });
+          }
+        })
     });
-  });
 
   docRef
     .update({
