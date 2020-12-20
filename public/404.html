@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1 minimum-scale=1.0, maximum-scale = 1.0, user-scalable = no" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:500,600" rel="stylesheet">
+    <title>Page not found | Learn Spanish</title>
+    <meta name="theme-color" content="#663ce2" />
+    <meta name="description" content="Learn Spanish - The most funniest way to learn Spanish words!" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="icon" href="%PUBLIC_URL%/icons/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icons/icon.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="%PUBLIC_URL%/icons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="%PUBLIC_URL%/icons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="%PUBLIC_URL%/icons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="%PUBLIC_URL%/icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="%PUBLIC_URL%/icons/apple-touch-icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/icons/apple-touch-icon-180x180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Learn Spanish">
+    <meta name="msapplication-config" content="browserconfig.xml">
+
+    <style>
+
+      body {
+        font-family: "Open Sans", sans-serif;
+        font-weight: 500;
+        background: #663CE2;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-height: 100vh;
+        height: 100%;
+        background-image: url('./confetti.svg');
+      }
+
+      a {
+        position: fixed;
+        top: 18px;
+        left: 7vw;
+        z-index: 3
+      }
+
+      .arrow {
+        width: 24px;
+        height: 24px;
+      }
+
+      .information {
+        padding: 20vh 15vw 0 15vw;
+        position: relative;
+        color: white;
+        text-align: center;
+        z-index: 2
+      }
+
+      h1 {
+        font-size: 30px;
+        font-weight: 700
+      }
+
+      @media (min-width: 768px) {
+        a {
+          left: 30px;
+        }
+
+        h1 {
+          font-size: 40px;
+          margin: 20px;
+        }
+
+        p {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="background"></div>
+
+    <a href="/">
+      <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 100 100">
+        <path
+          style="fill: none; stroke: white; stroke-width: 7; stroke-linecap: round"
+          d="M5,50 L95,50 M3,50 L19,34 M3,50 L19,66" />
+      </svg>
+    </a>
+
+    <div class="information">
+      <h1>Oooops...</h1>
+      <p>Your last session failed. Please move back to home page.</p>
+    </div>
+  </body>
+</html>
