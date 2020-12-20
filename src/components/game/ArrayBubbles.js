@@ -72,6 +72,10 @@ class ArrayBubbles extends Component {
     };
 
     this.boundaryRef = React.createRef();
+
+    this.handlePicking = this.handlePicking.bind(this);
+    this.handleAnswer = this.handleAnswer.bind(this);
+    this.promptingTimer = this.promptingTimer.bind(this);
   }
 
   componentDidMount() {
@@ -96,7 +100,7 @@ class ArrayBubbles extends Component {
     }
   }
 
-  createGame = () => {
+  createGame() {
     this.setState((state, props) => {
       let nextIndex = 0;
       let tabIndex = 0;
@@ -129,9 +133,9 @@ class ArrayBubbles extends Component {
         bubbles: this.shuffleOptions(bubbles)
       };
     });
-  }
+  };
 
-  chunkString = reducedStr => {
+  chunkString(reducedStr) {
     let bubbles = [];
     let index = 0;
 
@@ -153,7 +157,7 @@ class ArrayBubbles extends Component {
     return bubbles;
   };
 
-  createBubbles = str => {
+  createBubbles(str) {
     let bubbles = [];
     const isLong = str.length < 10 ? true : false;
     const isShort = str.length < 5 ? true : false;
@@ -172,7 +176,7 @@ class ArrayBubbles extends Component {
     return bubbles;
   };
 
-  createLetters = (term, excludedIndexes) => {
+  createLetters(term, excludedIndexes) {
     let letters = [];
 
     letters = term
@@ -185,7 +189,7 @@ class ArrayBubbles extends Component {
     return letters;
   };
 
-  createGroupedWords = (text, excludedIndexes) => {
+  createGroupedWords(text, excludedIndexes) {
     let array = text.split("");
     let groupedWords = [];
     let prevIndex = 0;
@@ -232,7 +236,7 @@ class ArrayBubbles extends Component {
     return groupedWords.filter(subarray => subarray.length);
   };
 
-  getExcludedIndexes = word => {
+  getExcludedIndexes(word) {
     // it won't catch special char like
     const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
     const array = [];
@@ -245,12 +249,12 @@ class ArrayBubbles extends Component {
     return array;
   };
 
-  shuffleOptions = array => {
+  shuffleOptions(array) {
     const newOrder = [...array];
     return newOrder.sort(() => Math.random() - 0.5);
   };
 
-  revealLetters = (currentIndex, groupedWords) => {
+  revealLetters(currentIndex, groupedWords) {
     let leftLetters = currentIndex;
 
     return groupedWords.map(word => {
@@ -266,7 +270,7 @@ class ArrayBubbles extends Component {
     });
   };
 
-  handlePicking = event => {
+  handlePicking(event) {
     const pickedBubble = event.target.id;
     const pickedIndex = event.target.tabIndex;
     let bubbleLength = pickedBubble.length;
@@ -342,14 +346,14 @@ class ArrayBubbles extends Component {
     });
   };
 
-  handleAnswer = () => {
+  handleAnswer() {
     this.setState({
       isCorrect: false,
       isWrong: false
     });
   };
 
-  promptingTimer = () => {
+  promptingTimer() {
     this.setState({
       isPrompting: true
     });

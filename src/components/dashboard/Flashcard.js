@@ -5,11 +5,21 @@ import Speech from "../speech/Speech";
 import { Button, colors, fonts } from "../../assets/styles/GlobalStyles";
 import { shuffle, throwOut } from "../../assets/styles/GlobalKeyframes";
 
+function debounce(fn, delay) {
+  var timer = null;
+  return function() {
+    var context = this,
+      args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      fn.apply(context, args);
+    }, delay);
+  };
+}
+
 export class FrontCard extends Component {
   constructor(props) {
     super(props);
-
-    this.cardRef = React.createRef();
 
     this.state = {
       id: undefined,
@@ -30,9 +40,21 @@ export class FrontCard extends Component {
       position: { x: 0, y: 0 },
       transformCard: { x: 0, y: 0, rotate: 0 },
     };
+
+    this.cardRef = React.createRef();
+
+    this.flipCard = this.flipCard.bind(this);
+    this.animateCard = this.animateCard.bind(this);
+    this.startMoving = this.startMoving.bind(this);
+    this.moveCard = debounce(this.moveCard.bind(this), 1);
+    this.mouseMove = this.mouseMove.bind(this);
+    this.stopMoving = this.stopMoving.bind(this);
+    this.moveLeft = this.moveLeft.bind(this);
+    this.moveRight = this.moveRight.bind(this);
+    this.handleAnimationEnd = this.handleAnimationEnd.bind(this);
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     const cardCenter = this.cardRef.current.getBoundingClientRect();
     const horizontalAmp = this.props.moveEnabled ? 100 : 35;
     this.setState({
@@ -44,7 +66,7 @@ export class FrontCard extends Component {
     });
   }
 
-  flipCard = () => {
+  flipCard() {
     if (this.state.isFlipped) {
       if (!this.state.isMoved) {
         this.setState(prevState => {
@@ -67,11 +89,11 @@ export class FrontCard extends Component {
     }
   };
 
-  animateCard = () => {
+  animateCard() {
     this.setState({ isFlipped: true });
   };
 
-  startMoving = event => {
+  startMoving(event) {
     const pagePosition = event.targetTouches ? event.targetTouches[0] : event;
 
     this.setState({
@@ -83,7 +105,8 @@ export class FrontCard extends Component {
     });
   };
 
-  moveCard = event => {
+  moveCard(event)  {
+    event.persist();
     const pagePosition = event.targetTouches ? event.targetTouches[0] : event;
 
     const position = {
@@ -122,13 +145,13 @@ export class FrontCard extends Component {
     });
   };
 
-  mouseMove = event => {
+  mouseMove(event) {
     if (this.state.isClicked) {
       this.moveCard(event);
     }
   };
 
-  stopMoving = event => {
+  stopMoving(event) {
     const { isMoved, cardCenter, backAmplitude } = this.state;
     const cardPosition = this.cardRef.current.getBoundingClientRect();
 
@@ -150,7 +173,7 @@ export class FrontCard extends Component {
     }
   };
 
-  moveLeft = () => {
+  moveLeft() {
     if (this.props.moveEnabled) {
       this.setState({
         moveLeft: true,
@@ -168,14 +191,14 @@ export class FrontCard extends Component {
     }
   };
 
-  moveRight = () => {
+  moveRight() {
     this.setState({
       moveRight: true,
       isSpeaking: true
     });
   };
 
-  handleAnimationEnd = (event) => {
+  handleAnimationEnd(event) {
     const { item, throwoutCard, shuffleCard } = this.props;
 
     if (event.animationName === throwOut.name) {
@@ -233,7 +256,7 @@ export class FrontCard extends Component {
             </Bottom>
           </Front>
 
-          <Back rotate={rotateBack} onTouchMove={this.moveCard}>
+          <Back rotate={rotateBack}>
             <Top>
               <Term>{definition}</Term>
             </Top>

@@ -36,6 +36,12 @@ class TypeMeaning extends Component {
     this.dashesRef = React.createRef();
     this.firstWordRef = React.createRef();
     this.dashRef = React.createRef();
+
+    this.handleTyping = this.handleTyping.bind(this);
+    this.handleAnswer = this.handleAnswer.bind(this);
+    this.handleFocus = this.handleFocus.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+    this.promptingTimer = this.promptingTimer.bind(this);
   }
 
   componentDidMount() {
@@ -83,7 +89,7 @@ class TypeMeaning extends Component {
     }
   }
 
-  createGame = () => {
+  createGame() {
     this.setState((state, props) => {
       const { item } = props;
       const correctAnswer = item.term.replace(/\n/, "");
@@ -119,7 +125,7 @@ class TypeMeaning extends Component {
     });
   };
 
-  excludeSpaces = word => {
+  excludeSpaces(word) {
     const regex = /\s/g;
     const array = [];
     let match;
@@ -131,7 +137,7 @@ class TypeMeaning extends Component {
     return array;
   };
 
-  createGroupedWords = text => {
+  createGroupedWords(text) {
     let array = text.split("");
     let groupedWords = [];
     let prevIndex = 0;
@@ -164,7 +170,7 @@ class TypeMeaning extends Component {
     return groupedWords.filter(subarray => subarray.length);
   };
 
-  findCurrentLetter = (index, groupedWords) => {
+  findCurrentLetter(index, groupedWords) {
     let inputIndex = index;
     let wordIndex = 0;
     let letterIndex = 0;
@@ -188,7 +194,7 @@ class TypeMeaning extends Component {
     };
   };
 
-  getExcludedIndexes = word => {
+  getExcludedIndexes(word) {
     // it won't catch special char like
     const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
     const array = [];
@@ -201,7 +207,7 @@ class TypeMeaning extends Component {
     return array;
   };
 
-  switchSpecialLetters = (letters, correctLetters) => {
+  switchSpecialLetters(letters, correctLetters) {
     const chars = [
       { basic: "a", regex: /[áàâãäåą]/ },
       { basic: "e", regex: /[éèêëę]/ },
@@ -228,7 +234,7 @@ class TypeMeaning extends Component {
     }
   };
 
-  handleTyping = event => {
+  handleTyping(event) {
     const inputValue = event.target.value.toLowerCase();
 
     this.setState(prevState => {
@@ -299,26 +305,26 @@ class TypeMeaning extends Component {
     });
   };
 
-  handleAnswer = () => {
+  handleAnswer() {
     this.setState({
       isCorrect: false,
       isWrong: false
     });
   };
 
-  handleFocus = event => {
+  handleFocus(event) {
     this.setState({
       isFocused: true
     });
   };
 
-  handleBlur = event => {
+  handleBlur(event) {
     this.setState({
       isFocused: false
     });
   };
 
-  promptingTimer = () => {
+  promptingTimer() {
     this.setState({
       isPrompting: true
     });

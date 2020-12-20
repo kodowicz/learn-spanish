@@ -24,11 +24,11 @@ class ChooseBetweenFour extends Component {
     this.createGame();
   }
 
-  shuffleOptions = array => {
+  shuffleOptions(array) {
     return array.sort(() => Math.random() - 0.5);
   };
 
-  createGame = () => {
+  createGame() {
     this.setState((prevState, props) => {
       const { item, terms } = props;
       const styles = this.termRef.current;
@@ -59,7 +59,7 @@ class ChooseBetweenFour extends Component {
     });
   }
 
-  handleChosenAnswer = answer => {
+  handleChosenAnswer(answer) {
     const { item, showGameAnswer } = this.props;
     const correctAnswer = item.id;
 
@@ -132,7 +132,8 @@ class DefinitionOption extends Component {
 
   render() {
     const { transformStart } = this.state;
-    const delay = this.props.index * 0.5;
+    const { index, children } = this.props;
+    const delay = index * 0.5;
 
     return (
       <>
@@ -141,7 +142,7 @@ class DefinitionOption extends Component {
           transformStart={transformStart}
           ref={this.optionRef}
         >
-          {this.props.children}
+          {children}
         </Definition>
       </>
     );

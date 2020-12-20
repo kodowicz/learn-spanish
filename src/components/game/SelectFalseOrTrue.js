@@ -5,18 +5,25 @@ import { flipOut, flipIn } from '../../assets/styles/GlobalKeyframes';
 
 
 class SelectFalseOrTrue extends Component {
-  state = {
-    isChosen: false,
-    answer: "",
-    term: "",
-    comparisonItem: {}
-  }
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isChosen: false,
+      answer: "",
+      term: "",
+      comparisonItem: {}
+    }
+
+    this.handleChosenAnswer = this.handleChosenAnswer.bind(this);
+    this.handleAnimationEnd = this.handleAnimationEnd.bind(this);
+  };
 
   componentDidMount() {
     this.createGame();
   }
 
-  createGame = () => {
+  createGame() {
     this.setState((prevState, props) => {
       const { item, terms } = props;
       const term = item.term;
@@ -37,7 +44,7 @@ class SelectFalseOrTrue extends Component {
     })
   }
 
-  handleChosenAnswer = (event) => {
+  handleChosenAnswer(event) {
     const answer = event.target.id;
     this.setState({
       answer,
@@ -45,7 +52,7 @@ class SelectFalseOrTrue extends Component {
     })
   }
 
-  handleAnimationEnd = (event) => {
+  handleAnimationEnd(event) {
     if (event.animationName === flipOut.name) {
       const { item, showGameAnswer } = this.props;
       const { answer, comparisonItem } = this.state;
@@ -169,4 +176,4 @@ const Button = styled.button`
   }
 `;
 
-export default SelectFalseOrTrue
+export default SelectFalseOrTrue;

@@ -1,30 +1,33 @@
 import React, { Component } from "react";
 import styled, { css } from "styled-components";
 import { colors } from "../../assets/styles/GlobalStyles";
-import {
-  shake,
-  scale,
-  fadeUp,
-  popIn
-} from "../../assets/styles/GlobalKeyframes";
+import { shake, scale, fadeUp, popIn } from "../../assets/styles/GlobalKeyframes";
 
 class ArrayLetters extends Component {
-  state = {
-    definition: "",
-    userAnswer: "",
-    correctAnswer: "",
-    counter: 0,
-    index: 0,
-    promptingTime: 3000,
-    isPrompting: false,
-    excludedIndexes: [],
-    groupedWords: [],
-    letters: [],
-    promptedLetter: {
-      wordIndex: 0,
-      letterIndex: 0
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      definition: "",
+      userAnswer: "",
+      correctAnswer: "",
+      counter: 0,
+      index: 0,
+      promptingTime: 3000,
+      isPrompting: false,
+      excludedIndexes: [],
+      groupedWords: [],
+      letters: [],
+      promptedLetter: {
+        wordIndex: 0,
+        letterIndex: 0
+      }
     }
-  };
+
+    this.handlePicking = this.handlePicking.bind(this);
+    this.promptingTimer = this.promptingTimer.bind(this);
+    this.handleLettersAnimation = this.handleLettersAnimation.bind(this);
+  }
 
   componentDidMount() {
     this.createGame();
@@ -46,7 +49,7 @@ class ArrayLetters extends Component {
     }
   }
 
-  createGame = () => {
+  createGame() {
     this.setState((state, props) => {
       const correctAnswer = props.item.term;
       const excludedIndexes = this.getExcludedIndexes(correctAnswer);
@@ -78,7 +81,7 @@ class ArrayLetters extends Component {
     });
   };
 
-  randomLetters = (word, index) => {
+  randomLetters(word, index) {
     const alphabet = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "w", "z" ];
     const correctLetter = {
       letter: word[index],
@@ -104,12 +107,12 @@ class ArrayLetters extends Component {
     return letters;
   };
 
-  shuffleOptions = array => {
+  shuffleOptions(array) {
     const newOrder = [...array];
     return newOrder.sort(() => Math.random() - 0.5);
   };
 
-  getExcludedIndexes = word => {
+  getExcludedIndexes(word) {
     const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
     const array = [];
     let match;
@@ -121,7 +124,7 @@ class ArrayLetters extends Component {
     return array;
   };
 
-  createGroupedWords = (text, excludedIndexes) => {
+  createGroupedWords(text, excludedIndexes) {
     let array = text.split("");
     let groupedWords = [];
     let prevIndex = 0;
@@ -168,7 +171,7 @@ class ArrayLetters extends Component {
     return groupedWords.filter(subarray => subarray.length);
   };
 
-  revealLetters = groupedWords => {
+  revealLetters(groupedWords) {
     let leftLetters = 1;
 
     return groupedWords.map(word => {
@@ -184,7 +187,7 @@ class ArrayLetters extends Component {
     });
   };
 
-  findCurrentLetter = (index, groupedWords) => {
+  findCurrentLetter(index, groupedWords) {
     let inputIndex = index;
     let wordIndex = 0;
     let letterIndex = 0;
@@ -208,7 +211,7 @@ class ArrayLetters extends Component {
     };
   };
 
-  checkIfCompleted = array => {
+  checkIfCompleted(array) {
     let counter = 0;
 
     array.forEach(subarray =>
@@ -222,7 +225,7 @@ class ArrayLetters extends Component {
     return counter === 0 ? true : false;
   };
 
-  handlePicking = event => {
+  handlePicking(event) {
     event.persist();
 
     this.setState(
@@ -303,7 +306,7 @@ class ArrayLetters extends Component {
     );
   };
 
-  handleLettersAnimation = () => {
+  handleLettersAnimation() {
     this.setState(state => {
       const letters = state.letters;
       letters.forEach(element => (element.isWrong = false));
@@ -313,7 +316,7 @@ class ArrayLetters extends Component {
     });
   };
 
-  promptingTimer = () => {
+  promptingTimer() {
     this.setState({
       isPrompting: true
     });
