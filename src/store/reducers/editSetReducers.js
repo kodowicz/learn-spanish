@@ -1,8 +1,6 @@
-const initialState = {
-  isDeleted: false
-}
+const initialState = false;
 
-export const setChangesReducer = (state = initialState.isDeleted, action) => {
+export const setChangesReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'SUBMIT_EDITED_SET':
       return action.payload;
@@ -20,8 +18,8 @@ export const setChangesReducer = (state = initialState.isDeleted, action) => {
       return action.payload;
 
     case 'DELETE_CREATED_SET':
-      console.log(action.payload);
       return action.payload;
+
     default:
       return state;
   }

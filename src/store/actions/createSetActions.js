@@ -27,6 +27,8 @@ export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => 
   const firestore = getFirestore();
   const authId = getState().firebase.auth.uid;
   const termsLength = 3;
+  const delay = 1000;
+  let date = Date.now();
   let size;
 
   const unsavedRef = firestore.collection("users").doc(authId).collection("unsaved");
@@ -40,14 +42,15 @@ export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => 
       while (size <= termsLength) {
         let newDocument = unsavedRef.doc();
         let keyId = newDocument.id;
+        let time = new Date(date + (size * delay));
 
         newDocument.set({
+          time,
           id: keyId,
           term: "",
           definition: "",
           termRows: 1,
           definitionRows: 1,
-          time: new Date()
         });
 
         size++;
@@ -134,28 +137,28 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
     .get()
     .then(snap => {
       if (snap.size < 50) {
-      const termRef = termsRef.doc();
+        const termRef = termsRef.doc();
 
-      termRef
-        .set({
-          id: termRef.id,
-          term: "",
-          definition: "",
-          termRows: 1,
-          definitionRows: 1,
-          time: firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-          dispatch({
-            type: "ADD_UNSAVED_NEW_TERM"
+        termRef
+          .set({
+            id: termRef.id,
+            term: "",
+            definition: "",
+            termRows: 1,
+            definitionRows: 1,
+            time: new Date()
+          })
+          .then(() => {
+            dispatch({
+              type: "ADD_UNSAVED_NEW_TERM"
+            });
+          })
+          .catch(error => {
+            dispatch({
+              type: "ADD_UNSAVED_NEW_TERM_ERROR",
+              error
+            });
           });
-        })
-        .catch(error => {
-          dispatch({
-            type: "ADD_UNSAVED_NEW_TERM_ERROR",
-            error
-          });
-        });
       }
     });
 };
@@ -182,29 +185,33 @@ export const submitCreateSet = terms => (dispatch, getState, { getFirestore }) =
         unsavedRef.doc(termid).delete();
       });
 
-      createRef
-        .set({
-          author,
-          name,
-          authorId: uid,
-          id: createRef.id,
-          amount: terms.length
-        });
+      createRef.set({
+        author,
+        name,
+        authorId: uid,
+        id: createRef.id,
+        amount: terms.length
+      });
 
       // user learning set
-      learnRef
-        .set({
-          name,
-          knowledge: 0,
-          isCompleted: false,
-          id: createRef.id,
-          amount: terms.length
-        });
+      learnRef.set({
+        name,
+        knowledge: 0,
+        isCompleted: false,
+        id: createRef.id,
+        amount: terms.length
+      });
 
       terms.forEach(element => {
-        const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
-        const flashcardsRef = firestore.collection(`users/${uid}/learn/${createRef.id}/flashcards/`).doc(termsRef.id);
-        const gameRef = firestore.collection(`users/${uid}/learn/${createRef.id}/game/`).doc(termsRef.id);
+        const termsRef = firestore
+          .collection(`sets/${createRef.id}/terms`)
+          .doc();
+        const flashcardsRef = firestore
+          .collection(`users/${uid}/learn/${createRef.id}/flashcards/`)
+          .doc(termsRef.id);
+        const gameRef = firestore
+          .collection(`users/${uid}/learn/${createRef.id}/game/`)
+          .doc(termsRef.id);
 
         termsRef.set({
           term: element.term,

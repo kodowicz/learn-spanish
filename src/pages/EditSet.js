@@ -41,22 +41,23 @@ const EditSet = ({
 
   useEffect(
     () => {
-      if (isOverlayOpen) setContentHeight(0);
-    },
-    [isOverlayOpen]
-  );
-
-  useEffect(
-    () => {
       setTopic(setName);
       setFilled(setName ? true : false);
     },
     [setName]
   );
 
+  useEffect(
+    () => {
+      if (isOverlayOpen) setContentHeight(0);
+    },
+    [isOverlayOpen]
+  );
+
   function changeTopic(event) {
     const topic = event.target.value;
     setTopic(topic);
+    editSetName(topic);
     setFilled(topic ? true : false);
   }
 
@@ -85,7 +86,7 @@ const EditSet = ({
   } else {
     return (
       <Content setContentHeight={setContentHeight} width={80} desktop={500}>
-        <Form>
+        <form>
           <SetName>
             <NameInput value={topic} maxLength="30" onChange={changeTopic} />
             <NameLabel isFilled={isFilled} htmlFor="name">
@@ -98,7 +99,6 @@ const EditSet = ({
             topic={topic}
             terms={terms}
             askForDeleting={askForDeleting}
-            editSetName={editSetName}
             submitSet={submitEditSet}
             setNotification={setNotification}
           />
@@ -112,7 +112,7 @@ const EditSet = ({
           </TermsListWrapper>
 
           <AddButton onClick={addTerm}>add term</AddButton>
-        </Form>
+        </form>
       </Content>
     );
   }
@@ -122,7 +122,6 @@ const Buttons = ({
   topic,
   terms,
   askForDeleting,
-  editSetName,
   submitSet,
   setNotification
 }) => {
@@ -163,7 +162,6 @@ const Buttons = ({
     } else if (reducedTerms.length < 4) {
       setNotification("You have to create at least 4 terms");
     } else {
-      editSetName(topic);
       submitSet(reducedTerms);
     }
   }
@@ -187,29 +185,32 @@ const SetName = styled.div`
 `;
 
 const NameLabel = styled.label`
+  ${({ isFilled }) =>
+    isFilled &&
+    css`
+      opacity: 0;
+    `};
+
+  color: ${colors.azure};
   position: absolute;
   bottom: 2px;
   left: 2px;
   font-size: 2rem;
-  color: ${colors.azure};
   transition: opacity 0.1s;
   z-index: -1;
 
-  ${props =>
-    props.isFilled &&
-    css`
-      opacity: 0;
-    `} @media (min-width: 768px) {
+  @media (min-width: 768px) {
     font-size: 2.5rem;
   }
 `;
 
 const NameInput = styled(BasicInput)`
+  outline-color: ${colors.blue};
+  color: ${colors.white};
   padding: 2px;
   width: 100%;
   font-size: 2rem;
-  outline-color: ${colors.blue};
-  color: ${colors.white};
+  user-select: auto;
 
   &:focus + ${NameLabel} {
     opacity: 0;
@@ -221,26 +222,20 @@ const NameInput = styled(BasicInput)`
 `;
 
 const Border = styled.div`
-  width: 100%;
-  height: 2px;
   background: ${colors.white};
   position: absolute;
-  bottom: ${props => (props.isBig ? "-2px" : "10px")};
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
   left: 0;
 `;
 
 const ButtonsWrapper = styled.div`
-  margin: 40px auto 60px auto;
+  margin: 4rem auto 6rem auto;
   display: flex;
   justify-content: space-evenly;
-  max-width: 300px;
-
-  ${"" /* @media (min-width: 768px) {
-    ${props => props.iseditable ? 'justify-content: space-between' : false };
-  } */};
+  max-width: 30rem;
 `;
-
-const Form = styled.form``;
 
 const TermsListWrapper = styled.div`
   width: 76vw;
@@ -252,7 +247,7 @@ const TermsListWrapper = styled.div`
 `;
 
 const AddButton = styled(Button)`
-  margin: 50px auto;
+  margin: 5rem auto;
 `;
 
 export default EditSet;
