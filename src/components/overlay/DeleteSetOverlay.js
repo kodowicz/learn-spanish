@@ -42,13 +42,13 @@ const DeleteSetOverlay = ({
 
   return (
     <Background ref={backgroundRef} onClick={handleCancel}>
-      <Dialog role="alertdialog" aria-describedby="info">
+      <Dialog height="28" role="alertdialog" aria-describedby="info">
         <Alert id="info">Are you sure you want to delete this set?</Alert>
-        <Buttons>
+        <Buttons height="10">
           <Button color={colors.navy} center="true" onClick={handleDecline}>
             go back
           </Button>
-          <Button color={colors.warming} center="true" onClick={handleDelete}>
+          <Button color={colors.warning} center="true" onClick={handleDelete}>
             delete
           </Button>
         </Buttons>

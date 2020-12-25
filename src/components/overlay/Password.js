@@ -46,7 +46,7 @@ const Password = ({
 
   return (
     <Background ref={backgroundRef} onClick={handleCancel}>
-      <Dialog aria-labelledby="change-password" onSubmit={handleSubmit}>
+      <Dialog height="30" aria-labelledby="change-password" onSubmit={handleSubmit}>
         <Alert id="change-password">Change your password</Alert>
 
         <Wrapper>

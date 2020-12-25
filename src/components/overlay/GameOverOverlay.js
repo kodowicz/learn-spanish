@@ -35,10 +35,10 @@ const GameOverOverlay = ({ setid, finishGame }) => {
   } else {
     return (
       <Background>
-        <Dialog role="alertdialog" aria-describedby="info">
+        <Dialog height="31" role="alertdialog" aria-describedby="info">
           <Header id="info">time is over!</Header>
           <Alert>Do you want to keep learning?</Alert>
-          <Buttons>
+          <Buttons height="10">
             <Button color={colors.navy} center="true" onClick={handleCancel}>
               quit
             </Button>

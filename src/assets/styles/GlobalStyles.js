@@ -254,15 +254,15 @@ export const Background = styled.div`
 `;
 
 export const Dialog = styled.div`
+  height: ${props => `${props.height}rem`};
+  box-shadow: 10px 10px 20px ${colors.shadow};
+  background: ${colors.white};
+  color: ${colors.navy};
   position: absolute;
   top: 50%;
   left: 50%;
   width: 25rem;
-  height: 30rem;
-  background: ${colors.white};
-  color: ${colors.navy};
   border-radius: 15px;
-  box-shadow: 10px 10px 20px ${colors.shadow};
   transform: translate(-50%, -50%);
   padding: 2rem;
 `;
@@ -274,7 +274,7 @@ export const Alert = styled.p`
 `;
 
 export const Buttons = styled.div`
-  height: 10rem;
+  height: ${props => `${props.height}rem`};
   display: flex;
   flex-direction: column;
   justify-content: space-between;

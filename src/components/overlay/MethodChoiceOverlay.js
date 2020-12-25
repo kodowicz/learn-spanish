@@ -36,6 +36,11 @@ const MethodChoiceOverlay = ({
     createPlaySet(setid);
   }
 
+  function handleWriteChoice() {
+    setChosenMethod("write");
+    createPlaySet(setid);
+  }
+
   useEffect(() => {
     return () => {
       chooseMethod(false);
@@ -44,24 +49,37 @@ const MethodChoiceOverlay = ({
 
   if (!signedUser) {
     return <Redirect to="/signup" />;
+
   } else if (chosenMethod === "learn") {
     return <Redirect to={`/learn/${setid}`} />;
+
   } else if (chosenMethod === "play") {
     return <Redirect to={`/play/${setid}`} />;
+
+  } else if (chosenMethod === "write") {
+    return <Redirect to={`/write/${setid}`} />;
+
   } else {
     return (
       <Background ref={backgroundRef} onClick={handleCancel}>
-        <Dialog role="alertdialog" aria-describedby="info">
+        <Dialog height="35" role="alertdialog" aria-describedby="info">
           <Alert id="info">
             Do you want to learn words by flashcards or by game?
           </Alert>
-          <Buttons>
+          <Buttons height="15">
             <Button
               color={colors.navy}
               center="true"
               onClick={handleLearnChoice}
             >
               flashcards
+            </Button>
+            <Button
+              color={colors.navy}
+              center="true"
+              onClick={handleWriteChoice}
+            >
+              write
             </Button>
             <Button
               color={colors.navy}

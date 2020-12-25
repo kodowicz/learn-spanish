@@ -138,6 +138,10 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
     });
 };
 
+export const cleanWriting = () => ({
+  type: "CLEAN_WRITE"
+});
+
 export const setAnimationEnd = isFinished => ({
   type: "ANIMATION_END",
   payload: isFinished

@@ -40,9 +40,9 @@ const StopLearningOverlay = ({ setid, cancelSesion }) => {
 
   return (
     <Background ref={backgroundRef} onClick={handleCancel}>
-      <Dialog role="alertdialog" aria-describedby="info">
+      <Dialog height="28" role="alertdialog" aria-describedby="info">
         <Alert id="info">Are you sure you want to finish learning?</Alert>
-        <Buttons>
+        <Buttons height="10">
           <Button
             color={colors.navy}
             center="true"

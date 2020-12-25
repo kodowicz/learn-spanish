@@ -10,6 +10,7 @@ import EditSet from "../containers/EditSetContainer";
 import CreateSet from "../containers/CreateSetContainer";
 import LearnSet from "../containers/LearnSetContainer";
 import PlaySet from "../containers/PlaySetContainer";
+import WriteSet from "../containers/WriteSetContainer";
 import Search from "../containers/SearchContainer";
 import Notification from "../containers/NotificationContainer";
 import ContentWrapper from "../containers/ContentContainer";
@@ -23,7 +24,7 @@ const App = () => (
     <Route component={Navbar} />
     <Route component={Notification} />
     <Behavior />
-    <Background>
+    <Background />
     <ContentWrapper>
       <GlobalStyle />
       <Switch>
@@ -33,13 +34,13 @@ const App = () => (
         <Route path="/create" component={CreateSet} />
         <Route path="/learn/:id" component={LearnSet} />
         <Route path="/play/:id" component={PlaySet} />
+        <Route path="/write/:id" component={WriteSet} />
         <Route path="/signup" component={Login} />
         <Route path="/profile/:user" component={ViewProfile} />
         <Route path="/search" component={Search} />
         <Route path="*" component={NotFoundPage} />
       </Switch>
     </ContentWrapper>
-    </Background>
   </BrowserRouter>
 );
 
