@@ -297,6 +297,7 @@ const Textarea = styled(BasicTextArea)`
   line-height: 1.8rem;
   width: 100%;
   height: auto;
+  cursor: pointer;
 `;
 
 const Border = styled.div`

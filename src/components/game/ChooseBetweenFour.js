@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled, { css } from "styled-components";
 import { colors } from "../../assets/styles/GlobalStyles";
-import { popIn, pulse, moveBackards, pulseShadow } from "../../assets/styles/GlobalKeyframes";
+import { popIn, moveBackards, pulseShadow } from "../../assets/styles/GlobalKeyframes";
 
 class ChooseBetweenFour extends Component {
   constructor(props) {
@@ -182,7 +182,7 @@ const Definition = styled.p`
   z-index: 2;
 
   &::before {
-    animation: ${pulse} 3s infinite 2s;
+    animation: ${pulseShadow} 3s infinite 2s;
     content: "";
     position: absolute;
     top: 50%;

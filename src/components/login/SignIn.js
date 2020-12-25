@@ -36,6 +36,7 @@ const SignIn = ({ signIn }) => {
           id="email"
           name="email"
           type="email"
+          autoComplete="email"
           onChange={handleChange}
         />
       </Wrapper>
@@ -46,13 +47,12 @@ const SignIn = ({ signIn }) => {
           id="password"
           name="password"
           type="password"
+          autoComplete="new-password"
           onChange={handleChange}
         />
       </Wrapper>
 
-      <Button color={colors.white} center="true">
-        sign in
-      </Button>
+      <Button center="true">sign in</Button>
     </Form>
   );
 };

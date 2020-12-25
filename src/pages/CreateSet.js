@@ -180,19 +180,23 @@ const SetName = styled.div`
 `;
 
 const NameLabel = styled.label`
+  ${({ isFilled }) =>
+    isFilled &&
+    css`
+      opacity: 0;
+    `};
+
   color: ${colors.azure};
   position: absolute;
   bottom: 2px;
   left: 2px;
-  font-size: 20px;
+  font-size: 2rem;
   transition: opacity 0.1s;
   z-index: -1;
 
-  ${props =>
-    props.isFilled &&
-    css`
-      opacity: 0;
-    `};
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const NameInput = styled(BasicInput)`
@@ -206,6 +210,10 @@ const NameInput = styled(BasicInput)`
   &:focus + ${NameLabel} {
     opacity: 0;
   }
+
+  @media (min-width: 768px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const Border = styled.div`
@@ -218,10 +226,10 @@ const Border = styled.div`
 `;
 
 const ButtonsWrapper = styled.div`
-  margin: 40px auto 60px auto;
+  margin: 4rem auto 6rem auto;
   display: flex;
   justify-content: space-evenly;
-  max-width: 300px;
+  max-width: 30rem;
 `;
 
 const TermsListWrapper = styled.div`
@@ -234,7 +242,7 @@ const TermsListWrapper = styled.div`
 `;
 
 const AddButton = styled(Button)`
-  margin: 50px auto;
+  margin: 5rem auto;
 `;
 
 export default CreateSet;

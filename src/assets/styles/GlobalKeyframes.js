@@ -220,7 +220,7 @@ export const blink = keyframes`
   }
 `;
 
-const zoomInOut = keyframes`
+export const zoomInOut = keyframes`
   from {
     opacity: 0;
     transform: translate(-50%,-50%) scale3d(1.3, 1.3, 1.3);
@@ -246,7 +246,7 @@ const zoomInOut = keyframes`
   }
 `;
 
-const fadeInOut = keyframes`
+export const fadeInOut = keyframes`
   from {
     opacity: 0;
     transform: translate(-50%, -50%) scale3d(0.6, 0.6, 0.6);

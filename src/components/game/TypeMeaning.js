@@ -460,7 +460,7 @@ const InputWrapper = styled.div`
     ${({ isInputWrong }) =>
       isInputWrong
         ? css`
-            border: 1px solid ${colors.warming};
+            border: 1px solid ${colors.warning};
           `
         : css`
             border: 1px solid ${colors.white};
@@ -490,7 +490,7 @@ const Input = styled(BasicTextArea)`
   ${({ isInputWrong }) =>
     isInputWrong
       ? css`
-          color: ${colors.warming};
+          color: ${colors.warning};
         `
       : css`
           color: ${colors.white};
@@ -590,7 +590,7 @@ const Dash = styled.span`
         `
       : isInputWrong
         ? css`
-            border-bottom: 1px solid ${colors.warming};
+            border-bottom: 1px solid ${colors.warning};
           `
         : css`
             border-bottom: 1px solid ${colors.white};

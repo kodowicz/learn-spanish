@@ -108,7 +108,7 @@ const Description = ({ signedUser, setDetails, percentage, width }) => (
         <Progress>
           <ProgressBar
             percentage={percentage}
-            width={`${width}rem`}
+            width={width}
             bgColor={colors.progress}
           />
         </Progress>
@@ -225,18 +225,15 @@ const Progress = styled.figure`
 `;
 
 const ButtonsWrapper = styled.div`
-  margin: 40px auto 60px auto;
+  margin: 4rem auto 6rem auto;
   display: flex;
   justify-content: space-evenly;
-  max-width: 300px;
+  max-width: 30rem;
 
   @media (min-width: 768px) {
     justify-content: ${props =>
-      props.iseditable
-        ? "space-between"
-        : "flex-start"
-      };
-    margin: 40px 0 60px;
+      props.iseditable ? "space-between" : "flex-start"};
+    margin: 4rem 0 6rem;
   }
 `;
 
@@ -310,13 +307,13 @@ const SetWrapper = styled(BlockElement)`
 
   @media (min-width: 768px) {
     padding: 2rem 3.5rem;
-    grid-template-rows: 1fr;
+    grid-template-rows: max-content;
     align-items: center;
 
     ${({ isUserSet }) =>
       isUserSet
         ? css`
-            grid-template-columns: 1fr 6rem 2px 1fr;
+            grid-template-columns: 1fr 6rem 2px 45%;
             grid-column-gap: 3.5rem;
           `
         : css`
@@ -328,22 +325,13 @@ const SetWrapper = styled(BlockElement)`
 
 const Term = styled.p`
   font-weight: ${props =>
-    props.id === "term"
-      ? `${fonts.bold}`
-      : `${fonts.semiBold}`
-  };
-  font-size: ${props =>
-    props.id === "term"
-      ? "1.6rem"
-      : "1.4rem"
-  };
+    props.id === "term" ? `${fonts.bold}` : `${fonts.semiBold}`};
+  font-size: ${props => (props.id === "term" ? "1.6rem" : "1.4rem")};
   color: ${props =>
-    props.id === "term"
-      ? `${colors.white}`
-      : `${colors.lightGray}`
-  };
+    props.id === "term" ? `${colors.white}` : `${colors.lightGray}`};
   margin: 0;
   white-space: pre-line;
+  word-break: break-word;
   user-select: text;
 `;
 
@@ -354,7 +342,7 @@ const Line = styled.div`
     background: ${colors.darkGray};
     grid-column: span 1;
     width: 2px;
-    height: 2rem;
+    height: 100%;
   }
 `;
 

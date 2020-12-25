@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { colors, fonts } from '../../assets/styles/GlobalStyles';
 import { flipOut, flipIn } from '../../assets/styles/GlobalKeyframes';
 
@@ -111,6 +111,15 @@ const GameWrapper = styled.div`
 `;
 
 const Question = styled.div`
+  ${({ isChosen }) =>
+    isChosen
+      ? css`
+          animation: ${flipOut} 0.5s linear forwards;
+        `
+      : css`
+          animation: ${flipIn} 0.5s linear;
+        `};
+
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -123,11 +132,6 @@ const Question = styled.div`
   background: rgba(65, 33, 160, 0.5);
   border-radius: 4rem;
   padding: 2rem;
-  animation: ${flipIn} 0.5s linear;
-
-  ${({ isChosen }) => isChosen && css`
-    animation: ${flipOut} 0.5s linear forwards
-  `};
 `;
 
 const Term = styled.p`
@@ -145,11 +149,11 @@ const Definition = styled.p`
 `;
 
 const ButtonsWrapper = styled.div`
-  margin: 40px auto 60px auto;
+  margin: 4rem auto 6rem auto;
   display: flex;
   justify-content: space-between;
   width: 60vw;
-  max-width: 300px;
+  max-width: 30rem;
 `;
 
 const Button = styled.button`
@@ -167,8 +171,8 @@ const Button = styled.button`
   transition: transform .2s;
 
   &:focus, &:active {
-    transform: translateY(2px);
     background: ${colors.shadow};
+    transform: translateY(2px);
   }
 
   @media (min-width: 768px) {

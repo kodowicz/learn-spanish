@@ -1,9 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 
-import styled from 'styled-components';
-import { colors } from '../../assets/styles/GlobalStyles';
-
+import { colors } from "../../assets/styles/GlobalStyles";
 
 const Menu = ({
   uid,
@@ -12,52 +11,45 @@ const Menu = ({
   askForDeleting,
   createBasicTerms
 }) => {
-
-  const handleButton = () => {
+  function handleButton() {
     chooseMethod(false);
     askForDeleting(false);
     handleMenu(false);
   }
-  const handleMenuButton = (event) => {
+
+  function handleMenuButton(event) {
     handleButton();
     event.target.blur();
   }
 
-  const handleCreateButton = (event) => {
-    handleButton();
-    event.target.blur();
-    createBasicTerms()
+  function handleCreateButton(event) {
+    if (uid) {
+      handleButton();
+      event.target.blur();
+      createBasicTerms();
+    }
   }
 
   return (
     <Wrapper>
-      <LinkAnchor
-        onClick={handleMenuButton}
-        to="/">
+      <LinkAnchor onClick={handleMenuButton} to="/">
         home
       </LinkAnchor>
 
-      <LinkAnchor
-        onClick={handleMenuButton}
-        to="/search/">
+      <LinkAnchor onClick={handleMenuButton} to="/search/">
         search
       </LinkAnchor>
 
-      <LinkAnchor
-        onClick={handleCreateButton}
-        to="/create/">
+      <LinkAnchor onClick={handleCreateButton} to="/create/">
         create
       </LinkAnchor>
 
-      <LinkAnchor
-        onClick={handleMenuButton}
-        to={`/profile/${uid}`}>
+      <LinkAnchor onClick={handleMenuButton} to={`/profile/${uid}`}>
         profile
       </LinkAnchor>
     </Wrapper>
-  )
+  );
 };
-
 
 const Wrapper = styled.div`
   position: relative;
@@ -71,29 +63,31 @@ const Wrapper = styled.div`
   @media (min-width: 768px) {
     flex-direction: row;
     height: auto;
-    width: 25rem;
+    width: 30rem;
     margin-top: 0;
   }
 `;
 
 const LinkAnchor = styled(Link)`
   color: ${colors.white};
+  font-weight: 600;
   text-decoration: none;
   font-size: 2rem;
-  transition: transform .2s;
+  transition: transform 0.2s;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     transform: translateX(5px);
   }
 
   @media (min-width: 768px) {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       transform: translateY(-2px);
     }
   }
 `;
 
-
-export default Menu
+export default Menu;

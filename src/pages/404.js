@@ -1,7 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import { colors, fonts } from '../assets/styles/GlobalStyles';
-
+import React from "react";
+import styled from "styled-components";
+import { colors, fonts } from "../assets/styles/GlobalStyles";
 
 const NotFoundPage = () => (
   <>
@@ -29,7 +28,7 @@ const Header = styled.h1`
 
   @media (min-width: 768px) {
     font-size: 5rem;
-    margin: 2rem
+    margin: 2rem;
   }
 `;
 
@@ -53,5 +52,4 @@ const Background = styled.span`
   }
 `;
 
-
-export default NotFoundPage
+export default NotFoundPage;

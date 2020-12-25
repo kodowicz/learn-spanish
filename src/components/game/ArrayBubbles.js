@@ -413,6 +413,7 @@ class ArrayBubbles extends Component {
                   <Letter
                     letter={letter}
                     index={letterIndex}
+                    isWrong={isWrong}
                     isVisible={isVisible}
                     key={letterIndex}
                   >
@@ -574,10 +575,14 @@ const Bubble = styled.div`
 
 const AnswerWrapper = styled.div`
   ${({ isWrong }) =>
-    isWrong &&
-    css`
-      animation: ${shake} 0.5s linear;
-    `};
+    isWrong
+      ? css`
+          animation: ${shake} 0.5s linear;
+          border: 1px solid ${colors.warning};
+        `
+      : css`
+          border: 1px solid ${colors.white};
+        `};
 
   ${({ isCorrect }) =>
     isCorrect &&
@@ -586,7 +591,6 @@ const AnswerWrapper = styled.div`
     `};
 
   position: relative;
-  border: 1px solid white;
   border-radius: 4rem;
   display: flex;
   align-items: center;
@@ -611,27 +615,34 @@ const Word = styled.div`
 `;
 
 const Letter = styled.span`
-  width: ${({ letter }) => letter === " " && "1rem"};
   height: 3rem;
+  font-size: 2.4rem;
+  display: inline-block;
+  transition: transform 0.1s ease-out;
 
-  ${({ isVisible }) =>
-    !isVisible &&
-    css`
-      color: transparent;
-    `};
+  ${({ isVisible, isWrong }) =>
+    isVisible
+      ? isWrong &&
+        css`
+          color: ${colors.warning};
+        `
+      : css`
+          color: transparent;
+        `};
 
-  ${({ letter }) =>
+  ${({ letter, isWrong }) =>
     letter === " "
       ? css`
           width: 1rem;
           border: none;
         `
-      : css`
-          border-bottom: 1px solid white;
-        `};
-  font-size: 2.4rem;
-  display: inline-block;
-  transition: transform 0.1s ease-out;
+      : isWrong
+        ? css`
+            border-bottom: 1px solid ${colors.warning};
+          `
+        : css`
+            border-bottom: 1px solid ${colors.white};
+          `};
 `;
 
 export default ArrayBubbles;

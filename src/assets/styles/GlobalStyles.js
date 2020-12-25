@@ -14,7 +14,7 @@ export const colors = {
   progress: "#A080FF",
   darkGray: "#BDA7FF",
   lightGray: "#EDE7FF",
-  warming: "#F65D5D",
+  warning: "#F65D5D",
   navyBoxShadow: "rgba(7, 22, 124, 0.2)"
 };
 
@@ -96,7 +96,7 @@ export const GlobalStyle = createGlobalStyle`
 
 export const BlockElement = styled.div`
   background: ${colors.bluish};
-  border-radius: 15px;
+  border-radius: 1.5rem;
 `;
 
 const mutualButton = {
@@ -107,6 +107,7 @@ const mutualButton = {
   fontSize: "1.4rem",
   borderRadius: "50px",
   transition: "transform 0.2s",
+  outline: "none",
   cursor: "pointer"
 };
 
@@ -114,15 +115,28 @@ export const Button = styled.button`
   ${css({
     ...mutualButton
   })};
-  margin: ${props => (props.center ? "0 auto" : 0)};
-  color: ${({ color }) => color || `${colors.white}`};
-  border: 1px solid ${({ color }) => color || `${colors.white}`};
+  margin: ${props => props.center ? "0 auto" : 0};
   text-align: center;
   background: transparent;
 
-  &:focus {
-    transform: translateY(2px);
-  }
+  ${(props) => {
+    const color = props.color || colors.white;
+    const hoverColor = props.color || colors.navy;
+    const hoverBg = colors.white;
+
+    return css`
+      color: ${color};
+      border: 1px solid ${color};
+
+      &:hover, &:focus {
+        color: ${hoverColor};
+        background: ${hoverBg};
+      };
+
+      &:focus {
+        transform: translateY(2px)
+      };
+  `}}
 `;
 
 const Anchor = styled(Link)`
@@ -130,19 +144,27 @@ const Anchor = styled(Link)`
     ...mutualButton
   })};
   margin: ${props => (props.center ? "0 auto" : 0)};
-  color: ${({ color }) => color || `${colors.white}`};
-  border: 1px solid ${({ color }) => color || `${colors.white}`};
   position: relative;
   text-decoration: none;
 
-  &:hover {
-    color: ${colors.blue};
-    background: ${colors.white};
-  }
+  ${(props) => {
+    const color = props.color || colors.white;
+    const hoverColor = colors.navy;
+    const hoverBg = colors.white;
 
-  &:focus {
-    transform: translateY(2px);
-  }
+    return css`
+      color: ${color};
+      border: 1px solid ${color};
+
+      &:hover, &:focus {
+        color: ${hoverColor};
+        background: ${hoverBg};
+      };
+
+      &:focus {
+        transform: translateY(2px)
+      };
+  `}}
 `;
 
 const AnchorWrapper = styled.span`
@@ -191,7 +213,6 @@ const mutualInputs = {
   fontFamily: fonts.family,
   background: "none",
   border: "none",
-  outline: "none",
   overflow: "hidden",
   height: "auto",
   resize: "none",
@@ -213,6 +234,8 @@ export const BasicTextArea = styled.textarea`
   ${css({
     ...mutualInputs
   })};
+
+  outline: none;
 `;
 
 /* login styles */
@@ -239,9 +262,11 @@ export const Label = styled.label`
 export const Input = styled(BasicInput)`
   color: ${colors.navy};
   background: ${colors.white};
-  border-radius: 30px;
+  outline-color: ${colors.navy};
+  border-radius: 3rem;
   padding: 1rem 1.8rem;
   width: 100%;
+  cursor: pointer;
 `;
 
 /* overlay styles */

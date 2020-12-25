@@ -44,6 +44,7 @@ const SignUp = ({ signUp, signUpError }) => {
           id="email"
           name="email"
           type="email"
+          autoComplete="email"
           onChange={handleChange}
         />
       </Wrapper>
@@ -54,6 +55,7 @@ const SignUp = ({ signUp, signUpError }) => {
           id="username"
           name="name"
           type="text"
+          autoComplete="username"
           onChange={handleChange}
         />
       </Wrapper>
@@ -64,6 +66,7 @@ const SignUp = ({ signUp, signUpError }) => {
           id="password"
           name="password"
           type="password"
+          autoComplete="new-password"
           onChange={handleChange}
         />
       </Wrapper>
@@ -74,13 +77,12 @@ const SignUp = ({ signUp, signUpError }) => {
           id="confirm"
           name="confirm"
           type="password"
+          autoComplete="new-password"
           onChange={handleChange}
         />
       </Wrapper>
 
-      <Button color={colors.white} center="true">
-        sign up
-      </Button>
+      <Button center="true">sign up</Button>
     </Form>
   );
 };
