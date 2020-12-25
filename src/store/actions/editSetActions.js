@@ -24,23 +24,11 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
       setTermsRef.get().then(snapshot => {
         if (snap.empty) {
           snapshot.forEach(doc => {
-            const {
-              id,
-              term,
-              definition,
-              ratio,
-              time,
-              termRows,
-              definitionRows
-            } = doc.data();
+            const { id, term, definition } = doc.data();
             const termRef = editTermsRef.doc(id);
 
             termRef.set({
-              id,
-              time,
-              termRows,
-              definitionRows,
-              ratio,
+              ...doc.data(),
               term: /^\.\.\.$/g.test(term) ? "" : term,
               definition: /^\.\.\.$/g.test(definition) ? "" : definition
             });
@@ -70,9 +58,7 @@ export const editSetName = name => (dispatch, getState, { getFirestore }) => {
   const userRef = firestore.doc(`users/${uid}`);
 
   userRef
-    .update({
-      editedSet: name
-    })
+    .update({ editedSet: name })
     .then(() => {
       dispatch({
         type: "EDIT_SET_NAME"
@@ -99,12 +85,7 @@ export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
     .get()
     .then(thisDoc => {
       if (thisDoc.exists) {
-        docRef.update({
-          term: element.term,
-          definition: element.definition,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
-        });
+        docRef.update({ ...element });
       }
     })
     .then(() => {
@@ -155,13 +136,13 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore }) => {
 
   termRef
     .set({
-      id: termRef.id,
       term: "",
       definition: "",
-      time: firestore.FieldValue.serverTimestamp(),
       ratio: 0,
       termRows: 1,
-      definitionRows: 1
+      definitionRows: 1,
+      id: termRef.id,
+      time: firestore.FieldValue.serverTimestamp()
     })
     .then(() => {
       dispatch({
@@ -177,7 +158,7 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore }) => {
 };
 
 // submit changes swapping editSet with sets/setid
-export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFirestore }) => {
+export const submitEditSet = terms => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const setid = getState().navigation.setid;
@@ -187,6 +168,9 @@ export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFi
   const setRef = firestore.doc(`sets/${setid}`);
   const userRef = firestore.doc(`users/${uid}`);
   const learnRef = firestore.doc(`users/${uid}/learn/${setid}`);
+  const gameRef = firestore.collection(`users/${uid}/learn/${setid}/game`);
+  const flashcardsRef = firestore.collection(`users/${uid}/learn/${setid}/flashcards`);
+  const setTermsRef = firestore.collection(`sets/${setid}/terms`);
 
   // update a new set name
   setRef.update({
@@ -202,8 +186,7 @@ export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFi
   userRef.update({ editedSet: "" });
 
   // delete all set terms
-  learnRef
-    .collection("game")
+  gameRef
     .get()
     .then(snapshot => {
       snapshot.forEach(doc => {
@@ -212,15 +195,12 @@ export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFi
     })
     .then(() => {
       terms.forEach(element => {
-        const playRef = firestore.doc(
-          `users/${uid}/learn/${setid}/game/${element.id}`
-        );
+        const playRef = gameRef.doc(element.id);
         playRef.set({ ...element });
       });
     });
 
-  learnRef
-    .collection("flashcards")
+  flashcardsRef
     .get()
     .then(snapshot => {
       snapshot.forEach(doc => {
@@ -229,24 +209,12 @@ export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFi
     })
     .then(() => {
       terms.forEach(element => {
-        const {
-          id,
-          term,
-          definition,
-          time,
-          termRows,
-          definitionRows
-        } = element;
-        const learnRef = firestore.doc(
-          `users/${uid}/learn/${setid}/flashcards/${id}`
-        );
-
-        learnRef.set({ id, term, definition, time, termRows, definitionRows });
+        const learnRef = flashcardsRef.doc(element.id);
+        learnRef.set({ ...element });
       });
     });
 
-  setRef
-    .collection("terms")
+  setTermsRef
     .get()
     .then(snapshot => {
       snapshot.forEach(doc => {
@@ -255,17 +223,8 @@ export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFi
     })
     .then(() => {
       terms.forEach(element => {
-        const {
-          id,
-          term,
-          definition,
-          time,
-          termRows,
-          definitionRows
-        } = element;
-        const termRef = firestore.doc(`sets/${setid}/terms/${id}`);
-
-        termRef.set({ id, term, definition, time, termRows, definitionRows });
+        const termRef = setTermsRef.doc(element.id);
+        termRef.set({ ...element });
       });
     });
 
@@ -289,41 +248,6 @@ export const submitEditSet = terms => ( dispatch, getState, { getFirebase, getFi
     .catch(error => {
       dispatch({
         type: "SUBMIT_EDITED_SET_ERROR",
-        error
-      });
-    });
-};
-
-export const deleteSetChanges = () => ( dispatch, getState, { getFirestore }) => {
-  const firestore = getFirestore();
-  const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
-
-  const editedRef = firestore.doc(`users/${uid}/edit/${setid}`);
-  const editedTermsRef = editedRef.collection("terms");
-  const userRef = firestore.doc(`users/${uid}`);
-
-  userRef.update({ editedSet: "" });
-
-  editedTermsRef
-    .get()
-    .then(snapshot => {
-      snapshot.forEach(doc => {
-        doc.ref.delete();
-      });
-    })
-    .then(() => {
-      editedRef.delete();
-    })
-    .then(() => {
-      dispatch({
-        type: "DELETE_SET_CHANGES",
-        payload: true
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: "DELETE_SET_CHANGES_ERROR",
         error
       });
     });

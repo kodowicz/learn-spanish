@@ -1,10 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
-import { colors } from '../assets/styles/GlobalStyles';
-
+import React from "react";
+import styled from "styled-components";
+import { colors } from "../assets/styles/GlobalStyles";
 
 const Knowledge = ({ ratio }) => {
-  const dots = Array(5).fill(false).fill(true, 0, ratio);
+  const dots = Array(5)
+    .fill(false)
+    .fill(true, 0, ratio);
 
   return (
     <Dots>
@@ -12,9 +13,8 @@ const Knowledge = ({ ratio }) => {
         <Dot key={index} isFilled={dot} />
       )}
     </Dots>
-  )
+  );
 };
-
 
 const Dots = styled.div`
   width: 5rem;
@@ -25,17 +25,19 @@ const Dots = styled.div`
 
   @media (min-width: 768px) {
     padding: 0;
-    width: 6rem
+    width: 6rem;
   }
 `;
 
 const Dot = styled.div`
-  background: ${({ isFilled }) =>
-    isFilled ? `${colors.white}` : `${colors.darkGray}`
-  };
+  background: ${ props =>
+    props.isFilled ?
+      `${colors.white}` :
+      `${colors.darkGray}`
+    };
   width: 0.7rem;
   height: 0.7rem;
   border-radius: 1rem;
 `;
 
-export default Knowledge
+export default Knowledge;

@@ -22,7 +22,7 @@ class ArrayLetters extends Component {
         wordIndex: 0,
         letterIndex: 0
       }
-    }
+    };
 
     this.handlePicking = this.handlePicking.bind(this);
     this.promptingTimer = this.promptingTimer.bind(this);
@@ -43,6 +43,7 @@ class ArrayLetters extends Component {
 
       if (counter === 3) {
         window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
+
       } else if (isFinished) {
         window.setTimeout(() => showGameAnswer(item, "correct"), 500);
       }
@@ -79,10 +80,9 @@ class ArrayLetters extends Component {
         definition: props.item.definition
       };
     });
-  };
+  }
 
   randomLetters(word, index) {
-    const alphabet = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "w", "z" ];
     const correctLetter = {
       letter: word[index],
       isWrong: false,
@@ -91,12 +91,12 @@ class ArrayLetters extends Component {
     let letters = [correctLetter];
 
     while (letters.length < 5) {
-      const index = Math.floor(Math.random() * alphabet.length);
-      const isTaken = letters.some(el => el.letter === alphabet[index]);
+      const letter = Math.random().toString(36).replace(/[^a-z]+/g, "")[0];
+      const isTaken = letters.some(el => el.letter === letter);
 
       if (!isTaken) {
         const wrongLetter = {
-          letter: alphabet[index],
+          letter,
           isWrong: false,
           isScaled: true
         };
@@ -105,12 +105,12 @@ class ArrayLetters extends Component {
     }
 
     return letters;
-  };
+  }
 
   shuffleOptions(array) {
     const newOrder = [...array];
     return newOrder.sort(() => Math.random() - 0.5);
-  };
+  }
 
   getExcludedIndexes(word) {
     const regex = /[~`_$&+,:;=?@#|"'<>.^*(){}[\]\\%!-/\s]/g;
@@ -122,7 +122,7 @@ class ArrayLetters extends Component {
     }
 
     return array;
-  };
+  }
 
   createGroupedWords(text, excludedIndexes) {
     let array = text.split("");
@@ -145,12 +145,14 @@ class ArrayLetters extends Component {
             letter,
             isVisible: false
           }));
+
           groupedWords.push(subarray, [excludedLetter]);
           prevIndex = nextIndex + 1;
 
           if (lastIndex === nextIndex && lastIndex !== lastWordIndex) {
             let lastSubarrayLength = array.length - 1 - lastIndex;
             let lastSubarray = [...array.slice(-lastSubarrayLength)];
+
             lastSubarray = lastSubarray.map(letter => ({
               letter,
               isVisible: false
@@ -169,7 +171,7 @@ class ArrayLetters extends Component {
     }
 
     return groupedWords.filter(subarray => subarray.length);
-  };
+  }
 
   revealLetters(groupedWords) {
     let leftLetters = 1;
@@ -185,7 +187,7 @@ class ArrayLetters extends Component {
         return obj;
       });
     });
-  };
+  }
 
   findCurrentLetter(index, groupedWords) {
     let inputIndex = index;
@@ -198,6 +200,7 @@ class ArrayLetters extends Component {
         if (wordLength - 1 < inputIndex) {
           wordIndex++;
           inputIndex = inputIndex - wordLength;
+
         } else {
           letterIndex = inputIndex;
           inputIndex = 0;
@@ -209,7 +212,7 @@ class ArrayLetters extends Component {
       wordIndex,
       letterIndex
     };
-  };
+  }
 
   checkIfCompleted(array) {
     let counter = 0;
@@ -222,8 +225,8 @@ class ArrayLetters extends Component {
       })
     );
 
-    return counter === 0 ? true : false;
-  };
+    return counter === 0;
+  }
 
   handlePicking(event) {
     event.persist();
@@ -251,6 +254,7 @@ class ArrayLetters extends Component {
               userAnswer,
               groupedWords
             };
+
           } else {
             const promptedLetter = this.findCurrentLetter(
               nextIndex,
@@ -260,6 +264,7 @@ class ArrayLetters extends Component {
               correctAnswer.toLowerCase(),
               nextIndex
             );
+
             letters = this.shuffleOptions(letters);
 
             clearTimeout(this.prompting);
@@ -280,9 +285,7 @@ class ArrayLetters extends Component {
         } else {
           let counter = prevState.counter + 1;
           let letters = prevState.letters;
-          const wrongIndex = letters.findIndex(
-            element => element.letter === choice
-          );
+          const wrongIndex = letters.findIndex(el => el.letter === choice);
           let wrongLetter = letters[wrongIndex];
 
           // shake letter
@@ -304,23 +307,24 @@ class ArrayLetters extends Component {
         }
       }
     );
-  };
+  }
 
   handleLettersAnimation() {
     this.setState(state => {
       const letters = state.letters;
+
       letters.forEach(element => (element.isWrong = false));
       letters.forEach(element => (element.isScaled = false));
 
       return { letters };
     });
-  };
+  }
 
   promptingTimer() {
     this.setState({
       isPrompting: true
     });
-  };
+  }
 
   render() {
     const {
@@ -338,15 +342,13 @@ class ArrayLetters extends Component {
         <Term>{definition}</Term>
 
         <AnswerWrapper>
-          {groupedWords.map((word, wordIndex) => {
-            const activeWord =
-              wordIndex === promptedLetter.wordIndex ? true : false;
+          { groupedWords.map((word, wordIndex) => {
+            const activeWord = wordIndex === promptedLetter.wordIndex;
 
             return (
               <WordAnswer key={wordIndex}>
-                {word.map(({ letter, isVisible }, letterIndex) => {
-                  const activeLetter =
-                    letterIndex === promptedLetter.letterIndex ? true : false;
+                { word.map(({ letter, isVisible }, letterIndex) => {
+                  const activeLetter = letterIndex === promptedLetter.letterIndex;
                   const isPrompted = isPrompting && activeWord && activeLetter;
 
                   return (
@@ -367,7 +369,7 @@ class ArrayLetters extends Component {
         </AnswerWrapper>
 
         <PickWrapper>
-          {letters.map(({ letter, isScaled, isWrong }, index) => (
+          { letters.map(({ letter, isScaled, isWrong }, index) => (
             <PickLetter
               id={letter}
               key={index}
@@ -455,17 +457,19 @@ const AnswerLetter = styled.span`
   }
 
   @media (min-width: 768px) {
-    font-size: 2.8rem;
-    bottom: ${({ letter }) => letter && "4px"};
-
     ${({ letter }) =>
-      !letter &&
+      letter ?
       css`
+        bottom: 4px;
+      `:
+      css`
+        border-bottom: 1px solid ${colors.white};
         height: calc(2.8rem * 1.333);
         width: 1.7rem;
         margin: 0 0.2rem;
-        border-bottom: 1px solid white;
       `};
+
+    font-size: 2.8rem;
   }
 `;
 

@@ -1,25 +1,25 @@
-import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect, isLoaded } from 'react-redux-firebase';
+import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firestoreConnect, isLoaded } from "react-redux-firebase";
 
-import { cancelSesion } from '../store/actions/overlayActions';
+import { cancelSesion } from "../store/actions/overlayActions";
 import {
   createLearnSet,
   shuffleCard,
   throwoutCard
-} from '../store/actions/learnSetActions';
+} from "../store/actions/learnSetActions";
 import {
   changeLocation,
   changeLastLocation,
   setContentHeight,
   setCurrentSetId
-} from '../store/actions/navigationActions';
+} from "../store/actions/navigationActions";
 
-import LearnSet from '../pages/LearnSet';
+import LearnSet from "../pages/LearnSet";
 
-const LearnSetContainer = (props) => {
-  return props.isLoaded ?
+const LearnSetContainer = props => {
+  return props.isLoaded ? (
     <LearnSet
       amount={props.amount}
       leftTerms={props.leftTerms}
@@ -35,12 +35,12 @@ const LearnSetContainer = (props) => {
       throwoutCard={props.throwoutCard}
       createLearnSet={props.createLearnSet}
     />
-    :
+  ) : (
     <></>
+  );
 };
 
-
-const layerCards = (terms) => {
+const layerCards = terms => {
   let layerIndex = 1;
 
   return terms.map(term => {
@@ -48,9 +48,9 @@ const layerCards = (terms) => {
     return {
       ...term,
       layerIndex
-    }
-  })
-}
+    };
+  });
+};
 
 const mapStateToProps = (state, ownProps) => {
   const terms = state.firestore.ordered.learnTerms || [];
@@ -66,8 +66,8 @@ const mapStateToProps = (state, ownProps) => {
     isOverlayOpen: state.isOverlayOpen.isCancelled,
     terms: layerCards(terms),
     isLoaded: isLoaded(terms)
-  }
-}
+  };
+};
 
 export default compose(
   connect(
@@ -84,34 +84,33 @@ export default compose(
     }
   ),
   firestoreConnect(props => {
-    return props.uid ?
-      [
-        {
-          collection: 'users',
-          doc: props.uid,
-          subcollections: [
-            {
-              collection: 'learn',
-              doc: props.match.params.id,
-              subcollections: [{ collection: 'flashcards' }]
-            }
-          ],
-          storeAs: 'learnTerms',
-          orderBy: ["time"]
-        },
-        {
-          collection: 'users',
-          doc: props.uid,
-          subcollections: [
-            {
-              collection: 'learn',
-              doc: props.match.params.id
-            }
-          ],
-          storeAs: 'learnDetails'
-        },
-      ]
-      :
-      []
+    return props.uid
+      ? [
+          {
+            collection: "users",
+            doc: props.uid,
+            subcollections: [
+              {
+                collection: "learn",
+                doc: props.match.params.id,
+                subcollections: [{ collection: "flashcards" }]
+              }
+            ],
+            storeAs: "learnTerms",
+            orderBy: ["time"]
+          },
+          {
+            collection: "users",
+            doc: props.uid,
+            subcollections: [
+              {
+                collection: "learn",
+                doc: props.match.params.id
+              }
+            ],
+            storeAs: "learnDetails"
+          }
+        ]
+      : [];
   })
-)(LearnSetContainer)
+)(LearnSetContainer);

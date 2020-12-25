@@ -32,6 +32,7 @@ const EditSet = ({
   const [topic, setTopic] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [isFilled, setFilled] = useState(false);
+  const [isFocused, setFocused] = useState(false);
 
   useEffect(() => {
     setCurrentSetId(setid);
@@ -65,6 +66,7 @@ const EditSet = ({
     event.preventDefault();
     if (terms.length === 50) {
       setNotification("You've reached a limit of terms");
+
     } else {
       addNewTerm();
     }
@@ -88,11 +90,17 @@ const EditSet = ({
       <Content setContentHeight={setContentHeight} width={80} desktop={500}>
         <form>
           <SetName>
-            <NameInput value={topic} maxLength="30" onChange={changeTopic} />
+            <NameInput
+              value={topic}
+              maxLength="30"
+              onChange={changeTopic}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+            />
             <NameLabel isFilled={isFilled} htmlFor="name">
               Name your set
             </NameLabel>
-            <Border isBig="true" />
+            <Border isFilled={isFocused || isFilled} />
           </SetName>
 
           <Buttons
@@ -127,13 +135,11 @@ const Buttons = ({
 }) => {
   function reduceTerms(terms) {
     return terms
-      .map(element => {
-        return {
+      .map(element => ({
           ...element,
           term: element.term.trim(),
           definition: element.definition.trim()
-        };
-      })
+      }))
       .map(element => {
         const { term, definition } = element;
 
@@ -142,10 +148,13 @@ const Buttons = ({
           (/^\s$/.test(definition) || definition.length === 0)
         ) {
           return null;
+
         } else if (/^\s$/.test(term) || term.length === 0) {
           return { ...element, term: "..." };
+
         } else if (/^\s$/.test(definition) || definition.length === 0) {
           return { ...element, definition: "..." };
+
         } else {
           return element;
         }
@@ -159,8 +168,10 @@ const Buttons = ({
 
     if (!topic || /^\s$/.test(topic)) {
       setNotification("You must enter a title to save your set");
+
     } else if (reducedTerms.length < 4) {
       setNotification("You have to create at least 4 terms");
+
     } else {
       submitSet(reducedTerms);
     }
@@ -185,12 +196,7 @@ const SetName = styled.div`
 `;
 
 const NameLabel = styled.label`
-  ${({ isFilled }) =>
-    isFilled &&
-    css`
-      opacity: 0;
-    `};
-
+  opacity: ${ props => props.isFilled && 0 };
   color: ${colors.azure};
   position: absolute;
   bottom: 2px;
@@ -222,7 +228,7 @@ const NameInput = styled(BasicInput)`
 `;
 
 const Border = styled.div`
-  background: ${colors.white};
+  background: ${ props => props.isFilled ? colors.white : colors.azure };
   position: absolute;
   width: 100%;
   height: 2px;

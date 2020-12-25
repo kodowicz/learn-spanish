@@ -40,7 +40,7 @@ const Login = ({
 
   return (
     <>
-      {authError && (
+      { authError && (
         <Notification
           message={authError}
           removeNotification={removeNotification}
@@ -59,7 +59,7 @@ const Login = ({
             id="signin"
             aria-controls="signin-tab"
             tabIndex={isToggled ? "0" : "-1"}
-            aria-selected={isToggled ? "false" : "true"}
+            aria-selected={!isToggled}
             onKeyDown={handleKeySwitch}
             onClick={() => handleSwitch(false)}
           >
@@ -69,7 +69,7 @@ const Login = ({
             role="tab"
             id="signup"
             aria-controls="signup-tab"
-            aria-selected={isToggled ? "true" : "false"}
+            aria-selected={isToggled}
             tabIndex={isToggled ? "-1" : "0"}
             onKeyDown={handleKeySwitch}
             onClick={() => handleSwitch(true)}
@@ -86,7 +86,7 @@ const Login = ({
           tabIndex="0"
           aria-labelledby="signin"
         >
-          {isToggled && <SignIn auth={auth} signIn={signIn} />}
+          { isToggled && <SignIn auth={auth} signIn={signIn} /> }
         </div>
 
         <div
@@ -96,7 +96,7 @@ const Login = ({
           tabIndex="0"
           aria-labelledby="signup"
         >
-          {!isToggled && (
+          { !isToggled && (
             <SignUp auth={auth} signUp={signUp} signUpError={signUpError} />
           )}
         </div>
@@ -122,8 +122,8 @@ const Switch = styled.button`
 `;
 
 const Border = styled.div`
-  transform: ${props =>
-    props.isToggled ? "translateX(100%)" : "translateX(0)"};
+  transform: ${ props =>
+    props.isToggled ? "translateX(100%)" : "translateX(0)" };
   background: ${colors.white};
   position: absolute;
   bottom: 0;

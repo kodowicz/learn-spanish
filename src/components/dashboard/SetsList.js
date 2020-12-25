@@ -1,38 +1,37 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-import Masonry from 'react-masonry-component';
-import styled from 'styled-components';
-import { BlockElement, colors, fonts } from '../../assets/styles/GlobalStyles';
-import ProgressBar from '../ProgressBar';
-
+import React from "react";
+import { Link } from "react-router-dom";
+import Masonry from "react-masonry-component";
+import styled from "styled-components";
+import { BlockElement, colors, fonts } from "../../assets/styles/GlobalStyles";
+import ProgressBar from "../ProgressBar";
 
 const SetsList = ({ sets, title, margin, isPercentage }) => {
-  const calculatePercentage = (set) => {
+  function calculatePercentage(set) {
     const knowledge = set.knowledge;
     const amount = set.amount;
     const percentage = Math.round((knowledge * 100) / (amount * 5));
 
-    return percentage || 0
+    return percentage || 0;
   }
 
   const setsList = sets.map(set => (
-    <ListItem key={ set.id }>
+    <ListItem key={set.id}>
       <Link to={`/sets/${set.id}`}>
         <SetWrapper>
-          <Topic>{ set.name }</Topic>
-          <Amount>{ set.amount } terms</Amount>
-          { isPercentage ?
+          <Topic>{set.name}</Topic>
+          <Amount>{set.amount} terms</Amount>
+          { isPercentage ? (
             <Progress>
               <ProgressBar
                 percentage={calculatePercentage(set)}
-                width='4.6rem'
+                width={4.6}
                 bgColor={colors.blue}
-                progressColor={colors.white} />
+                progressColor={colors.white}
+              />
             </Progress>
-            :
-            <Author>by { set.author }</Author>
-          }
+          ) : (
+            <Author>by {set.author}</Author>
+          )}
         </SetWrapper>
       </Link>
     </ListItem>
@@ -40,18 +39,14 @@ const SetsList = ({ sets, title, margin, isPercentage }) => {
 
   return (
     <ListWrapper margin={margin}>
-      <ListTitle>{ title }</ListTitle>
-      <List
-        elementType={'ul'}>
-        {setsList}
-      </List>
+      <ListTitle>{title}</ListTitle>
+      <List elementType={"ul"}>{setsList}</List>
     </ListWrapper>
-  )
+  );
 };
 
-
 const ListWrapper = styled.div`
-  margin: ${({margin}) => margin || 0};
+  margin: ${ props => props.margin || "0" };
 `;
 
 const ListTitle = styled.p`
@@ -105,7 +100,7 @@ const Topic = styled.p`
   margin: 0;
 
   @media (min-width: 768px) {
-    font-size: 2rem
+    font-size: 2rem;
   }
 `;
 
@@ -127,7 +122,7 @@ const Progress = styled.figure`
   grid-row: 1 / 3;
   grid-column: 2 / 3;
   justify-self: end;
-  align-self: center
+  align-self: center;
 `;
 
-export default SetsList
+export default SetsList;

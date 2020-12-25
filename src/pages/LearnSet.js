@@ -188,15 +188,15 @@ const InfoBar = styled.div`
   position: fixed;
   z-index: 1;
   top: 7rem;
-  left: 0;
-  padding: 0 7vw;
-  width: 100%;
+  width: calc(100% - 14vw);
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
   align-items: baseline;
 
   @media (min-width: 768px) {
-    padding: 0 3rem;
+    width: 50rem;
   }
 `;
 

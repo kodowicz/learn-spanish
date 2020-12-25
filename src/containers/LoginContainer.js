@@ -1,21 +1,20 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from "react";
+import { connect } from "react-redux";
 import {
   changeLocation,
   changeLastLocation,
   setContentHeight
-} from '../store/actions/navigationActions';
+} from "../store/actions/navigationActions";
 import {
   signUp,
   signIn,
   cleanErrorNotification,
   signUpError
-} from '../store/actions/authActions';
+} from "../store/actions/authActions";
 
-import Login from '../pages/Login';
+import Login from "../pages/Login";
 
-
-const LoginContainer = (props) => (
+const LoginContainer = props => (
   <Login
     auth={props.auth}
     authError={props.authError}
@@ -27,8 +26,7 @@ const LoginContainer = (props) => (
     changeLastLocation={props.changeLastLocation}
     setContentHeight={props.setContentHeight}
   />
-)
-
+);
 
 const mapStateToProps = state => ({
   auth: state.firebase.auth,

@@ -30,7 +30,7 @@ const HomePage = ({
       >
         <Title>Are you ready for a new dose of words?</Title>
 
-        {userSets?.length > 0 ? (
+        { userSets?.length > 0 ? (
           <>
             <SetsList
               isPercentage={true}
@@ -60,9 +60,9 @@ const HomePage = ({
 };
 
 const Title = styled.h1`
+  font-weight: ${fonts.bold};
   text-align: center;
   font-size: 2.2rem;
-  font-weight: ${fonts.bold};
   margin: 0 7vw;
 
   @media (min-width: 768px) {

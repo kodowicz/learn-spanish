@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
+import styled from "styled-components";
+
 import Menu from "./Menu";
 import Navigation from "./Navigation";
 import Scroller from "./Scroller";
-import { Wrapper } from "../Background";
-
-import styled from "styled-components";
-import { Background } from "../Background";
+import { Wrapper, Background } from "../Background";
+import { colors } from "../../assets/styles/GlobalStyles";
 
 const Navbar = ({
   uid,
@@ -50,9 +50,9 @@ const Navbar = ({
 
   return (
     <>
-      {location && (
+      { location && (
         <Nav isVisible={isMenuOpen}>
-          {isOpen && (
+          { isOpen && (
             <BackgroundWrapper>
               <Background />
             </BackgroundWrapper>
@@ -73,7 +73,7 @@ const Navbar = ({
             closeChangePassword={closeChangePassword}
           />
 
-          {(isOpen || isMenuVisible) && (
+          { (isOpen || isMenuVisible) && (
             <Menu
               uid={uid}
               handleMenu={handleMenu}
@@ -83,9 +83,11 @@ const Navbar = ({
             />
           )}
 
-          {!isMenuOpen &&
+          { !isMenuOpen &&
             isPageScrollable &&
-            !isScrollTop && <Scroller scrollToTop={scrollToTop} />}
+            !isScrollTop &&
+            <Scroller scrollToTop={scrollToTop} />
+          }
         </Nav>
       )}
     </>
@@ -93,7 +95,7 @@ const Navbar = ({
 };
 
 const Nav = styled.nav`
-  height: ${({ isVisible }) => (isVisible ? "100vh" : "6rem")};
+  height: ${ props => props.isVisible ? "100vh" : "6rem" };
   position: fixed;
   top: 0;
   left: 0;
@@ -109,12 +111,12 @@ const Nav = styled.nav`
 `;
 
 const BackgroundWrapper = styled.div`
+  background: ${colors.translucentNavy};
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
   height: 100vh;
-  background: rgba(16, 6, 54, 0.6);
 `;
 
 export default Navbar;

@@ -11,7 +11,7 @@ class ChooseBetweenTwo extends Component {
       isInSpanish: true,
       term: "",
       options: [],
-      startingPosition: {
+      startPosition: {
         left: 0,
         top: 0
       }
@@ -24,11 +24,11 @@ class ChooseBetweenTwo extends Component {
     this.createGame();
   }
 
-  shuffleOptions = array => {
+  shuffleOptions(array) {
     return array.sort(() => Math.random() - 0.5);
-  };
+  }
 
-  createGame = () => {
+  createGame() {
     this.setState((prevState, props) => {
       const { item, terms } = props;
       const styles = this.termRef.current;
@@ -36,7 +36,7 @@ class ChooseBetweenTwo extends Component {
       const term = isInSpanish ? item.term : item.definition;
       let options = [item.id];
 
-      const startingPosition = {
+      const startPosition = {
         left: styles.offsetLeft,
         top: styles.offsetTop
       };
@@ -45,6 +45,7 @@ class ChooseBetweenTwo extends Component {
         const index = Math.floor(Math.random() * terms.length);
         const id = terms[index].id;
         const isTaken = options.some(element => element === id);
+
         if (!isTaken) {
           options.push(id);
         }
@@ -53,13 +54,13 @@ class ChooseBetweenTwo extends Component {
       return {
         isInSpanish,
         term,
-        startingPosition,
+        startPosition,
         options: this.shuffleOptions(options)
       };
     });
   }
 
-  handleChosenAnswer = answer => {
+  handleChosenAnswer(answer) {
     const { item, showGameAnswer } = this.props;
     const correctAnswer = item.id;
 
@@ -68,33 +69,29 @@ class ChooseBetweenTwo extends Component {
     } else {
       showGameAnswer(item, "wrong");
     }
-  };
+  }
 
   render() {
     const { terms, isDesktop } = this.props;
-    const {
-      isInSpanish,
-      term,
-      options,
-      startingPosition
-    } = this.state;
+    const { isInSpanish, term, options, startPosition } = this.state;
 
     return (
       <GameWrapper>
         <Term ref={this.termRef}>{term}</Term>
 
-        {options.map((termid, index) => {
+        { options.map((termid, index) => {
           const elementid = terms.findIndex(element => element.id === termid);
           return (
             <div key={termid} onClick={() => this.handleChosenAnswer(termid)}>
               <DefinitionOption
                 index={index}
                 isDesktop={isDesktop}
-                startingPosition={startingPosition}
+                startPosition={startPosition}
               >
-                {isInSpanish
+                { isInSpanish
                   ? terms[elementid].definition
-                  : terms[elementid].term}
+                  : terms[elementid].term
+                }
               </DefinitionOption>
             </div>
           );
@@ -118,15 +115,15 @@ class DefinitionOption extends Component {
 
   componentDidMount() {
     this.setState((state, props) => {
-      const { startingPosition, isDesktop } = props;
+      const { startPosition, isDesktop } = props;
       const styles = this.optionRef.current;
       const transformStart = {
         left: isDesktop
-          ? startingPosition.left - styles.offsetLeft - styles.offsetWidth / 2
+          ? startPosition.left - styles.offsetLeft - styles.offsetWidth / 2
           : 0,
         top: isDesktop
           ? 0
-          : startingPosition.top - styles.offsetTop - styles.offsetHeight / 2
+          : startPosition.top - styles.offsetTop - styles.offsetHeight / 2
       };
 
       return { transformStart };
@@ -165,10 +162,7 @@ const GameWrapper = styled.div`
 
   @media (min-width: 768px) {
     place-content: center;
-    grid-template-columns: minmax(auto, 30rem) minmax(auto, 30rem) minmax(
-        auto,
-        30rem
-      );
+    grid-template-columns: repeat(3, minmax(auto, 30rem));
     grid-template-rows: 1fr;
     grid-column-gap: 4rem;
   }
@@ -188,12 +182,11 @@ const Term = styled.span`
 `;
 
 const Definition = styled.p`
-  color: ${colors.lightGray};
-
   ${({ transformStart, delay }) => css`
     animation: ${moveBackards(transformStart)} 0.5s ${delay * 0.3}s both;
   `};
 
+  color: ${colors.lightGray};
   font-size: 2rem;
   margin: 0;
   text-align: center;

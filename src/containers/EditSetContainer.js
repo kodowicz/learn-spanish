@@ -2,10 +2,12 @@ import React from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { firestoreConnect, isLoaded } from "react-redux-firebase";
-
 import { askForDeleting } from "../store/actions/overlayActions";
-import { deleteEditSet } from "../store/actions/deleteSetActions";
 import { setNotification } from "../store/actions/notificationActions";
+import {
+  deleteEditSet,
+  deleteSetChanges
+} from "../store/actions/deleteSetActions";
 import {
   changeLocation,
   changeLastLocation,
@@ -18,8 +20,7 @@ import {
   updateTerm,
   removeTerm,
   addNewTerm,
-  submitEditSet,
-  deleteSetChanges
+  submitEditSet
 } from "../store/actions/editSetActions";
 
 import EditSet from "../pages/EditSet";

@@ -1,3 +1,3 @@
 export const sortTerms = () => ({
-  type: 'SORT_TERMS'
-})
+  type: "SORT_TERMS"
+});

@@ -46,7 +46,11 @@ const Password = ({
 
   return (
     <Background ref={backgroundRef} onClick={handleCancel}>
-      <Dialog height="30" aria-labelledby="change-password" onSubmit={handleSubmit}>
+      <Dialog
+        height="30"
+        aria-labelledby="change-password"
+        onSubmit={handleSubmit}
+      >
         <Alert id="change-password">Change your password</Alert>
 
         <Wrapper>
@@ -87,7 +91,7 @@ const Wrapper = styled.div`
 `;
 
 const Label = styled.label`
-  display: ${props => props.isHidden && "none"};
+  display: ${ props => props.isHidden && "none" };
   color: ${colors.darkGray};
   position: absolute;
   top: 1rem;

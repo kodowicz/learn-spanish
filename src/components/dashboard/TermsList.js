@@ -13,16 +13,12 @@ const TermsList = ({ terms, updateTerm, removeTerm }) => {
     setMovedElement(element);
   }
 
-  useEffect(
-    () => {
-      setIsMoved(false); // after removing term
-    },
-    [terms]
-  );
+  // after removing term
+  useEffect(() => setIsMoved(false), [terms]);
 
   return (
     <>
-      {terms.map((term, index) => {
+      { terms.map((term, index) => {
         let isVisible = movedElement === index && isMoved ? false : true;
 
         return (
@@ -66,8 +62,8 @@ const SetWrapper = styled.div`
 `;
 
 const Counter = styled.span`
-  opacity: ${props => (props.isVisible ? 1 : 0)};
-  left: ${props => (props.isLessThanTen ? "-8vw" : "-10vw")};
+  opacity: ${ props => props.isVisible ? 1 : 0 };
+  left: ${ props => props.isLessThanTen ? "-8vw" : "-10vw" };
   color: ${colors.azure};
   font-weight: ${fonts.bold};
   position: absolute;

@@ -70,10 +70,10 @@ const MatchedSets = ({ value, searchedSets }) => {
 };
 
 const Header = styled.h1`
+  font-weight: ${fonts.bold};
   font-size: 2.3rem;
   text-align: center;
   margin-bottom: 3rem;
-  font-weight: ${fonts.bold};
 
   @media (min-width: 768px) {
     font-size: 3.6rem;

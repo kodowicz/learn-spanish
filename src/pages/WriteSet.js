@@ -94,7 +94,7 @@ const WriteSet = ({
           />
         ) : (
           <>
-            {isCancelOpen && (
+            { isCancelOpen && (
               <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
             )}
             <WriteSentence
@@ -144,7 +144,7 @@ const Content = styled.div`
 `;
 
 const GameWrapper = styled.div`
-  visibility: ${({ isHidden }) => isHidden && "hidden"};
+  visibility: ${ props => props.isHidden && "hidden" };
   cursor: pointer;
 `;
 

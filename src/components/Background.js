@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+
+import { colors } from "../assets/styles/GlobalStyles";
 import confetti from "../assets/images/confetti.svg";
 
 export const ContentWrapper = ({
@@ -71,42 +73,42 @@ export const Background = props => (
 );
 
 const Wrapper = styled.div`
-  overflow-y: ${({ isScrollable }) => isScrollable && "scroll"};
+  overflow-y: ${ props => props.isScrollable && "scroll" };
   position: fixed;
   width: 100%;
   height: 100%;
 `;
 
 const Main = styled.main`
-  width: ${props => `${props.width}vw`};
-  max-width: ${props => `${props.maxWidth}px`};
+  width: ${ props => `${props.width}vw`};
+  max-width: ${ props => `${props.maxWidth}px`};
   padding-top: 85px;
   margin: 0 auto;
   height: max-content;
 
   @media (min-width: 768px) {
-    width: ${props => `${props.desktop}px`};
+    width: ${ props => `${props.desktop}px`};
     max-width: none;
     padding-top: 100px;
   }
 `;
 
 const BGWrapper = styled.div`
+  background: ${colors.blue};
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
-  background: #663ce2;
   width: 100%;
   z-index: -2;
 `;
 
 const Confetti = styled.div`
+  background-image: ${ props => `url(${props.svg})`};
   width: 100%;
   height: 100%;
   background-attachment: fixed;
   background-position: center;
   background-repeat: repeat;
   background-size: contain;
-  background-image: ${({ svg }) => `url(${svg})`};
 `;

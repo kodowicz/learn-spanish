@@ -5,33 +5,36 @@ export const deleteCreateSet = () => (dispatch, getState, { getFirestore }) => {
   const termsRef = firestore.collection(`users/${uid}/unsaved/`);
   const userRef = firestore.doc(`users/${uid}`);
 
-  termsRef.get().then(snapshot => {
-    userRef.update({
-      unsavedSet: '',
-      notification: 'changes has been deleted'
+  termsRef
+    .get()
+    .then(snapshot => {
+      userRef.update({
+        unsavedSet: "",
+        notification: "changes has been deleted"
+      });
+      snapshot.forEach(doc => {
+        doc.ref.delete();
+      });
     })
-    snapshot.forEach(doc => {
-      doc.ref.delete();
+    .then(() => {
+      dispatch({
+        type: "DELETE_CREATE_SET",
+        payload: true
+      });
     })
-  })
-  .then(() => {
-    dispatch({
-      type: 'DELETE_CREATE_SET',
-      payload: true
-    })
-  }).catch(error => {
-    dispatch({
-      type: 'DELETE_CREATE_SET_ERROR',
-      error
-    })
-  })
+    .catch(error => {
+      dispatch({
+        type: "DELETE_CREATE_SET_ERROR",
+        error
+      });
+    });
 };
 
 // delete existing set from available sets list
 export const deleteEditSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
-  const setid = getState().setid;
+  const setid = getState().navigation.setid;
 
   const userRef = firestore.doc(`users/${uid}`);
   const setRef = firestore.doc(`sets/${setid}`);
@@ -42,40 +45,77 @@ export const deleteEditSet = () => (dispatch, getState, { getFirestore }) => {
 
   // cloud functions
   userRef.update({
-    editedSet: '',
-    notification: 'The set has been deleted'
-  })
+    editedSet: "",
+    notification: "The set has been deleted"
+  });
 
   learnSetRef.get().then(snapshot => {
     snapshot.forEach(doc => {
       doc.ref.delete();
-    })
-  })
+    });
+  });
 
   playSetRef.get().then(snapshot => {
     snapshot.forEach(doc => {
       doc.ref.delete();
-    })
-  })
+    });
+  });
 
+  termsRef
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        doc.ref.delete();
+      });
 
-  termsRef.get().then(snapshot => {
-    snapshot.forEach(doc => {
-      doc.ref.delete();
+      userSetRef.delete();
+      setRef.delete();
     })
+    .then(() => {
+      dispatch({
+        type: "DELETE_EDIT_SET",
+        payload: true
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: "DELETE_EDIT_SET_ERROR",
+        error
+      });
+    });
+};
 
-    userSetRef.delete()
-    setRef.delete();
-  })
-  .then(() => {
-    dispatch({
-      type: 'DELETE_EDIT_SET',
-      payload: true
+export const deleteSetChanges = () => (dispatch, getState, { getFirestore }) => {
+  const firestore = getFirestore();
+  const uid = getState().firebase.auth.uid;
+  const setid = getState().navigation.setid;
+
+  const editedRef = firestore.doc(`users/${uid}/edit/${setid}`);
+  const editedTermsRef = editedRef.collection("terms");
+  const userRef = firestore.doc(`users/${uid}`);
+
+  userRef.update({ editedSet: "" });
+
+  editedTermsRef
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        doc.ref.delete();
+      });
     })
-  }).catch(error => {
-    dispatch({
-      type: 'DELETE_EDIT_SET_ERROR',
-      error
+    .then(() => {
+      editedRef.delete();
     })
-  })
-}
+    .then(() => {
+      dispatch({
+        type: "DELETE_SET_CHANGES",
+        payload: true
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: "DELETE_SET_CHANGES_ERROR",
+        error
+      });
+    });
+};

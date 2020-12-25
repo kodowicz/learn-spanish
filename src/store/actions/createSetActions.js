@@ -25,13 +25,13 @@ export const setUnsavedName = unsavedSet => (dispatch, getState, { getFirestore 
 // if there is no basic terms
 export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
-  const authId = getState().firebase.auth.uid;
+  const uid = getState().firebase.auth.uid;
   const termsLength = 3;
   const delay = 1000;
   let date = Date.now();
   let size;
 
-  const unsavedRef = firestore.collection("users").doc(authId).collection("unsaved");
+  const unsavedRef = firestore.collection(`users/${uid}/unsaved`);
 
   unsavedRef
     .get()
@@ -203,43 +203,23 @@ export const submitCreateSet = terms => (dispatch, getState, { getFirestore }) =
       });
 
       terms.forEach(element => {
-        const termsRef = firestore
-          .collection(`sets/${createRef.id}/terms`)
-          .doc();
-        const flashcardsRef = firestore
-          .collection(`users/${uid}/learn/${createRef.id}/flashcards/`)
-          .doc(termsRef.id);
-        const gameRef = firestore
-          .collection(`users/${uid}/learn/${createRef.id}/game/`)
-          .doc(termsRef.id);
+        const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
+        const learnRef = firestore.doc(`users/${uid}/learn/${createRef.id}`);
+        const flashcardsRef = learnRef.collection("flashcards").doc(termsRef.id);
+        const gameRef = learnRef.collection("game").doc(termsRef.id);
 
         termsRef.set({
-          term: element.term,
-          definition: element.definition,
-          id: termsRef.id,
-          time: element.time,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
+          ...element
         });
 
         flashcardsRef.set({
-          term: element.term,
-          definition: element.definition,
-          id: termsRef.id,
-          time: element.time,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
+          ...element
         });
 
         gameRef.set({
+          ...element,
           ratio: 0,
-          isMastered: false,
-          term: element.term,
-          definition: element.definition,
-          id: termsRef.id,
-          time: element.time,
-          termRows: element.termRows,
-          definitionRows: element.definitionRows
+          isMastered: false
         });
       });
     })

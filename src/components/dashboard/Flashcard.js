@@ -38,7 +38,7 @@ export class FrontCard extends Component {
       cardCenter: {},
       point: { x: 0, y: 0 },
       position: { x: 0, y: 0 },
-      transformCard: { x: 0, y: 0, rotate: 0 },
+      transformCard: { x: 0, y: 0, rotate: 0 }
     };
 
     this.cardRef = React.createRef();
@@ -87,11 +87,11 @@ export class FrontCard extends Component {
         this.setState({ isMoved: false });
       }
     }
-  };
+  }
 
   animateCard() {
     this.setState({ isFlipped: true });
-  };
+  }
 
   startMoving(event) {
     const pagePosition = event.targetTouches ? event.targetTouches[0] : event;
@@ -103,9 +103,9 @@ export class FrontCard extends Component {
         y: pagePosition.pageY
       }
     });
-  };
+  }
 
-  moveCard(event)  {
+  moveCard(event) {
     event.persist();
     const pagePosition = event.targetTouches ? event.targetTouches[0] : event;
 
@@ -143,13 +143,13 @@ export class FrontCard extends Component {
         isMoved: true
       });
     });
-  };
+  }
 
   mouseMove(event) {
     if (this.state.isClicked) {
       this.moveCard(event);
     }
-  };
+  }
 
   stopMoving(event) {
     const { isMoved, cardCenter, backAmplitude } = this.state;
@@ -171,7 +171,7 @@ export class FrontCard extends Component {
         }
       });
     }
-  };
+  }
 
   moveLeft() {
     if (this.props.moveEnabled) {
@@ -189,14 +189,14 @@ export class FrontCard extends Component {
         }
       });
     }
-  };
+  }
 
   moveRight() {
     this.setState({
       moveRight: true,
       isSpeaking: true
     });
-  };
+  }
 
   handleAnimationEnd(event) {
     const { item, throwoutCard, shuffleCard } = this.props;
@@ -204,7 +204,7 @@ export class FrontCard extends Component {
     if (event.animationName === throwOut.name) {
       throwoutCard(item.id);
     } else {
-      shuffleCard(item)
+      shuffleCard(item);
     }
   }
 
@@ -225,9 +225,9 @@ export class FrontCard extends Component {
 
     return (
       <>
-        { isSpeaking &&
+        { isSpeaking && (
           <Speech settings={settings} voices={voices} text={item.term} />
-        }
+        )}
 
         <FrontWrapper
           ref={this.cardRef}
@@ -321,6 +321,7 @@ const Wrapper = styled.div`
 `;
 
 const Card = styled.div`
+  transform: ${ props => `rotateY(${props.rotate}deg)`};
   position: absolute;
   top: 0;
   left: 0;
@@ -331,7 +332,6 @@ const Card = styled.div`
   flex-direction: column;
   background: white;
   box-shadow: 0 0 20px rgba(88, 38, 235, 0.53);
-  transform: ${props => `rotateY(${props.rotate}deg)`};
 `;
 
 const Front = styled(Card)`
@@ -345,14 +345,15 @@ const Back = styled(Card)`
 `;
 
 const FrontWrapper = styled(Wrapper)`
-  perspective: 1000px;
-  z-index: 5;
   ${({ isClicked }) =>
     isClicked &&
     css`
       cursor: grabbing;
     `};
 
+    perspective: 1000px;
+    z-index: 5;
+    
   /*flipping a card */
   ${({ flip }) =>
     flip &&

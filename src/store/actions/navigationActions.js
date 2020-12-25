@@ -37,4 +37,3 @@ export const scrollToTop = isScrollTop => ({
   type: "SCROLL_TO_TOP",
   payload: isScrollTop
 });
- 

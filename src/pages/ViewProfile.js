@@ -60,7 +60,7 @@ const ViewProfile = ({
           <Button type="button" center="true" onClick={handleClick}>
             log out
           </Button>
-          {userSets?.length ? (
+          { userSets?.length ? (
             <SetsList
               isPercentage={true}
               sets={userSets}

@@ -28,8 +28,10 @@ const SignUp = ({ signUp, signUpError }) => {
     event.preventDefault();
     if (login.username.length < 4) {
       signUpError("Username should be at least 4 characters.");
+
     } else if (login.password !== login.confirm) {
       signUpError("The password hasn't been confirmed properly.");
+      
     } else {
       signUp(login);
     }

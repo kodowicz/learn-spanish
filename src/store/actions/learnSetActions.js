@@ -1,4 +1,4 @@
-export const createLearnSet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createLearnSet = setid => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -7,48 +7,50 @@ export const createLearnSet = setid => (dispatch, getState, { getFirebase, getFi
   const learnDetailsRef = firestore.doc(`users/${uid}/learn/${setid}/`);
   const learnSetRef = firestore.collection(`users/${uid}/learn/${setid}/flashcards`);
 
-  learnSetRef.get().then(snap => {
-    if (!snap.size) {
+  learnSetRef
+    .get()
+    .then(snap => {
+      if (!snap.size) {
+        setRef.get().then(doc => {
+          const { amount, name } = doc.data();
 
-      setRef.get().then(doc => {
-        const { amount, name } = doc.data();
+          learnDetailsRef.set({
+            name,
+            amount,
+            knowledge: 0,
+            id: learnDetailsRef.id
+          });
+        });
 
-        learnDetailsRef.set({
-          name,
-          amount,
-          knowledge: 0,
-          id: learnDetailsRef.id,
-        })
-      })
+        setTermsRef.get().then(snapshot => {
+          snapshot.forEach(doc => {
+            const { id, term, definition, time } = doc.data();
+            const termRef = learnSetRef.doc(id);
 
-      setTermsRef.get().then(snapshot => {
-        snapshot.forEach(doc => {
-          const { id, term, definition, time } = doc.data();
-          const termRef = learnSetRef.doc(id);
-
-          termRef.set({
-            id,
-            term,
-            definition,
-            time
-          })
-        })
-      })
-    }
-  }).then(() => {
-    dispatch({
-      type: 'CREATE_LEARN_SET'
-
+            termRef.set({
+              id,
+              term,
+              definition,
+              time
+            });
+          });
+        });
+      }
     })
-  }).catch(error => {
-    dispatch({
-      type: 'CREATE_LEARN_SET_ERROR',
-      error
+    .then(() => {
+      dispatch({
+        type: "CREATE_LEARN_SET"
+      });
     })
-  })
-}
+    .catch(error => {
+      dispatch({
+        type: "CREATE_LEARN_SET_ERROR",
+        error
+      });
+    });
+};
 
-export const shuffleCard = term => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const shuffleCard = term => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
@@ -56,37 +58,41 @@ export const shuffleCard = term => (dispatch, getState, { getFirebase, getFirest
 
   const docRef = firestore.doc(`users/${uid}/learn/${set}/flashcards/${term.id}`);
 
-  docRef.update({
-    time
-  })
-  .then(() => {
-    dispatch({
-      type: 'SHUFFLE_CARD'
+  docRef
+    .update({
+      time
     })
-  }).catch(error => {
-    dispatch({
-      type: 'SHUFFLE_CARD_ERROR',
-      error
+    .then(() => {
+      dispatch({
+        type: "SHUFFLE_CARD"
+      });
     })
-  })
-}
+    .catch(error => {
+      dispatch({
+        type: "SHUFFLE_CARD_ERROR",
+        error
+      });
+    });
+};
 
-export const throwoutCard = term => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const throwoutCard = term => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
 
   const docRef = firestore.doc(`users/${uid}/learn/${set}/flashcards/${term}`);
 
-  docRef.delete()
-  .then(() => {
-    dispatch({
-      type: 'THROWOUT_CARD'
+  docRef
+    .delete()
+    .then(() => {
+      dispatch({
+        type: "THROWOUT_CARD"
+      });
     })
-  }).catch(error => {
-    dispatch({
-      type: 'THROWOUT_CARD_ERROR',
-      error
-    })
-  })
-}
+    .catch(error => {
+      dispatch({
+        type: "THROWOUT_CARD_ERROR",
+        error
+      });
+    });
+};

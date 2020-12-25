@@ -11,7 +11,6 @@ import {
   setCurrentSetId
 } from "../store/actions/navigationActions";
 import {
-  createPlaySet,
   showGameAnswer,
   cleanGameAnswer,
   setAnimationEnd
@@ -72,7 +71,6 @@ export default compose(
   connect(
     mapStateToProps,
     {
-      createPlaySet,
       changeLocation,
       changeLastLocation,
       setContentHeight,

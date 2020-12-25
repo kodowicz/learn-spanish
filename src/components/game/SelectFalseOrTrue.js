@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
-import styled, { css } from 'styled-components';
-import { colors, fonts } from '../../assets/styles/GlobalStyles';
-import { flipOut, flipIn } from '../../assets/styles/GlobalKeyframes';
-
+import React, { Component } from "react";
+import styled, { css } from "styled-components";
+import { colors, fonts } from "../../assets/styles/GlobalStyles";
+import { flipOut, flipIn } from "../../assets/styles/GlobalKeyframes";
 
 class SelectFalseOrTrue extends Component {
   constructor(props) {
@@ -13,11 +12,11 @@ class SelectFalseOrTrue extends Component {
       answer: "",
       term: "",
       comparisonItem: {}
-    }
+    };
 
     this.handleChosenAnswer = this.handleChosenAnswer.bind(this);
     this.handleAnimationEnd = this.handleAnimationEnd.bind(this);
-  };
+  }
 
   componentDidMount() {
     this.createGame();
@@ -32,6 +31,7 @@ class SelectFalseOrTrue extends Component {
 
       if (isEqual) {
         comparisonItem = item;
+
       } else {
         const index = Math.floor(Math.random() * terms.length);
         comparisonItem = terms[index];
@@ -40,8 +40,8 @@ class SelectFalseOrTrue extends Component {
       return {
         term,
         comparisonItem
-      }
-    })
+      };
+    });
   }
 
   handleChosenAnswer(event) {
@@ -49,7 +49,7 @@ class SelectFalseOrTrue extends Component {
     this.setState({
       answer,
       isChosen: true
-    })
+    });
   }
 
   handleAnimationEnd(event) {
@@ -57,12 +57,12 @@ class SelectFalseOrTrue extends Component {
       const { item, showGameAnswer } = this.props;
       const { answer, comparisonItem } = this.state;
       const correctAnswer = item.id === comparisonItem.id;
-      const userAnswer = answer === 'correct' ? true : false;
+      const userAnswer = answer === "correct" ? true : false;
 
       if (userAnswer === correctAnswer) {
-        showGameAnswer(item, 'correct');
+        showGameAnswer(item, "correct");
       } else {
-        showGameAnswer(item, 'wrong');
+        showGameAnswer(item, "wrong");
       }
     }
   }
@@ -72,32 +72,23 @@ class SelectFalseOrTrue extends Component {
 
     return (
       <GameWrapper>
-        <Question
-          isChosen={isChosen}
-          onAnimationEnd={this.handleAnimationEnd}>
+        <Question isChosen={isChosen} onAnimationEnd={this.handleAnimationEnd}>
           <Term>{term}</Term>
           <Definition>{comparisonItem.definition}</Definition>
         </Question>
 
         <ButtonsWrapper>
-          <Button
-            id="wrong"
-            onClick={this.handleChosenAnswer}
-          >
+          <Button id="wrong" onClick={this.handleChosenAnswer}>
             false
           </Button>
-          <Button
-            id="correct"
-            onClick={this.handleChosenAnswer}
-          >
+          <Button id="correct" onClick={this.handleChosenAnswer}>
             true
           </Button>
         </ButtonsWrapper>
       </GameWrapper>
-    )
+    );
   }
 }
-
 
 const GameWrapper = styled.div`
   padding-top: 20vh;
@@ -168,9 +159,10 @@ const Button = styled.button`
   font-size: 1.4rem;
   background: transparent;
   border-radius: 50px;
-  transition: transform .2s;
+  transition: transform 0.2s;
 
-  &:focus, &:active {
+  &:focus,
+  &:active {
     background: ${colors.shadow};
     transform: translateY(2px);
   }

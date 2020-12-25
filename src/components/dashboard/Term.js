@@ -58,12 +58,7 @@ const Term = ({
     });
   }, []);
 
-  useEffect(
-    () => {
-      setTranslation(0);
-    },
-    [isVisible]
-  );
+  useEffect(() => setTranslation(0), [isVisible]);
 
   useEffect(
     () => {
@@ -138,6 +133,7 @@ const Term = ({
       } else if (translation > 0) {
         translation = 0;
       }
+
     } else if (lastTouch < currentTouch) {
       if (translation >= 0) {
         translation = 0;
@@ -153,6 +149,7 @@ const Term = ({
   function handleTouchEnd(event) {
     if (translation < -40) {
       setTranslation(-80);
+
     } else {
       onMove(false, element);
       setTranslation(0);
@@ -245,14 +242,14 @@ const Wrapper = styled.div`
   grid-template: 1fr / 1fr 80px;
 
   @media (min-width: 768px) {
-    grid-template: 1fr / 10% 80% 10%;
-    border-radius: 15px;
     background: ${colors.bluish};
+    grid-template: 1fr / 10% 80% 10%;
+    border-radius: 1.5rem;
   }
 `;
 
 const TermWrapper = styled.div`
-  transform: ${props => `translateX(${props.translation}px)`};
+  transform: ${ props => `translateX(${props.translation}px)`};
   background: ${colors.bluish};
   border-radius: 15px;
   height: auto;
@@ -280,8 +277,8 @@ const DefineTerm = styled.div`
 `;
 
 const Label = styled.label`
-  display: ${props => props.isVisible && "none"};
-  font-size: ${props => (props.htmlFor === "term" ? "1.6rem" : "1.4rem")};
+  display: ${ props => props.isVisible && "none" };
+  font-size: ${ props => props.htmlFor === "term" ? "1.6rem" : "1.4rem" };
   color: ${colors.darkGray};
   position: absolute;
   bottom: 0px;
@@ -301,7 +298,7 @@ const Textarea = styled(BasicTextArea)`
 `;
 
 const Border = styled.div`
-  background: ${props => props.focused && `${colors.white}`};
+  background: ${ props => props.focused && `${colors.white}`};
   width: 100%;
   height: 1px;
   position: absolute;
@@ -310,7 +307,7 @@ const Border = styled.div`
 `;
 
 const DeleteButton = styled.button`
-  display: ${props => (props.isVisible ? "block" : "none")};
+  display: ${ props => props.isVisible ? "block" : "none" };
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   background: none;

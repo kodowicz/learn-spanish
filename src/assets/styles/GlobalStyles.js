@@ -6,16 +6,17 @@ import sort from "../images/sort.svg";
 export const colors = {
   white: "#FFFFFF",
   navy: "#372454",
-  blue: "#6F40FC",
+  blue: "#663ce2",
   bluish: "rgba(247, 244, 255, 0.25)",
   shadow: "rgba(66, 49, 119, 0.5)",
-  azure: "#EFF3F7",
+  azure: "#dfd3ff", 
   black: "#303030",
   progress: "#A080FF",
   darkGray: "#BDA7FF",
   lightGray: "#EDE7FF",
   warning: "#F65D5D",
-  navyBoxShadow: "rgba(7, 22, 124, 0.2)"
+  navyBoxShadow: "rgba(7, 22, 124, 0.2)",
+  translucentNavy: "rgba(16, 6, 54, 0.6)"
 };
 
 export const fonts = {
@@ -115,11 +116,11 @@ export const Button = styled.button`
   ${css({
     ...mutualButton
   })};
-  margin: ${props => props.center ? "0 auto" : 0};
+  margin: ${ props => props.center ? "0 auto" : "0" };
   text-align: center;
   background: transparent;
 
-  ${(props) => {
+  ${ props => {
     const color = props.color || colors.white;
     const hoverColor = props.color || colors.navy;
     const hoverBg = colors.white;
@@ -128,26 +129,29 @@ export const Button = styled.button`
       color: ${color};
       border: 1px solid ${color};
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: ${hoverColor};
         background: ${hoverBg};
-      };
+      }
 
       &:focus {
-        transform: translateY(2px)
-      };
-  `}}
+        transform: translateY(2px);
+      }
+    `;
+  }};
 `;
 
 const Anchor = styled(Link)`
   ${css({
     ...mutualButton
   })};
-  margin: ${props => (props.center ? "0 auto" : 0)};
+
+  margin: ${ props => props.center ? "0 auto" : "0" };
   position: relative;
   text-decoration: none;
 
-  ${(props) => {
+  ${ props => {
     const color = props.color || colors.white;
     const hoverColor = colors.navy;
     const hoverBg = colors.white;
@@ -156,15 +160,17 @@ const Anchor = styled(Link)`
       color: ${color};
       border: 1px solid ${color};
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: ${hoverColor};
         background: ${hoverBg};
-      };
+      }
 
       &:focus {
-        transform: translateY(2px)
-      };
-  `}}
+        transform: translateY(2px);
+      }
+    `;
+  }};
 `;
 
 const AnchorWrapper = styled.span`
@@ -223,6 +229,7 @@ export const BasicInput = styled.input`
   ${css({
     ...mutualInputs
   })};
+
   font-size: 1.6rem;
 
   &::placeholder {
@@ -279,7 +286,7 @@ export const Background = styled.div`
 `;
 
 export const Dialog = styled.div`
-  height: ${props => `${props.height}rem`};
+  height: ${ props => `${props.height}rem`};
   box-shadow: 10px 10px 20px ${colors.shadow};
   background: ${colors.white};
   color: ${colors.navy};
@@ -299,7 +306,7 @@ export const Alert = styled.p`
 `;
 
 export const Buttons = styled.div`
-  height: ${props => `${props.height}rem`};
+  height: ${ props => `${props.height}rem`};
   display: flex;
   flex-direction: column;
   justify-content: space-between;

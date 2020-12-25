@@ -31,22 +31,18 @@ const Solution = ({
 
   return (
     <>
-      {isAnswer && (
+      { isAnswer && (
         <AnswerWrapper onAnimationEnd={handleAnswer}>
           <Answer src={answer === "correct" ? good : wrong} />
         </AnswerWrapper>
       )}
-      {isItem && (
+      { isItem && (
         <ItemWrapper onAnimationEnd={handleItem}>
           <Term>{correctItem.term}</Term>
           <Definition>{correctItem.definition}</Definition>
         </ItemWrapper>
       )}
-      <Speech
-        settings={settings}
-        voices={voices}
-        text={correctItem.term}
-      />
+      <Speech settings={settings} voices={voices} text={correctItem.term} />
     </>
   );
 };
@@ -95,8 +91,8 @@ const Term = styled(Item)`
 `;
 
 const Definition = styled(Item)`
-  font-size: 2.2rem;
   color: ${colors.lightGray};
+  font-size: 2.2rem;
 
   @media (min-width: 768px) {
     font-size: 2.8rem;

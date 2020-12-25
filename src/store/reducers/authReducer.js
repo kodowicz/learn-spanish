@@ -4,65 +4,65 @@ const initState = {
 
 export const authReducer = (state = initState, action) => {
   switch (action.type) {
-    case 'LOGIN_SUCCESS':
+    case "LOGIN_SUCCESS":
       return {
         ...state,
         authError: null
-      }
+      };
 
-    case 'LOGIN_ERROR':
+    case "LOGIN_ERROR":
       return {
         ...state,
         authError: action.error.message
-      }
+      };
 
-    case 'SIGNUP_SUCCESS':
+    case "SIGNUP_SUCCESS":
       return {
         ...state,
         authError: null
-      }
+      };
 
-    case 'SIGNUP_ERROR':
+    case "SIGNUP_ERROR":
       return {
         ...state,
         authError: action.error.message
-      }
+      };
 
-    case 'LOGOUT_NOTIFICATION':
+    case "LOGOUT_NOTIFICATION":
       return {
         ...state,
-        authError: 'logout'
-      }
+        authError: "logout"
+      };
 
-    case 'REMOVE_LOGOUT_NOTIFICATION':
+    case "REMOVE_LOGOUT_NOTIFICATION":
       return {
         ...state,
-        authError: ''
-      }
+        authError: ""
+      };
 
-    case 'LOGOUT_ERROR':
+    case "LOGOUT_ERROR":
       return {
         ...state,
-        authError: 'Logout failed'
-      }
+        authError: "Logout failed"
+      };
 
-    case 'CHANGE_PASSWORD_ERROR':
+    case "CHANGE_PASSWORD_ERROR":
       return {
         ...state,
-        authError: 'The password is invalid'
-      }
+        authError: "The password is invalid"
+      };
 
-    case 'CLEAN_UP':
+    case "CLEAN_UP":
       return {
         ...state,
         authError: null
-      }
+      };
 
-    case 'INVALID_DATA':
+    case "INVALID_DATA":
       return {
         ...state,
         authError: action.message
-      }
+      };
 
     default:
       return state;

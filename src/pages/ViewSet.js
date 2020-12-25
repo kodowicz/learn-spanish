@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import styled, { css } from "styled-components";
 
-import MethodChoiceOverlay from "../components/overlay/MethodChoiceOverlay";
 import { Content } from "../components/Background";
 import ProgressBar from "../components/ProgressBar";
 import RatioDots from "../components/RatioDots";
+import MethodChoiceOverlay from "../components/overlay/MethodChoiceOverlay";
 import { LinkButton, Button, BlockElement, Switcher, colors, fonts } from "../assets/styles/GlobalStyles";
 
 const ViewSet = ({
@@ -30,7 +30,7 @@ const ViewSet = ({
   enableEditSet,
   setCurrentSetId
 }) => {
-  const iseditable = author === signedUser ? true : false;
+  const iseditable = author === signedUser;
   const progressBarWidth = window.innerWidth < 768 ? 6 : 7;
 
   useEffect(() => {
@@ -94,28 +94,31 @@ const ViewSet = ({
   }
 };
 
-const Description = ({ signedUser, setDetails, percentage, width }) => (
-  <>
-    <DetailsWrapper isExtended={!isNaN(percentage)}>
-      <SetName isExtended={percentage}>{setDetails.name}</SetName>
-      <Info>{setDetails.amount} terms</Info>
-      <Border />
-      <Info>
-        {"by "}
-        {signedUser === setDetails.authorId ? "you" : setDetails.author}
-      </Info>
-      {!isNaN(percentage) && (
-        <Progress>
-          <ProgressBar
-            percentage={percentage}
-            width={width}
-            bgColor={colors.progress}
-          />
-        </Progress>
-      )}
-    </DetailsWrapper>
-  </>
-);
+const Description = ({ signedUser, setDetails, percentage, width }) => {
+  const isExtended = !isNaN(percentage);
+  return (
+    <>
+      <DetailsWrapper isExtended={isExtended}>
+        <SetName isExtended={isExtended}>{setDetails.name}</SetName>
+        <Info>{setDetails.amount} terms</Info>
+        <Border />
+        <Info>
+          {"by "}
+          { signedUser === setDetails.authorId ? "you" : setDetails.author }
+        </Info>
+        { isExtended && (
+          <Progress>
+            <ProgressBar
+              percentage={percentage}
+              width={width}
+              bgColor={colors.progress}
+            />
+          </Progress>
+        )}
+      </DetailsWrapper>
+    </>
+  )
+};
 
 const Buttons = ({ setid, iseditable, chooseMethod, createEditSet }) => {
   const handleChoice = () => {
@@ -129,7 +132,7 @@ const Buttons = ({ setid, iseditable, chooseMethod, createEditSet }) => {
 
   return (
     <ButtonsWrapper iseditable={iseditable.toString()}>
-      {iseditable && (
+      { iseditable && (
         <div onClick={handleEdit}>
           <LinkButton isCentre={true} to={`/edit/${setid}`}>
             edit set
@@ -153,14 +156,14 @@ const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
       </ListLable>
 
       <List>
-        {terms.map((term, index) => (
+        { terms.map((term, index) => (
           <ListItem key={term.id}>
             <Counter isLessThanTen={index + 1 < 10 ? true : false}>
               {index + 1}
             </Counter>
             <SetWrapper isUserSet={isUserSet}>
               <Term id="term">{term.term}</Term>
-              {isUserSet && <RatioDots ratio={term.ratio} />}
+              { isUserSet && <RatioDots ratio={term.ratio} /> }
               <Line />
               <Term id="definition">{term.definition}</Term>
             </SetWrapper>
@@ -190,14 +193,14 @@ const DetailsWrapper = styled.div`
 `;
 
 const SetName = styled.h1`
-  max-width: ${({ percentage }) => (percentage ? "50vw" : "none")};
+  max-width: ${ props => props.isExtended ? "50vw" : "none" };
   font-weight: ${fonts.bold};
   grid-column: span 4;
   font-size: 3.2rem;
   margin: 0;
 
   @media (min-width: 768px) {
-    max-width: ${({ percentage }) => (percentage ? "35rem" : "none")};
+    max-width: ${ props => props.isExtended ? "35rem" : "none" };
   }
 `;
 
@@ -271,7 +274,7 @@ const ListItem = styled.li`
 `;
 
 const Counter = styled.span`
-  left: ${props => (props.isLessThanTen ? "-8vw" : "-10vw")};
+  left: ${ props => props.isLessThanTen ? "-8vw" : "-10vw" };
   color: ${colors.azure};
   font-weight: ${fonts.bold};
   position: absolute;
@@ -324,10 +327,10 @@ const SetWrapper = styled(BlockElement)`
 `;
 
 const Term = styled.p`
-  font-weight: ${props =>
+  font-weight: ${ props =>
     props.id === "term" ? `${fonts.bold}` : `${fonts.semiBold}`};
   font-size: ${props => (props.id === "term" ? "1.6rem" : "1.4rem")};
-  color: ${props =>
+  color: ${ props =>
     props.id === "term" ? `${colors.white}` : `${colors.lightGray}`};
   margin: 0;
   white-space: pre-line;

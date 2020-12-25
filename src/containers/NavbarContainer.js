@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { deleteSetChanges } from "../store/actions/editSetActions";
+import { deleteSetChanges } from "../store/actions/deleteSetActions";
 import { createBasicTerms } from "../store/actions/createSetActions";
 import { handleMenu, scrollToTop } from "../store/actions/navigationActions";
 import {

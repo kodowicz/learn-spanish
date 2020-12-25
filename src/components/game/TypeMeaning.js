@@ -50,14 +50,14 @@ class TypeMeaning extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { inputValue, correctAnswer, counter } = this.state;
+    const wordsRef = this.dashesRef.current.childNodes;
     const dashesRect = this.dashesRef.current.getBoundingClientRect();
     const wordRect = this.firstWordRef.current.getBoundingClientRect();
-    const dashesWidth = dashesRect.width;
     const inputPadding = wordRect.left - dashesRect.left;
+    const dashesWidth = dashesRect.width;
     const hasMoreLines = dashesRect.height > 60;
-    const wordsRef = this.dashesRef.current.childNodes;
-    let inputWidth = 0;
     const maxWidth = prevProps.isDesktop ? 400 : 250;
+    let inputWidth = 0;
 
     wordsRef.forEach(word => {
       const width = word.getBoundingClientRect().width;
@@ -83,6 +83,7 @@ class TypeMeaning extends Component {
 
       if (counter === 3) {
         window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
+
       } else if (isFinished) {
         window.setTimeout(() => showGameAnswer(item, "correct"), 500);
       }
@@ -107,6 +108,7 @@ class TypeMeaning extends Component {
 
       if (excludedIndexes.includes(0)) {
         this.prompting = setTimeout(this.promptingTimer, 0);
+
       } else {
         this.prompting = setTimeout(
           this.promptingTimer,
@@ -123,7 +125,7 @@ class TypeMeaning extends Component {
         definition: item.definition
       };
     });
-  };
+  }
 
   excludeSpaces(word) {
     const regex = /\s/g;
@@ -135,7 +137,7 @@ class TypeMeaning extends Component {
     }
 
     return array;
-  };
+  }
 
   createGroupedWords(text) {
     let array = text.split("");
@@ -168,7 +170,7 @@ class TypeMeaning extends Component {
     }
 
     return groupedWords.filter(subarray => subarray.length);
-  };
+  }
 
   findCurrentLetter(index, groupedWords) {
     let inputIndex = index;
@@ -181,6 +183,7 @@ class TypeMeaning extends Component {
         if (wordLength - 1 < inputIndex) {
           wordIndex++;
           inputIndex = inputIndex - wordLength;
+
         } else {
           letterIndex = inputIndex;
           inputIndex = 0;
@@ -192,7 +195,7 @@ class TypeMeaning extends Component {
       wordIndex,
       letterIndex
     };
-  };
+  }
 
   getExcludedIndexes(word) {
     // it won't catch special char like
@@ -205,7 +208,7 @@ class TypeMeaning extends Component {
     }
 
     return array;
-  };
+  }
 
   switchSpecialLetters(letters, correctLetters) {
     const chars = [
@@ -232,7 +235,7 @@ class TypeMeaning extends Component {
     if (isCommutable) {
       return correctLetters;
     }
-  };
+  }
 
   handleTyping(event) {
     const inputValue = event.target.value.toLowerCase();
@@ -252,7 +255,10 @@ class TypeMeaning extends Component {
 
       if (!isFinished) {
         const correctLetters = correctAnswer.slice(0, valueIndex);
-        const exchanged = this.switchSpecialLetters(inputValue, correctLetters.toLowerCase());
+        const exchanged = this.switchSpecialLetters(
+          inputValue,
+          correctLetters.toLowerCase()
+        );
 
         if (exchanged || inputValue === correctLetters.toLowerCase()) {
           if (prevState.valueIndex < valueIndex) {
@@ -268,6 +274,7 @@ class TypeMeaning extends Component {
           clearTimeout(this.prompting);
           if (excludedIndexes.includes(valueIndex)) {
             this.prompting = setTimeout(this.promptingTimer, 0);
+
           } else {
             this.prompting = setTimeout(this.promptingTimer, promptingTime);
           }
@@ -303,32 +310,32 @@ class TypeMeaning extends Component {
         }
       }
     });
-  };
+  }
 
   handleAnswer() {
     this.setState({
       isCorrect: false,
       isWrong: false
     });
-  };
+  }
 
   handleFocus(event) {
     this.setState({
       isFocused: true
     });
-  };
+  }
 
   handleBlur(event) {
     this.setState({
       isFocused: false
     });
-  };
+  }
 
   promptingTimer() {
     this.setState({
       isPrompting: true
     });
-  };
+  }
 
   render() {
     const {
@@ -380,23 +387,23 @@ class TypeMeaning extends Component {
             width={inputWidth}
             ref={this.dashesRef}
           >
-            {groupedWords.map((word, wordIndex) => {
+            { groupedWords.map((word, wordIndex) => {
               const isFirstWord = wordIndex === 0;
               const activeWord = wordIndex === promptedLetter.wordIndex;
 
               return (
                 <Word
-                  ref={isFirstWord ? this.firstWordRef : false}
+                  ref={isFirstWord && this.firstWordRef}
                   key={wordIndex}
                 >
-                  {word.map((letter, letterIndex) => {
-                    const activeLetter =
-                      letterIndex === promptedLetter.letterIndex;
+                  { word.map((letter, letterIndex) => {
+                    const activeLetter = letterIndex === promptedLetter.letterIndex;
                     const isActive = activeWord && activeLetter;
+
                     return (
                       <Dash
                         letter={letter}
-                        ref={isActive ? this.dashRef : false}
+                        ref={isActive && this.dashRef}
                         isInputWrong={isInputWrong}
                         isActive={isPrompting && isActive}
                         index={letterIndex}
@@ -424,11 +431,11 @@ const GameWrapper = styled.div`
 `;
 
 const Definition = styled.p`
+  animation: ${popIn} 0.3s linear 0.4s forwards;
   font-size: 3rem;
   text-align: center;
   margin: 7rem 0;
   opacity: 0;
-  animation: ${popIn} 0.3s linear 0.4s forwards;
 
   @media (max-width: 686px) {
     ${({ isFocused }) =>
@@ -485,7 +492,7 @@ const InputWrapper = styled.div`
 `;
 
 const Input = styled(BasicTextArea)`
-  width: ${({ width }) => `${width}px`};
+  width: ${ props => `${props.width}px`};
 
   ${({ isInputWrong }) =>
     isInputWrong
@@ -597,11 +604,7 @@ const Dash = styled.span`
           `};
 
   @media (min-width: 768px) {
-    ${({ letter }) =>
-      letter === " " &&
-      css`
-        width: 0.6rem;
-      `};
+    width: ${ props => props.letter === " " && "0.6rem" }
   }
 `;
 

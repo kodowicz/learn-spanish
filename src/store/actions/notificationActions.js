@@ -31,7 +31,7 @@ export const removeLogoutNotification = () => ({
 });
 
 // error notification
-export const setNotification = message => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const setNotification = message => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 

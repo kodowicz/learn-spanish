@@ -133,7 +133,7 @@ class ArrayBubbles extends Component {
         bubbles: this.shuffleOptions(bubbles)
       };
     });
-  };
+  }
 
   chunkString(reducedStr) {
     let bubbles = [];
@@ -155,7 +155,7 @@ class ArrayBubbles extends Component {
     bubbles = bubbles.flatMap(bubble => bubble.trim().split(" "));
 
     return bubbles;
-  };
+  }
 
   createBubbles(str) {
     let bubbles = [];
@@ -174,7 +174,7 @@ class ArrayBubbles extends Component {
     bubbles = bubbles.map((text, index) => ({ text, index }));
 
     return bubbles;
-  };
+  }
 
   createLetters(term, excludedIndexes) {
     let letters = [];
@@ -187,7 +187,7 @@ class ArrayBubbles extends Component {
       );
 
     return letters;
-  };
+  }
 
   createGroupedWords(text, excludedIndexes) {
     let array = text.split("");
@@ -234,7 +234,7 @@ class ArrayBubbles extends Component {
     }
 
     return groupedWords.filter(subarray => subarray.length);
-  };
+  }
 
   getExcludedIndexes(word) {
     // it won't catch special char like
@@ -247,12 +247,12 @@ class ArrayBubbles extends Component {
     }
 
     return array;
-  };
+  }
 
   shuffleOptions(array) {
     const newOrder = [...array];
     return newOrder.sort(() => Math.random() - 0.5);
-  };
+  }
 
   revealLetters(currentIndex, groupedWords) {
     let leftLetters = currentIndex;
@@ -268,7 +268,7 @@ class ArrayBubbles extends Component {
         return obj;
       });
     });
-  };
+  }
 
   handlePicking(event) {
     const pickedBubble = event.target.id;
@@ -344,20 +344,20 @@ class ArrayBubbles extends Component {
         };
       }
     });
-  };
+  }
 
   handleAnswer() {
     this.setState({
       isCorrect: false,
       isWrong: false
     });
-  };
+  }
 
   promptingTimer() {
     this.setState({
       isPrompting: true
     });
-  };
+  }
 
   render() {
     const {
@@ -379,9 +379,8 @@ class ArrayBubbles extends Component {
         <Definition>{definition}</Definition>
 
         <BubblesWrapper ref={this.boundaryRef}>
-          {bubbles.map(({ text, index }, bubbleIndex) => {
-            const isShaken =
-              isPrompting && index === tabIndex;
+          { bubbles.map(({ text, index }, bubbleIndex) => {
+            const isShaken = isPrompting && index === tabIndex;
 
             return (
               <BubbleComponent
@@ -407,9 +406,9 @@ class ArrayBubbles extends Component {
           onAnimationEnd={this.handleAnswer}
         >
           <Letters>
-            {groupedWords.map((word, wordIndex) => (
+            { groupedWords.map((word, wordIndex) => (
               <Word key={wordIndex}>
-                {word.map(({ letter, isVisible }, letterIndex) => (
+                { word.map(({ letter, isVisible }, letterIndex) => (
                   <Letter
                     letter={letter}
                     index={letterIndex}
@@ -429,7 +428,7 @@ class ArrayBubbles extends Component {
   }
 }
 
-class BubbleComponent extends React.Component {
+class BubbleComponent extends Component {
   constructor(props) {
     super(props);
 
@@ -531,12 +530,12 @@ const BubblesWrapper = styled.div`
 const BubbleWrapper = styled.div`
   ${({ startOffsetLeft, startOffsetTop, offsetLeft, offsetTop, index }) =>
     css`
-      animation-name: ${moveForwards(startOffsetLeft, startOffsetTop, offsetLeft, offsetTop)};
+      animation-name: ${moveForwards(startOffsetLeft,startOffsetTop,offsetLeft,offsetTop)};
       animation-duration: 0.4s;
       animation-delay: ${0.05 + index * 0.05}s;
       animation-fill-mode: both;
     `};
-  visibility: ${({ id }) => !id && "hidden"};
+  visibility: ${({ id }) => !id && "hidden" };
   width: 5.5rem;
   height: 5.5rem;
   position: absolute;

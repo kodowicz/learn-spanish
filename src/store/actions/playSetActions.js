@@ -1,4 +1,4 @@
-export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createPlaySet = setid => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -22,26 +22,21 @@ export const createPlaySet = setid => (dispatch, getState, { getFirebase, getFir
           });
         });
 
-        setTermsRef
-          .get()
-          .then(snap => {
-            snap.docs.forEach(doc => {
-              const { id, term, definition, time, termRows, definitionRows } = doc.data();
+        setTermsRef.get().then(snap => {
+          snap.docs.forEach(doc => {
+            const { id } = doc.data();
 
-              const playSetRef = firestore.doc(`users/${uid}/learn/${setid}/game/${id}`);
+            const playSetRef = firestore.doc(
+              `users/${uid}/learn/${setid}/game/${id}`
+            );
 
-              playSetRef.set({
-                id,
-                term,
-                definition,
-                time,
-                termRows,
-                definitionRows,
-                ratio: 0,
-                isMastered: false
-              });
+            playSetRef.set({
+              ...doc.data(),
+              ratio: 0,
+              isMastered: false
             });
           });
+        });
       }
     })
     .then(() => {
@@ -63,7 +58,7 @@ export const showGameAnswer = (item, answer) => ({
   answer
 });
 
-export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirebase, getFirestore }) => {
+export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
@@ -80,45 +75,41 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
   const itemsRef = firestore.collection(`users/${user}/learn/${set}/game`);
   const docRef = firestore.doc(`users/${user}/learn/${set}/game/${item.id}`);
 
-  setRef
-    .get()
-    .then(doc => {
-      const { amount, isCompleted, knowledge: prevKnowledge } = doc.data();
-      wasCompleted = isCompleted;
+  setRef.get().then(doc => {
+    const { amount, isCompleted, knowledge: prevKnowledge } = doc.data();
+    wasCompleted = isCompleted;
 
-      if (prevKnowledge) {
-        if (newRatio >= minRatio && newRatio <= maxRatio) {
-          knowledge = prevKnowledge + (isCorrect ? 1 : -1);
-        } else {
-          knowledge = prevKnowledge;
+    if (prevKnowledge) {
+      if (newRatio >= minRatio && newRatio <= maxRatio) {
+        knowledge = prevKnowledge + (isCorrect ? 1 : -1);
+      } else {
+        knowledge = prevKnowledge;
+      }
+    } else {
+      knowledge = isCorrect ? 1 : 0;
+    }
+
+    itemsRef.get().then(snapshot => {
+      const isCompleted = snapshot.docs.every(doc => doc.data().isMastered);
+
+      if (isCompleted) {
+        setRef.update({
+          isCompleted: true
+        });
+
+        if (!wasCompleted) {
+          userRef.update({
+            notification: "Congrats! You know every term!"
+          });
         }
       } else {
-        knowledge = isCorrect ? 1 : 0;
+        setRef.update({
+          knowledge,
+          isCompleted: false
+        });
       }
-
-      itemsRef
-        .get()
-        .then(snapshot => {
-          const isCompleted = snapshot.docs.every(doc => doc.data().isMastered);
-
-          if (isCompleted) {
-            setRef.update({
-              isCompleted: true
-            });
-
-            if (!wasCompleted) {
-              userRef.update({
-                notification: "Congrats! You know every term!"
-              });
-            }
-          } else {
-            setRef.update({
-              knowledge,
-              isCompleted: false
-            });
-          }
-        })
     });
+  });
 
   docRef
     .update({

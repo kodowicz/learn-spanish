@@ -45,7 +45,6 @@ const PlaySet = ({
     volume: 1
   };
 
-
   useEffect(() => {
     changeLocation("learn");
     setCurrentSetId(setid);
@@ -65,7 +64,7 @@ const PlaySet = ({
         const speechSynthesis = new SpeechVoices();
         const voices = speechSynthesis.getVoices();
 
-        setVoices(voices)
+        setVoices(voices);
       }
     },
     [voices]
@@ -80,8 +79,8 @@ const PlaySet = ({
 
   if (isGameOverOpen) {
     return <GameOverOverlay setid={setid} finishGame={finishGame} />;
-  } else {
 
+  } else {
     return (
       <Content ref={contentRef}>
         <GameTimer
@@ -91,7 +90,7 @@ const PlaySet = ({
           finishGame={finishGame}
         />
 
-        {answer ? (
+        { answer ? (
           <Solution
             answer={answer}
             correctItem={correctItem}
@@ -102,11 +101,10 @@ const PlaySet = ({
           />
         ) : (
           <>
-            {isCancelOpen && (
+            { isCancelOpen && (
               <StopLearningOverlay setid={setid} cancelSesion={cancelSesion} />
             )}
             <Game
-              setid={setid}
               isCompleted={isCompleted}
               isHidden={isCancelOpen}
               terms={terms}
@@ -120,7 +118,7 @@ const PlaySet = ({
   }
 };
 
-const Game = ({ setid, isCompleted, isHidden, terms, showGameAnswer }) => {
+const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
   const [item, setItem] = useState({});
   const [game, setgame] = useState(0);
   const isDesktop = window.innerWidth >= 768;
@@ -233,7 +231,7 @@ const Content = styled.div`
 `;
 
 const GameWrapper = styled.div`
-  visibility: ${({ isHidden }) => isHidden && "hidden"};
+  visibility: ${ props => props.isHidden && "hidden" };
   cursor: pointer;
 `;
 

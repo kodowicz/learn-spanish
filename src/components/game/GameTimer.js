@@ -3,8 +3,8 @@ import styled from "styled-components";
 
 const GameTimer = ({ isStopped, isAnswered, isAnimated, finishGame }) => {
   const [time, setTime] = useState(5 * 60);
-  let interval;
   const clock = timer(time);
+  let interval;
 
   function timer(time) {
     const minutes = Math.floor(time / 60);
@@ -37,14 +37,14 @@ const GameTimer = ({ isStopped, isAnswered, isAnimated, finishGame }) => {
   return (
     <Timer isVisible={isStopped || isAnswered}>
       {clock.minutes}
-      :
+      {":"}
       {clock.seconds}
     </Timer>
   );
 };
 
 const Timer = styled.span`
-  visibility: ${({ isVisible }) => (isVisible ? `hidden` : `visible`)};
+  visibility: ${ props => props.isVisible && "hidden" };
   position: fixed;
   top: 7.2rem;
   right: 7vw;

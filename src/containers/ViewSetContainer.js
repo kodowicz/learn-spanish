@@ -6,7 +6,7 @@ import { chooseMethod } from "../store/actions/overlayActions";
 import { createLearnSet } from "../store/actions/learnSetActions";
 import { createPlaySet } from "../store/actions/playSetActions";
 import { removeNewKey } from "../store/actions/createSetActions";
-import { deleteSetChanges } from "../store/actions/editSetActions";
+import { deleteSetChanges } from "../store/actions/deleteSetActions";
 import { sortTerms } from "../store/actions/setActions";
 import { createEditSet } from "../store/actions/editSetActions";
 import {

@@ -11,7 +11,7 @@ class ChooseBetweenFour extends Component {
       isInSpanish: true,
       term: "",
       options: [],
-      startingPosition: {
+      startPosition: {
         left: 0,
         top: 0
       }
@@ -26,7 +26,7 @@ class ChooseBetweenFour extends Component {
 
   shuffleOptions(array) {
     return array.sort(() => Math.random() - 0.5);
-  };
+  }
 
   createGame() {
     this.setState((prevState, props) => {
@@ -36,7 +36,7 @@ class ChooseBetweenFour extends Component {
       const term = isInSpanish ? item.term : item.definition;
       let options = [item.id];
 
-      const startingPosition = {
+      const startPosition = {
         left: styles.offsetLeft,
         top: styles.offsetTop
       };
@@ -45,6 +45,7 @@ class ChooseBetweenFour extends Component {
         const index = Math.floor(Math.random() * terms.length);
         const id = terms[index].id;
         const isTaken = options.some(element => element === id);
+
         if (!isTaken) {
           options.push(id);
         }
@@ -53,7 +54,7 @@ class ChooseBetweenFour extends Component {
       return {
         isInSpanish,
         term,
-        startingPosition,
+        startPosition,
         options: this.shuffleOptions(options)
       };
     });
@@ -68,7 +69,7 @@ class ChooseBetweenFour extends Component {
     } else {
       showGameAnswer(item, "wrong");
     }
-  };
+  }
 
   render() {
     const { terms } = this.props;
@@ -77,24 +78,25 @@ class ChooseBetweenFour extends Component {
       isInSpanish,
       term,
       options,
-      startingPosition
+      startPosition
     } = this.state;
 
     return (
       <GameWrapper>
         <Term ref={this.termRef}>{term}</Term>
 
-        {options.map((termid, index) => {
+        { options.map((termid, index) => {
           const elementid = terms.findIndex(element => element.id === termid);
           return (
             <div key={termid} onClick={() => this.handleChosenAnswer(termid)}>
               <DefinitionOption
                 index={index}
-                startingPosition={startingPosition}
+                startPosition={startPosition}
               >
-                {isInSpanish
-                  ? terms[elementid].definition
-                  : terms[elementid].term}
+                { isInSpanish
+                  ? terms[elementid].definition 
+                  : terms[elementid].term
+                }
               </DefinitionOption>
             </div>
           );
@@ -118,12 +120,11 @@ class DefinitionOption extends Component {
 
   componentDidMount() {
     this.setState((state, props) => {
-      const { startingPosition } = props;
+      const { startPosition } = props;
       const styles = this.optionRef.current;
       const transformStart = {
-        left:
-          startingPosition.left - styles.offsetLeft - styles.offsetWidth / 2,
-        top: startingPosition.top - styles.offsetTop - styles.offsetHeight / 2
+        left: startPosition.left - styles.offsetLeft - styles.offsetWidth / 2,
+        top: startPosition.top - styles.offsetTop - styles.offsetHeight / 2
       };
 
       return { transformStart };
