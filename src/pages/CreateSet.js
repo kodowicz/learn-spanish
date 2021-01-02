@@ -9,6 +9,7 @@ import { Button, BasicInput, colors } from "../assets/styles/GlobalStyles";
 
 const CreateSet = ({
   uid,
+  isGuest,
   setid,
   setName,
   terms,
@@ -72,6 +73,7 @@ const CreateSet = ({
   if (!uid) return <Redirect to="/signup" />;
   if (newSetKey) return <Redirect to={`/sets/${newSetKey}`} />;
   if (isSetDeleted) return <Redirect to="/" />;
+  if (isGuest) return <Redirect to={`/profile/${uid}`} />;
 
   if (isOverlayOpen) {
     return (

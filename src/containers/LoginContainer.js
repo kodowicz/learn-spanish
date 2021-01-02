@@ -8,6 +8,7 @@ import {
 import {
   signUp,
   signIn,
+  guestLogin,
   cleanErrorNotification,
   signUpError
 } from "../store/actions/authActions";
@@ -20,6 +21,7 @@ const LoginContainer = props => (
     authError={props.authError}
     signIn={props.signIn}
     signUp={props.signUp}
+    guestLogin={props.guestLogin}
     signUpError={props.signUpError}
     removeNotification={props.cleanErrorNotification}
     changeLocation={props.changeLocation}
@@ -39,6 +41,7 @@ export default connect(
     signIn,
     signUp,
     signUpError,
+    guestLogin,
     cleanErrorNotification,
     changeLocation,
     changeLastLocation,

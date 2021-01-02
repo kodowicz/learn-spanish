@@ -25,6 +25,7 @@ const CreateSetContainer = props => {
   return props.isLoaded ? (
     <CreateSet
       uid={props.uid}
+      isGuest={props.isGuest}
       location={props.location}
       lastLocation={props.lastLocation}
       isOverlayOpen={props.isOverlayOpen}
@@ -56,6 +57,7 @@ const mapStateToProps = state => {
   const terms = state.firestore.ordered.unsavedTerms;
   const setName = state.firebase.profile.unsavedSet;
   const uid = state.firebase.auth.uid;
+  const isGuest = state.firebase.auth.email === "guest@gmail.com";
 
   return {
     terms,

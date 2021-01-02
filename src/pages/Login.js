@@ -13,6 +13,7 @@ const Login = ({
   authError,
   signIn,
   signUp,
+  guestLogin,
   signUpError,
   removeNotification,
   changeLocation,
@@ -57,47 +58,49 @@ const Login = ({
           <Switch
             role="tab"
             id="signin"
-            aria-controls="signin-tab"
-            tabIndex={isToggled ? "0" : "-1"}
+            aria-controls="signup-tab"
             aria-selected={!isToggled}
+            tabIndex={isToggled ? "0" : "-1"}
             onKeyDown={handleKeySwitch}
             onClick={() => handleSwitch(false)}
           >
-            sign up
+            sign in
           </Switch>
           <Switch
             role="tab"
             id="signup"
-            aria-controls="signup-tab"
+            aria-controls="signin-tab"
             aria-selected={isToggled}
             tabIndex={isToggled ? "-1" : "0"}
             onKeyDown={handleKeySwitch}
             onClick={() => handleSwitch(true)}
           >
-            sign in
+            sign up
           </Switch>
           <Border isToggled={isToggled} />
         </TabList>
 
         <div
-          hidden={isToggled ? "" : "hidden"}
+          hidden={isToggled ? "hidden" : ""}
           role="tabpanel"
           id="signin-tab"
           tabIndex="0"
           aria-labelledby="signin"
         >
-          { isToggled && <SignIn auth={auth} signIn={signIn} /> }
+          { !isToggled && (
+            <SignIn signIn={signIn} guestLogin={guestLogin} />
+          )}
         </div>
 
         <div
-          hidden={isToggled ? "hidden" : ""}
+          hidden={isToggled ? "" : "hidden"}
           role="tabpanel"
           id="signup-tab"
           tabIndex="0"
           aria-labelledby="signup"
         >
-          { !isToggled && (
-            <SignUp auth={auth} signUp={signUp} signUpError={signUpError} />
+          { isToggled && (
+            <SignUp signUp={signUp} setNotification={setNotification} />
           )}
         </div>
       </Content>

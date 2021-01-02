@@ -84,32 +84,46 @@ const ViewProfile = ({
           To learn, create sets or edit existing ones you have to be signed in.
         </Paragraph>
         <LinkButton to="/signup" center="true">
-          sign up
+          sign in
         </LinkButton>
       </Content>
     );
   }
 };
 
-const UserDetails = ({ user, openPasswordOverlay }) => (
-  <UserWrapper>
-    <UserItem>
-      <span>email</span>
-      <span>{user.email}</span>
-    </UserItem>
-    <UserItem>
-      <span>username</span>
-      <span>{user.username}</span>
-    </UserItem>
-    <UserItem>
-      <span>change password</span>
-      <ArrowButton onClick={() => openPasswordOverlay(true)}>
-        <Img src={arrow} alt="change password" />
-      </ArrowButton>
-    </UserItem>
-  </UserWrapper>
-);
+const UserDetails = ({ user, openPasswordOverlay }) => {
+  const isGuest = user.email === "guest@gmail.com";
 
+  if (isGuest) {
+    return (
+      <UserWrapper isGuest>
+        <Paragraph>
+          You are logged as a guest. You are allowed only to learn sets.
+          If you want to create your own sets you have to be signed as a user.
+        </Paragraph>
+      </UserWrapper>
+    );
+  } else {
+    return (
+      <UserWrapper>
+        <UserItem>
+          <span>email</span>
+          <span>{user.email}</span>
+        </UserItem>
+        <UserItem>
+          <span>username</span>
+          <span>{user.username}</span>
+        </UserItem>
+        <UserItem>
+          <span>change password</span>
+          <ArrowButton onClick={() => openPasswordOverlay(true)}>
+            <Img src={arrow} alt="change password" />
+          </ArrowButton>
+        </UserItem>
+      </UserWrapper>
+    );
+  }
+}
 const Title = styled.h1`
   font-weight: ${fonts.bold};
   font-size: 2.5rem;
@@ -122,16 +136,14 @@ const Title = styled.h1`
 `;
 
 const UserWrapper = styled.ul`
+  max-width: ${ props => !props.isGuest && "35rem" };
   padding: 0;
   margin: 3rem auto;
   width: 100%;
-  max-width: 350px;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
 
   @media (min-width: 768px) {
-    width: 350px;
     margin: 4rem auto;
-    font-size: 1.6rem;
   }
 `;
 
