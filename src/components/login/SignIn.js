@@ -8,7 +8,7 @@ import {
   colors
 } from "../../assets/styles/GlobalStyles";
 
-const SignIn = ({ signIn }) => {
+const SignIn = ({ signIn, guestLogin }) => {
   const [login, setLogin] = useState({
     email: "",
     password: ""
@@ -27,33 +27,40 @@ const SignIn = ({ signIn }) => {
     signIn(login);
   }
 
-  return (
-    <Form onSubmit={handleSubmit}>
-      <Wrapper>
-        <Label htmlFor="email">email</Label>
-        <Input
-          required
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          onChange={handleChange}
-        />
-      </Wrapper>
-      <Wrapper>
-        <Label htmlFor="password">password</Label>
-        <Input
-          required
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          onChange={handleChange}
-        />
-      </Wrapper>
+  function handleLoginGuest() {
+    guestLogin()
+  }
 
-      <Button center="true">sign in</Button>
-    </Form>
+  return (
+    <>
+      <Form onSubmit={handleSubmit}>
+        <Wrapper>
+          <Label htmlFor="email">email</Label>
+          <Input
+            required
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            onChange={handleChange}
+          />
+        </Wrapper>
+        <Wrapper>
+          <Label htmlFor="password">password</Label>
+          <Input
+            required
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            onChange={handleChange}
+          />
+        </Wrapper>
+
+        <Button center="true">sign in</Button>
+      </Form>
+      <Button center="true" onClick={handleLoginGuest}>as guest</Button>
+    </>
   );
 };
 
