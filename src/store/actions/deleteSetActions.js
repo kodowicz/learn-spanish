@@ -1,4 +1,4 @@
-export const deleteCreateSet = () => (dispatch, getState, { getFirestore }) => {
+export const deleteCreateSet = isDeleted => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
 
@@ -9,8 +9,7 @@ export const deleteCreateSet = () => (dispatch, getState, { getFirestore }) => {
     .get()
     .then(snapshot => {
       userRef.update({
-        unsavedSet: "",
-        notification: "changes has been deleted"
+        unsavedSet: ""
       });
       snapshot.forEach(doc => {
         doc.ref.delete();
@@ -18,8 +17,7 @@ export const deleteCreateSet = () => (dispatch, getState, { getFirestore }) => {
     })
     .then(() => {
       dispatch({
-        type: "DELETE_CREATE_SET",
-        payload: true
+        type: "DELETE_CREATE_SET"
       });
     })
     .catch(error => {
@@ -40,13 +38,12 @@ export const deleteEditSet = () => (dispatch, getState, { getFirestore }) => {
   const setRef = firestore.doc(`sets/${setid}`);
   const termsRef = firestore.collection(`sets/${setid}/terms`);
   const userSetRef = firestore.doc(`users/${uid}/learn/${setid}`);
-  const learnSetRef = firestore.collection(`users/${uid}/learn/${setid}/flashcards`);
-  const playSetRef = firestore.collection(`users/${uid}/learn/${setid}/game`);
+  const learnSetRef = userSetRef.collection("flashcards");
+  const playSetRef = userSetRef.collection("game");
 
   // cloud functions
   userRef.update({
-    editedSet: "",
-    notification: "The set has been deleted"
+    editedSet: ""
   });
 
   learnSetRef.get().then(snapshot => {
@@ -85,7 +82,7 @@ export const deleteEditSet = () => (dispatch, getState, { getFirestore }) => {
     });
 };
 
-export const deleteSetChanges = () => (dispatch, getState, { getFirestore }) => {
+export const deleteSetChanges = isDeleted => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
   const setid = getState().navigation.setid;
@@ -107,15 +104,10 @@ export const deleteSetChanges = () => (dispatch, getState, { getFirestore }) => 
       editedRef.delete();
     })
     .then(() => {
-      dispatch({
-        type: "DELETE_SET_CHANGES",
-        payload: true
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: "DELETE_SET_CHANGES_ERROR",
-        error
-      });
+      if (!isDeleted) {
+        dispatch({
+          type: "DELETE_EDIT_CHANGES"
+        });
+      }
     });
 };

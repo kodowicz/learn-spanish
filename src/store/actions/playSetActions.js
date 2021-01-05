@@ -39,11 +39,6 @@ export const createPlaySet = setid => (dispatch, getState, { getFirestore }) => 
         });
       }
     })
-    .then(() => {
-      dispatch({
-        type: "CREATE_PLAY_SET"
-      });
-    })
     .catch(error => {
       dispatch({
         type: "CREATE_PLAY_SET_ERROR",
@@ -98,8 +93,8 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
         });
 
         if (!wasCompleted) {
-          userRef.update({
-            notification: "Congrats! You know every term!"
+          dispatch({
+            type: "GAME_COMPLETED"
           });
         }
       } else {
@@ -113,7 +108,6 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
 
   docRef
     .update({
-      time,
       isMastered,
       ratio:
         maxRatio < newRatio

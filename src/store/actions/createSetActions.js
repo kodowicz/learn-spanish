@@ -5,21 +5,7 @@ export const setUnsavedName = unsavedSet => (dispatch, getState, { getFirestore 
 
   const userRef = firestore.doc(`users/${authid}/`);
 
-  userRef
-    .update({
-      unsavedSet
-    })
-    .then(() => {
-      dispatch({
-        type: "CREATE_SET_NAME"
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: "CREATE_SET_NAME_ERROR",
-        error
-      });
-    });
+  userRef.update({ unsavedSet });
 };
 
 // if there is no basic terms
@@ -42,7 +28,7 @@ export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => 
       while (size <= termsLength) {
         let newDocument = unsavedRef.doc();
         let keyId = newDocument.id;
-        let time = new Date(date + (size * delay));
+        let time = new Date(date + size * delay);
 
         newDocument.set({
           time,
@@ -50,22 +36,14 @@ export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => 
           term: "",
           definition: "",
           termRows: 1,
-          definitionRows: 1,
+          definitionRows: 1
         });
 
         size++;
       }
     })
-    .then(() => {
-      dispatch({
-        type: "CREATE_BASIC_SET"
-      });
-    })
     .catch(error => {
-      dispatch({
-        type: "CREATE_BASIC_SET_ERROR",
-        error
-      });
+      dispatch({ type: "CREATE_BASIC_SET_ERROR" });
     });
 };
 
@@ -89,16 +67,8 @@ export const updateUnsavedTerm = element => (dispatch, getState, { getFirestore 
         });
       }
     })
-    .then(() => {
-      dispatch({
-        type: "CREATE_SET_TERM"
-      });
-    })
     .catch(error => {
-      dispatch({
-        type: "CREATE_SET_TERM_ERROR",
-        error
-      });
+      dispatch({ type: "UPDATE_TERM_ERROR" });
     });
 };
 
@@ -114,16 +84,8 @@ export const removeUnsavedTerm = termid => (dispatch, getState, { getFirestore }
     .then(() => {
       docRef.delete();
     })
-    .then(() => {
-      dispatch({
-        type: "DELETE_CREATE_TERM"
-      });
-    })
     .catch(error => {
-      dispatch({
-        type: "DELETE_CREATE_TERM_ERROR",
-        error
-      });
+      dispatch({ type: "DELETE_TERM_ERROR" });
     });
 };
 
@@ -133,34 +95,24 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
   const uid = getState().firebase.auth.uid;
   const termsRef = firestore.collection(`users/${uid}/unsaved`);
 
-  termsRef
-    .get()
-    .then(snap => {
-      if (snap.size < 50) {
-        const termRef = termsRef.doc();
+  termsRef.get().then(snap => {
+    if (snap.size < 50) {
+      const termRef = termsRef.doc();
 
-        termRef
-          .set({
-            id: termRef.id,
-            term: "",
-            definition: "",
-            termRows: 1,
-            definitionRows: 1,
-            time: new Date()
-          })
-          .then(() => {
-            dispatch({
-              type: "ADD_UNSAVED_NEW_TERM"
-            });
-          })
-          .catch(error => {
-            dispatch({
-              type: "ADD_UNSAVED_NEW_TERM_ERROR",
-              error
-            });
-          });
-      }
-    });
+      termRef
+        .set({
+          id: termRef.id,
+          term: "",
+          definition: "",
+          termRows: 1,
+          definitionRows: 1,
+          time: new Date()
+        })
+        .catch(error => {
+          dispatch({ type: "ADD_TERM_ERROR" });
+        });
+    }
+  });
 };
 
 // submit set of prompt an error
@@ -204,7 +156,6 @@ export const submitCreateSet = terms => (dispatch, getState, { getFirestore }) =
 
       terms.forEach(element => {
         const termsRef = firestore.collection(`sets/${createRef.id}/terms`).doc();
-        const learnRef = firestore.doc(`users/${uid}/learn/${createRef.id}`);
         const flashcardsRef = learnRef.collection("flashcards").doc(termsRef.id);
         const gameRef = learnRef.collection("game").doc(termsRef.id);
 
@@ -213,13 +164,17 @@ export const submitCreateSet = terms => (dispatch, getState, { getFirestore }) =
         });
 
         flashcardsRef.set({
-          ...element
+          id: termsRef.id,
+          term: element.term,
+          definition: element.definition,
+          time: element.time
         });
 
         gameRef.set({
           ...element,
           ratio: 0,
-          isMastered: false
+          isMastered: false,
+          id: termsRef.id
         });
       });
     })
@@ -230,10 +185,7 @@ export const submitCreateSet = terms => (dispatch, getState, { getFirestore }) =
       });
     })
     .catch(error => {
-      dispatch({
-        type: "CREATE_SET_ERROR",
-        error
-      });
+      dispatch({ type: "CREATE_SET_ERROR" });
     });
 };
 

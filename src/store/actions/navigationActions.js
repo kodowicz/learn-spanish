@@ -18,9 +18,13 @@ export const setCurrentSetId = id => ({
   payload: id
 });
 
+// replace ?
 export const enableEditSet = () => ({
-  type: "ENABLE_CREATE_SET",
-  payload: false
+  type: "ENABLE_EDIT_SET"
+});
+
+export const enableCreateSet = () => ({
+  type: "ENABLE_CREATE_SET"
 });
 
 export const setContentHeight = height => ({

@@ -19,7 +19,7 @@ const ViewProfile = ({
   setContentHeight,
   setNotification,
   logOut,
-  logoutNotification
+  // logoutNotification
 }) => {
   useEffect(() => {
     changeLocation("profile");
@@ -35,7 +35,7 @@ const ViewProfile = ({
 
   function handleClick() {
     logOut();
-    logoutNotification();
+    // logoutNotification();
   }
 
   if (uid) {

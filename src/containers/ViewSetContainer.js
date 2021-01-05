@@ -14,6 +14,7 @@ import {
   changeLastLocation,
   setContentHeight,
   setCurrentSetId,
+  enableCreateSet,
   enableEditSet
 } from "../store/actions/navigationActions";
 
@@ -45,6 +46,7 @@ const ViewSetContainer = props => {
       createLearnSet={props.createLearnSet}
       createPlaySet={props.createPlaySet}
       enableEditSet={props.enableEditSet}
+      enableCreateSet={props.enableCreateSet}
     />
   ) : (
     <></>
@@ -75,7 +77,7 @@ function orderTerms(terms, orderBy) {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const setDetails = state.firestore.data.setDetails;
+  const setDetails = state.firestore.data.setDetails || undefined;
   const author = setDetails ? setDetails.authorId : null;
   const terms = state.firestore.ordered.viewTerms;
   const userProgress = state.firestore.data.userProgress;
@@ -95,10 +97,10 @@ const mapStateToProps = (state, ownProps) => {
     setDetails,
     isUserSet,
     terms: orderedTerms,
-    sortedBy: state.sortedBy,
     signedUser: state.firebase.auth.uid,
     lastLocation: state.navigation.lastLocation,
-    isEditSubmited: state.isEditSubmited,
+    sortedBy: state.setStatus.sortedBy,
+    isEditSubmited: state.setStatus.isEditSubmited,
     isOverlayOpen: state.isOverlayOpen.isChosen,
     isLoaded: userProgress
       ? isLoaded(terms, setDetails, userProgress)
@@ -120,6 +122,7 @@ export default compose(
       chooseMethod,
       createLearnSet,
       createPlaySet,
+      enableCreateSet,
       enableEditSet,
       deleteSetChanges
     }

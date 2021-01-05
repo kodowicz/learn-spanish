@@ -37,11 +37,6 @@ export const createLearnSet = setid => (dispatch, getState, { getFirestore }) =>
         });
       }
     })
-    .then(() => {
-      dispatch({
-        type: "CREATE_LEARN_SET"
-      });
-    })
     .catch(error => {
       dispatch({
         type: "CREATE_LEARN_SET_ERROR",
@@ -62,17 +57,6 @@ export const shuffleCard = term => (dispatch, getState, { getFirestore }) => {
     .update({
       time
     })
-    .then(() => {
-      dispatch({
-        type: "SHUFFLE_CARD"
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: "SHUFFLE_CARD_ERROR",
-        error
-      });
-    });
 };
 
 export const throwoutCard = term => (dispatch, getState, { getFirestore }) => {
@@ -82,17 +66,5 @@ export const throwoutCard = term => (dispatch, getState, { getFirestore }) => {
 
   const docRef = firestore.doc(`users/${uid}/learn/${set}/flashcards/${term}`);
 
-  docRef
-    .delete()
-    .then(() => {
-      dispatch({
-        type: "THROWOUT_CARD"
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: "THROWOUT_CARD_ERROR",
-        error
-      });
-    });
+  docRef.delete();
 };

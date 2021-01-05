@@ -27,6 +27,7 @@ const ViewSet = ({
   changeLastLocation,
   setContentHeight,
   removeNewKey,
+  enableCreateSet,
   enableEditSet,
   setCurrentSetId
 }) => {
@@ -37,6 +38,7 @@ const ViewSet = ({
     changeLocation("set");
     changeLastLocation("/");
     removeNewKey();
+    enableCreateSet();
     enableEditSet();
     setCurrentSetId(match.params.id);
   }, []);
@@ -99,7 +101,7 @@ const Description = ({ signedUser, setDetails, percentage, width }) => {
   return (
     <>
       <DetailsWrapper isExtended={isExtended}>
-        <SetName isExtended={isExtended}>{setDetails.name}</SetName>
+        <SetName isExtended={isExtended}>{setDetails?.name}</SetName>
         <Info>{setDetails.amount} terms</Info>
         <Border />
         <Info>

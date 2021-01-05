@@ -2,10 +2,7 @@ import React from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { firestoreConnect } from "react-redux-firebase";
-import {
-  removeNotification,
-  removeLogoutNotification
-} from "../store/actions/notificationActions";
+import { cleanNotification } from "../store/actions/notificationActions";
 
 import Notification from "../components/navbar/Notification";
 
@@ -13,8 +10,7 @@ const NotificationContainer = props => {
   return props.message ? (
     <Notification
       message={props.message}
-      removeNotification={props.removeNotification}
-      removeLogoutNotification={props.removeLogoutNotification}
+      cleanNotification={props.cleanNotification}
     />
   ) : (
     <></>
@@ -27,27 +23,11 @@ const mapStateToProps = state => {
 
   return {
     uid: state.firebase.auth.uid,
-    message: userDetails?.notification || state.auth.authError
+    message: state.notification
   };
 };
 
-export default compose(
-  connect(
-    mapStateToProps,
-    {
-      removeNotification,
-      removeLogoutNotification
-    }
-  ),
-  firestoreConnect(props => {
-    return props.uid
-      ? [
-          {
-            collection: "users",
-            doc: props.uid,
-            storeAs: "user"
-          }
-        ]
-      : [];
-  })
+export default connect(
+  mapStateToProps,
+  { cleanNotification }
 )(NotificationContainer);

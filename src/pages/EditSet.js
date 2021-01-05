@@ -73,7 +73,6 @@ const EditSet = ({
   }
 
   if (!uid) return <Redirect to={`/sets/${setid}`} />;
-  if (isEditSubmited) return <Redirect to={`/sets/${setid}`} />;
   if (isSetDeleted) return <Redirect to="/" />;
 
   if (isOverlayOpen) {
@@ -104,6 +103,7 @@ const EditSet = ({
           </SetName>
 
           <Buttons
+            setid={setid}
             topic={topic}
             terms={terms}
             askForDeleting={askForDeleting}
@@ -127,12 +127,15 @@ const EditSet = ({
 };
 
 const Buttons = ({
+  setid,
   topic,
   terms,
   askForDeleting,
   submitSet,
   setNotification
 }) => {
+  const [isSubmited, setSubmited] = useState(false);
+
   function reduceTerms(terms) {
     return terms
       .map(element => ({
@@ -174,6 +177,7 @@ const Buttons = ({
 
     } else {
       submitSet(reducedTerms);
+      setSubmited(true);
     }
   }
 
@@ -182,6 +186,7 @@ const Buttons = ({
     askForDeleting(true);
   }
 
+  if (isSubmited) return <Redirect to={`/sets/${setid}`} />;
   return (
     <ButtonsWrapper>
       <Button onClick={handleDeleteSet}>delete set</Button>

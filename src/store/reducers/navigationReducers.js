@@ -1,7 +1,10 @@
+import * as types from "../../constants/actionTypes";
+
 const initState = {
   location: "home",
   lastLocation: "",
   setid: "",
+  newSetKey: null,
   isOpen: false,
   isLogged: false,
   isScrollTop: true,
@@ -11,53 +14,65 @@ const initState = {
 
 export const navigationReducer = (state = initState, action) => {
   switch (action.type) {
-    case "OPEN_MENU":
+    case types.OPEN_MENU:
       return {
         ...state,
         isOpen: action.payload
       };
 
-    case "CHANGE_LOCATION":
+    case types.CHANGE_LOCATION:
       return {
         ...state,
         location: action.payload
       };
 
-    case "LAST_LOCATION":
+    case types.LAST_LOCATION:
       return {
         ...state,
         lastLocation: action.payload
       };
 
-    case "SIGNUP_SUCCESS":
-    case "LOGIN_SUCCESS":
+    case types.SIGNUP_SUCCESS:
+    case types.LOGIN_SUCCESS:
       return {
         ...state,
         isLogged: true
       };
 
-    case "CURRENT_SET_ID":
+    case types.CURRENT_SET_ID:
       return {
         ...state,
         setid: action.payload
       };
 
-    case "SET_CONTENT_HEIGHT":
+    case types.SET_CONTENT_HEIGHT:
       return {
         ...state,
         contentHeight: action.payload
       };
 
-    case "SET_PAGE_SCROLL":
+    case types.SET_PAGE_SCROLL:
       return {
         ...state,
         isScrollTop: action.payload
       };
 
-    case "SCROLL_TO_TOP":
+    case types.SCROLL_TO_TOP:
       return {
         ...state,
         isScrolledToTop: action.payload
+      };
+
+    case types.CREATE_SET:
+      return {
+        ...state,
+        newSetKey: action.newSetKey
+      };
+
+    case types.REMOVE_KEY:
+      return {
+        ...state,
+        newSetKey: null
       };
 
     default:

@@ -23,7 +23,7 @@ export const overlayReducer = (state = initState, action) => {
     case "CHANGE_PASSWORD":
       return {
         ...state,
-        isPassword: action.payload
+        isPassword: false
       };
 
     case "SWITCH_CHOICE_METHOD":

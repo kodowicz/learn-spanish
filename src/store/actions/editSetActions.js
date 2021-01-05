@@ -36,11 +36,6 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
         }
       });
     })
-    .then(() => {
-      dispatch({
-        type: "CREATE_EDIT_SET"
-      });
-    })
     .catch(error => {
       dispatch({
         type: "CREATE_EDIT_SET_ERROR",
@@ -57,19 +52,7 @@ export const editSetName = name => (dispatch, getState, { getFirestore }) => {
 
   const userRef = firestore.doc(`users/${uid}`);
 
-  userRef
-    .update({ editedSet: name })
-    .then(() => {
-      dispatch({
-        type: "EDIT_SET_NAME"
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: "EDIT_SET_NAME_ERROR",
-        error
-      });
-    });
+  userRef.update({ editedSet: name });
 };
 
 // on change input
@@ -88,16 +71,8 @@ export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
         docRef.update({ ...element });
       }
     })
-    .then(() => {
-      dispatch({
-        type: "EDIT_SET_TERM"
-      });
-    })
     .catch(error => {
-      dispatch({
-        type: "EDIT_SET_TERM_ERROR",
-        error
-      });
+      dispatch({ type: "UPDATE_TERM_ERROR" });
     });
 };
 
@@ -111,16 +86,8 @@ export const removeTerm = termid => (dispatch, getState, { getFirestore }) => {
 
   termRef
     .delete()
-    .then(() => {
-      dispatch({
-        type: "DELETE_TERM"
-      });
-    })
     .catch(error => {
-      dispatch({
-        type: "DELETE_TERM_ERROR",
-        error
-      });
+      dispatch({ type: "DELETE_TERM_ERROR" });
     });
 };
 
@@ -130,9 +97,7 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore }) => {
   const uid = getState().firebase.auth.uid;
   const setid = getState().navigation.setid;
 
-  const termRef = firestore
-    .collection(`users/${uid}/edit/${setid}/terms`)
-    .doc();
+  const termRef = firestore.collection(`users/${uid}/edit/${setid}/terms`).doc();
 
   termRef
     .set({
@@ -144,16 +109,8 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore }) => {
       id: termRef.id,
       time: firestore.FieldValue.serverTimestamp()
     })
-    .then(() => {
-      dispatch({
-        type: "ADD_NEW_TERM"
-      });
-    })
     .catch(error => {
-      dispatch({
-        type: "ADD_NEW_TERM_ERROR",
-        error
-      });
+      dispatch({ type: "ADD_TERM_ERROR" });
     });
 };
 
@@ -238,12 +195,6 @@ export const submitEditSet = terms => (dispatch, getState, { getFirestore }) => 
     })
     .then(() => {
       firestore.doc(`users/${uid}/edit/${setid}`).delete();
-    })
-    .then(() => {
-      dispatch({
-        type: "SUBMIT_EDITED_SET",
-        payload: true
-      });
     })
     .catch(error => {
       dispatch({

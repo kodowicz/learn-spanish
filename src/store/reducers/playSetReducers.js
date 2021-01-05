@@ -12,7 +12,7 @@ export const gameAnswerReducer = (state = initState, action) => {
         item: action.item,
         answer: action.answer
       };
-      
+
     case "CLEAR_ANSWER":
     case "CLEAN_WRITE":
       return {

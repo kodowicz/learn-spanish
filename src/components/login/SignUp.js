@@ -8,7 +8,7 @@ import {
   colors
 } from "../../assets/styles/GlobalStyles";
 
-const SignUp = ({ signUp, signUpError }) => {
+const SignUp = ({ signUp, setNotification }) => {
   const [login, setLogin] = useState({
     email: "",
     username: "",
@@ -27,11 +27,11 @@ const SignUp = ({ signUp, signUpError }) => {
   function handleSubmit(event) {
     event.preventDefault();
     if (login.username.length < 4) {
-      signUpError("Username should be at least 4 characters.");
+      setNotification("Username should be at least 4 characters.");
 
     } else if (login.password !== login.confirm) {
-      signUpError("The password hasn't been confirmed properly.");
-      
+      setNotification("The password hasn't been confirmed properly.");
+
     } else {
       signUp(login);
     }

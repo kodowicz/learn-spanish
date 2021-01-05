@@ -7,7 +7,6 @@ import { openPasswordOverlay } from "../store/actions/overlayActions.js";
 import { logOut, changePassword } from "../store/actions/authActions";
 import {
   setNotification,
-  logoutNotification
 } from "../store/actions/notificationActions.js";
 import {
   changeLocation,
@@ -31,7 +30,6 @@ const ViewProfileContainer = (props) => {
         openPasswordOverlay={props.openPasswordOverlay}
         changePassword={props.changePassword}
         setNotification={props.setNotification}
-        logoutNotification={props.logoutNotification}
         changeLocation={props.changeLocation}
         changeLastLocation={props.changeLastLocation}
         setContentHeight={props.setContentHeight}
@@ -60,7 +58,7 @@ const mapStateToProps = state => {
     uid,
     userSets,
     user: state.firebase.profile,
-    authError: state.auth.authError,
+    authError: state.notification,
     isOverlayOpen: state.isOverlayOpen.isPassword,
     isLoaded: isLoaded(userSets)
   };
@@ -74,7 +72,6 @@ export default compose(
       openPasswordOverlay,
       changePassword,
       setNotification,
-      logoutNotification,
       changeLocation,
       changeLastLocation,
       setContentHeight

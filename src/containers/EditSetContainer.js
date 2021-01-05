@@ -68,9 +68,8 @@ const mapStateToProps = (state, ownProps) => {
     uid: state.firebase.auth.uid,
     setid: ownProps.match.params.id,
     isOverlayOpen: state.isOverlayOpen.isDeleted,
-    isSetDeleted: state.isSetDeleted,
-    isEditSubmited: state.isEditSubmited,
-    isNewTerm: state.isNewTerm,
+    isSetDeleted: state.setStatus.isSetDeleted,
+    isEditSubmited: state.setStatus.isEditSubmited,
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     isLoaded: isLoaded(terms, editSetDetails)

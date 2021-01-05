@@ -25,11 +25,8 @@ const DeleteSetOverlay = ({
   function handleDelete(event) {
     setIsDeleted(true);
     askForDeleting(false);
+    deleteSetChanges(true);
     deleteSet();
-
-    if (isEdited) {
-      deleteSetChanges();
-    }
   }
 
   function handleCancel(event) {

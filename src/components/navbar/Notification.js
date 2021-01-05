@@ -4,17 +4,12 @@ import { colors } from "../../assets/styles/GlobalStyles";
 
 const Notification = ({
   message,
-  removeNotification,
-  removeLogoutNotification
+  cleanNotification
 }) => {
   useEffect(
     () => {
       setTimeout(() => {
-        if (message) {
-          message === "logout"
-            ? removeLogoutNotification()
-            : removeNotification();
-        }
+        cleanNotification();
       }, 3000);
     },
     [message]
@@ -40,7 +35,7 @@ const Wrapper = styled.div`
 
   @media (min-width: 768px) {
     max-width: 400px;
-    font-size: 1.6rem
+    font-size: 1.6rem;
   }
 `;
 

@@ -48,7 +48,7 @@ const Navigation = ({
       goBack();
 
     } else if (location === "edit") {
-      deleteSetChanges();
+      deleteSetChanges(false);
       askForDeleting(false);
       goBack();
 

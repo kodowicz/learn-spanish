@@ -33,8 +33,6 @@ const CreateSetContainer = props => {
       isEditSubmited={props.isEditSubmited}
       setName={props.setName}
       terms={props.terms}
-      isTermAdded={props.isTermAdded}
-      isNewTerm={props.isNewTerm}
       newSetKey={props.newSetKey}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
@@ -63,12 +61,11 @@ const mapStateToProps = state => {
     terms,
     setName,
     uid,
+    isGuest,
     isOverlayOpen: state.isOverlayOpen.isDeleted,
-    isSetDeleted: state.isSetDeleted,
-    isEditSubmited: state.isEditSubmited,
-    isTermAdded: state.isTermAdded,
-    isNewTerm: state.isNewTerm,
-    newSetKey: state.newSetKey,
+    isSetDeleted: state.setStatus.isSetDeleted,
+    isEditSubmited: state.setStatus.isEditSubmited,
+    newSetKey: state.navigation.newSetKey,
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     isLoaded: uid ? isLoaded(terms, setName) : true

@@ -10,11 +10,10 @@ import { Button, BasicInput, colors, fonts } from "../assets/styles/GlobalStyles
 
 const Login = ({
   auth,
-  authError,
   signIn,
   signUp,
   guestLogin,
-  signUpError,
+  setNotification,
   removeNotification,
   changeLocation,
   changeLastLocation,
@@ -41,13 +40,6 @@ const Login = ({
 
   return (
     <>
-      { authError && (
-        <Notification
-          message={authError}
-          removeNotification={removeNotification}
-        />
-      )}
-
       <Content
         setContentHeight={setContentHeight}
         width={75}
@@ -125,8 +117,7 @@ const Switch = styled.button`
 `;
 
 const Border = styled.div`
-  transform: ${ props =>
-    props.isToggled ? "translateX(100%)" : "translateX(0)" };
+  transform: ${ props => props.isToggled ? "translateX(100%)" : "translateX(0)"};
   background: ${colors.white};
   position: absolute;
   bottom: 0;
