@@ -1,3 +1,5 @@
+import * as types from "../../constants/actionTypes";
+
 export const deleteCreateSet = isDeleted => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
@@ -17,12 +19,12 @@ export const deleteCreateSet = isDeleted => (dispatch, getState, { getFirestore 
     })
     .then(() => {
       dispatch({
-        type: "DELETE_CREATE_SET"
+        type: types.DELETE_CREATE_SET
       });
     })
     .catch(error => {
       dispatch({
-        type: "DELETE_CREATE_SET_ERROR",
+        type: types.DELETE_CREATE_SET_ERROR,
         error
       });
     });
@@ -70,13 +72,13 @@ export const deleteEditSet = () => (dispatch, getState, { getFirestore }) => {
     })
     .then(() => {
       dispatch({
-        type: "DELETE_EDIT_SET",
+        type: types.DELETE_EDIT_SET,
         payload: true
       });
     })
     .catch(error => {
       dispatch({
-        type: "DELETE_EDIT_SET_ERROR",
+        type: types.DELETE_EDIT_SET_ERROR,
         error
       });
     });
@@ -106,7 +108,7 @@ export const deleteSetChanges = isDeleted => (dispatch, getState, { getFirestore
     .then(() => {
       if (!isDeleted) {
         dispatch({
-          type: "DELETE_EDIT_CHANGES"
+          type: types.DELETE_EDIT_CHANGES
         });
       }
     });

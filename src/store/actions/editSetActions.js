@@ -1,3 +1,5 @@
+import * as types from "../../constants/actionTypes";
+
 // create set of edited terms
 export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
@@ -38,7 +40,7 @@ export const createEditSet = () => (dispatch, getState, { getFirestore }) => {
     })
     .catch(error => {
       dispatch({
-        type: "CREATE_EDIT_SET_ERROR",
+        type: types.CREATE_EDIT_SET_ERROR,
         error
       });
     });
@@ -72,7 +74,7 @@ export const updateTerm = element => (dispatch, getState, { getFirestore }) => {
       }
     })
     .catch(error => {
-      dispatch({ type: "UPDATE_TERM_ERROR" });
+      dispatch({ type: types.UPDATE_TERM_ERROR });
     });
 };
 
@@ -87,7 +89,7 @@ export const removeTerm = termid => (dispatch, getState, { getFirestore }) => {
   termRef
     .delete()
     .catch(error => {
-      dispatch({ type: "DELETE_TERM_ERROR" });
+      dispatch({ type: types.DELETE_TERM_ERROR });
     });
 };
 
@@ -110,7 +112,7 @@ export const addNewTerm = () => (dispatch, getState, { getFirestore }) => {
       time: firestore.FieldValue.serverTimestamp()
     })
     .catch(error => {
-      dispatch({ type: "ADD_TERM_ERROR" });
+      dispatch({ type: types.ADD_TERM_ERROR });
     });
 };
 
@@ -198,7 +200,7 @@ export const submitEditSet = terms => (dispatch, getState, { getFirestore }) => 
     })
     .catch(error => {
       dispatch({
-        type: "SUBMIT_EDITED_SET_ERROR",
+        type: types.SUBMIT_EDITED_SET_ERROR,
         error
       });
     });

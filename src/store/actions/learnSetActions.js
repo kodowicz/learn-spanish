@@ -1,3 +1,5 @@
+import { CREATE_LEARN_SET_ERROR } from "../../constants/actionTypes";
+
 export const createLearnSet = setid => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
@@ -39,7 +41,7 @@ export const createLearnSet = setid => (dispatch, getState, { getFirestore }) =>
     })
     .catch(error => {
       dispatch({
-        type: "CREATE_LEARN_SET_ERROR",
+        type: CREATE_LEARN_SET_ERROR,
         error
       });
     });

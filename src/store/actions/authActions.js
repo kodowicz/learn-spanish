@@ -1,3 +1,5 @@
+import * as types from "../../constants/actionTypes";
+
 export const signIn = data => (dispatch, getState, { getFirebase }) => {
   const firebase = getFirebase();
 
@@ -6,12 +8,12 @@ export const signIn = data => (dispatch, getState, { getFirebase }) => {
     .signInWithEmailAndPassword(data.email, data.password)
     .then(() =>
       dispatch({
-        type: "LOGIN_SUCCESS"
+        type: types.LOGIN_SUCCESS
       })
     )
     .catch(error =>
       dispatch({
-        type: "LOGIN_ERROR",
+        type: types.LOGIN_ERROR,
         error
       })
     );
@@ -26,12 +28,12 @@ export const guestLogin = () => (dispatch, getState, { getFirebase }) => {
     .signInWithEmailAndPassword("guest@gmail.com", "password")
     .then(() =>
       dispatch({
-        type: "LOGIN_SUCCESS"
+        type: types.LOGIN_SUCCESS
       })
     )
     .catch(error =>
       dispatch({
-        type: "LOGIN_ERROR",
+        type: types.LOGIN_ERROR,
         error
       })
     );
@@ -58,12 +60,12 @@ export const signUp = newUser => (dispatch, getState, { getFirebase, getFirestor
     })
     .then(() =>
       dispatch({
-        type: "SIGNUP_SUCCESS"
+        type: types.SIGNUP_SUCCESS
       })
     )
     .catch(error =>
       dispatch({
-        type: "SIGNUP_ERROR",
+        type: types.SIGNUP_ERROR,
         error
       })
     );
@@ -77,12 +79,12 @@ export const logOut = () => (dispatch, getState, { getFirebase }) => {
     .signOut()
     .then(() =>
       dispatch({
-        type: "LOGOUT_SUCCESS"
+        type: types.LOGOUT_SUCCESS
       })
     )
     .catch(error =>
       dispatch({
-        type: "LOGOUT_ERROR",
+        type: types.LOGOUT_ERROR,
         error
       })
     );
@@ -102,12 +104,12 @@ export const changePassword = data => (dispatch, getState, { getFirebase }) => {
     .then(() => {
       firebase.auth().currentUser.updatePassword(data.newpassword);
       dispatch({
-        type: "CHANGE_PASSWORD"
+        type: types.CHANGE_PASSWORD
       });
     })
     .catch(error => {
       dispatch({
-        type: "CHANGE_PASSWORD_ERROR"
+        type: types.CHANGE_PASSWORD_ERROR
       });
     });
 };

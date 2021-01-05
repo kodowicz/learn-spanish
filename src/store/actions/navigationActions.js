@@ -1,43 +1,45 @@
+import * as types from "../../constants/actionTypes";
+
 export const handleMenu = isOpen => ({
-  type: "OPEN_MENU",
+  type: types.OPEN_MENU,
   payload: isOpen
 });
 
 export const changeLocation = location => ({
-  type: "CHANGE_LOCATION",
+  type: types.CHANGE_LOCATION,
   payload: location
 });
 
 export const changeLastLocation = location => ({
-  type: "LAST_LOCATION",
+  type: types.LAST_LOCATION,
   payload: location
 });
 
 export const setCurrentSetId = id => ({
-  type: "CURRENT_SET_ID",
+  type: types.CURRENT_SET_ID,
   payload: id
 });
 
 // replace ?
 export const enableEditSet = () => ({
-  type: "ENABLE_EDIT_SET"
+  type: types.ENABLE_EDIT_SET
 });
 
 export const enableCreateSet = () => ({
-  type: "ENABLE_CREATE_SET"
+  type: types.ENABLE_CREATE_SET
 });
 
 export const setContentHeight = height => ({
-  type: "SET_CONTENT_HEIGHT",
+  type: types.SET_CONTENT_HEIGHT,
   payload: height
 });
 
 export const setPageScroll = isScrollTop => ({
-  type: "SET_PAGE_SCROLL",
+  type: types.SET_PAGE_SCROLL,
   payload: isScrollTop
 });
 
 export const scrollToTop = isScrollTop => ({
-  type: "SCROLL_TO_TOP",
+  type: types.SCROLL_TO_TOP,
   payload: isScrollTop
 });

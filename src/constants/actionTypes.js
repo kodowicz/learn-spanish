@@ -1,0 +1,65 @@
+// authentication
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+export const LOGIN_ERROR = "LOGIN_ERROR";
+export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
+export const SIGNUP_ERROR = "SIGNUP_ERROR";
+export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
+export const LOGOUT_ERROR = "LOGOUT_ERROR";
+export const CHANGE_PASSWORD = "CHANGE_PASSWORD";
+export const CHANGE_PASSWORD_ERROR = "CHANGE_PASSWORD_ERROR";
+
+// navigation
+export const OPEN_MENU = "OPEN_MENU";
+export const CHANGE_LOCATION = "CHANGE_LOCATION";
+export const LAST_LOCATION = "LAST_LOCATION";
+export const CURRENT_SET_ID = "CURRENT_SET_ID";
+export const ENABLE_EDIT_SET = "ENABLE_EDIT_SET";
+export const ENABLE_CREATE_SET = "ENABLE_CREATE_SET";
+export const SET_CONTENT_HEIGHT = "SET_CONTENT_HEIGHT";
+export const SET_PAGE_SCROLL = "SET_PAGE_SCROLL";
+export const SCROLL_TO_TOP = "SCROLL_TO_TOP";
+
+// notification
+export const CLEAN_NOTIFICATION = "CLEAN_NOTIFICATION";
+export const INVALID_DATA = "INVALID_DATA";
+
+// overlays
+export const SWITCH_CHOICE_METHOD = "SWITCH_CHOICE_METHOD";
+export const CANCEL_SESION = "CANCEL_SESION";
+export const ASKING_TO_DELETE_SET = "ASKING_TO_DELETE_SET";
+export const OPEN_PASSWORD = "OPEN_PASSWORD";
+export const CLOSE_PASSWORD = "CLOSE_PASSWORD";
+export const GAME_OVER = "GAME_OVER";
+
+// search
+export const SEARCH_SETS = "SEARCH_SETS";
+
+// sort
+export const SORT_TERMS = "SORT_TERMS";
+
+// create a set
+export const CREATE_BASIC_SET_ERROR = "CREATE_BASIC_SET_ERROR";
+export const UPDATE_TERM_ERROR = "UPDATE_TERM_ERROR";
+export const DELETE_TERM_ERROR = "DELETE_TERM_ERROR";
+export const ADD_TERM_ERROR = "ADD_TERM_ERROR";
+export const CREATE_SET = "CREATE_SET";
+export const CREATE_SET_ERROR = "CREATE_SET_ERROR";
+export const REMOVE_KEY = "REMOVE_KEY";
+export const CREATE_EDIT_SET_ERROR = "CREATE_EDIT_SET_ERROR";
+export const SUBMIT_EDITED_SET_ERROR = "SUBMIT_EDITED_SET_ERROR";
+
+// delete a set
+export const DELETE_CREATE_SET = "DELETE_CREATE_SET";
+export const DELETE_CREATE_SET_ERROR = "DELETE_CREATE_SET_ERROR";
+export const DELETE_EDIT_SET = "DELETE_EDIT_SET";
+export const DELETE_EDIT_SET_ERROR = "DELETE_EDIT_SET_ERROR";
+export const DELETE_EDIT_CHANGES = "DELETE_EDIT_CHANGES";
+
+// learning
+export const CREATE_LEARN_SET_ERROR = "CREATE_LEARN_SET_ERROR";
+export const CREATE_PLAY_SET_ERROR = "CREATE_PLAY_SET_ERROR";
+export const SHOW_ANSWER = "SHOW_ANSWER";
+export const GAME_COMPLETED = "GAME_COMPLETED";
+export const CLEAR_ANSWER = "CLEAR_ANSWER";
+export const CLEAN_WRITE = "CLEAN_WRITE";
+export const ANIMATION_END = "ANIMATION_END";

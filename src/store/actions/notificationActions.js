@@ -1,8 +1,10 @@
+import * as types from "../../constants/actionTypes";
+
 export const cleanNotification = () => ({
-  type: "CLEAN_NOTIFICATION"
+  type: types.CLEAN_NOTIFICATION
 });
 
 export const setNotification = message => ({
-  type: "INVALID_DATA",
+  type: types.INVALID_DATA,
   message
 })

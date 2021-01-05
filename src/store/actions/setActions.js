@@ -1,8 +1,10 @@
+import * as types from "../../constants/actionTypes";
+
 export const searchForSets = input => ({
-  type: "SEARCH_SETS",
+  type: types.SEARCH_SETS,
   payload: input
 });
 
 export const sortTerms = () => ({
-  type: "SORT_TERMS"
+  type: types.SORT_TERMS
 });

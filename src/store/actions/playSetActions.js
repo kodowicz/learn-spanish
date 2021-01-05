@@ -1,3 +1,5 @@
+import * as types from "../../constants/actionTypes";
+
 export const createPlaySet = setid => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const uid = getState().firebase.auth.uid;
@@ -41,14 +43,14 @@ export const createPlaySet = setid => (dispatch, getState, { getFirestore }) => 
     })
     .catch(error => {
       dispatch({
-        type: "CREATE_PLAY_SET_ERROR",
+        type: types.CREATE_PLAY_SET_ERROR,
         error
       });
     });
 };
 
 export const showGameAnswer = (item, answer) => ({
-  type: "SHOW_ANSWER",
+  type: types.SHOW_ANSWER,
   item,
   answer
 });
@@ -94,7 +96,7 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
 
         if (!wasCompleted) {
           dispatch({
-            type: "GAME_COMPLETED"
+            type: types.GAME_COMPLETED
           });
         }
       } else {
@@ -118,16 +120,16 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
     })
     .then(() => {
       dispatch({
-        type: "CLEAR_ANSWER"
+        type: types.CLEAR_ANSWER
       });
     });
 };
 
 export const cleanWriting = () => ({
-  type: "CLEAN_WRITE"
+  type: types.CLEAN_WRITE
 });
 
 export const setAnimationEnd = isFinished => ({
-  type: "ANIMATION_END",
+  type: types.ANIMATION_END,
   payload: isFinished
 });

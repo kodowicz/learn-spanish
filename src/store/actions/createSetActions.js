@@ -1,3 +1,5 @@
+import * as types from "../../constants/actionTypes";
+
 // update set name
 export const setUnsavedName = unsavedSet => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
@@ -43,7 +45,7 @@ export const createBasicTerms = () => (dispatch, getState, { getFirestore }) => 
       }
     })
     .catch(error => {
-      dispatch({ type: "CREATE_BASIC_SET_ERROR" });
+      dispatch({ type: types.CREATE_BASIC_SET_ERROR });
     });
 };
 
@@ -68,7 +70,7 @@ export const updateUnsavedTerm = element => (dispatch, getState, { getFirestore 
       }
     })
     .catch(error => {
-      dispatch({ type: "UPDATE_TERM_ERROR" });
+      dispatch({ type: types.UPDATE_TERM_ERROR });
     });
 };
 
@@ -85,7 +87,7 @@ export const removeUnsavedTerm = termid => (dispatch, getState, { getFirestore }
       docRef.delete();
     })
     .catch(error => {
-      dispatch({ type: "DELETE_TERM_ERROR" });
+      dispatch({ type: types.DELETE_TERM_ERROR });
     });
 };
 
@@ -109,7 +111,7 @@ export const addNewUnsavedTerm = () => (dispatch, getState, { getFirestore }) =>
           time: new Date()
         })
         .catch(error => {
-          dispatch({ type: "ADD_TERM_ERROR" });
+          dispatch({ type: types.ADD_TERM_ERROR });
         });
     }
   });
@@ -180,15 +182,15 @@ export const submitCreateSet = terms => (dispatch, getState, { getFirestore }) =
     })
     .then(() => {
       dispatch({
-        type: "CREATE_SET",
+        type: types.CREATE_SET,
         newSetKey: createRef.id
       });
     })
     .catch(error => {
-      dispatch({ type: "CREATE_SET_ERROR" });
+      dispatch({ type: types.CREATE_SET_ERROR });
     });
 };
 
 export const removeNewKey = () => ({
-  type: "REMOVE_KEY"
+  type: types.REMOVE_KEY
 });
