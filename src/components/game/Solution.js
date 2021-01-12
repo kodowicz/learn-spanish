@@ -49,6 +49,7 @@ const Solution = ({
 
 const AnswerWrapper = styled.div`
   animation: ${zoomInOut} 1.5s both;
+  background: ${colors.white};
   position: absolute;
   top: 45%;
   left: 50%;
@@ -56,7 +57,6 @@ const AnswerWrapper = styled.div`
   width: 20rem;
   height: 20rem;
   border-radius: 10rem;
-  background: white;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -25,7 +25,7 @@ const SetsList = ({ sets, title, margin, isPercentage }) => {
               <ProgressBar
                 percentage={calculatePercentage(set)}
                 width={4.6}
-                bgColor={colors.blue}
+                bgColor={colors.progress}
                 progressColor={colors.white}
               />
             </Progress>

@@ -315,13 +315,15 @@ const Wrapper = styled.div`
   grid-row: 1 / 1;
   width: 22rem;
   height: 30rem;
-  background: white;
+  background: ${colors.white};
   -webkit-user-select: none;
   transition: transform 0.2s;
 `;
 
 const Card = styled.div`
   transform: ${ props => `rotateY(${props.rotate}deg)`};
+  background: ${colors.white};
+  box-shadow: 0 0 3rem ${colors.translucentNavy};
   position: absolute;
   top: 0;
   left: 0;
@@ -330,8 +332,6 @@ const Card = styled.div`
   padding: 0 2rem;
   display: flex;
   flex-direction: column;
-  background: white;
-  box-shadow: 0 0 20px rgba(88, 38, 235, 0.53);
 `;
 
 const Front = styled(Card)`
@@ -353,7 +353,7 @@ const FrontWrapper = styled(Wrapper)`
 
     perspective: 1000px;
     z-index: 5;
-    
+
   /*flipping a card */
   ${({ flip }) =>
     flip &&
@@ -392,16 +392,16 @@ const FrontWrapper = styled(Wrapper)`
 `;
 
 const BackWrapper = styled(Wrapper)`
-  background: white;
-  z-index: 3;
+  box-shadow: 0 0 2remx ${colors.blueShadow};
+  background: ${colors.azure};
   transform: translate(-2px, -5px) rotate(5deg);
-  box-shadow: 0 0 20px rgba(88, 38, 235, 0.53);
+  z-index: 3;
 
   &::before,
   &::after {
+    background: ${colors.azure};
     content: "";
     position: absolute;
-    background: #f7f7f7;
     height: 100%;
     width: 100%;
     top: 0;
@@ -421,7 +421,7 @@ const BackWrapper = styled(Wrapper)`
 
 const CongratsWrapper = styled(Wrapper)`
   position: relative;
-  background: white;
+  background: ${colors.white};
   z-index: 0;
 
   div {
@@ -432,19 +432,19 @@ const CongratsWrapper = styled(Wrapper)`
     position: absolute;
     width: 100%;
     height: 100%;
-    box-shadow: 0 0 20px #83838378;
-    background: white;
+    box-shadow: 0 0 2rem ${colors.blueShadow};
+    background: ${colors.white};
 
     &::before,
     &::after {
       content: "";
       position: absolute;
-      background: white;
+      background: ${colors.azure};
       height: 100%;
       width: 100%;
       top: 0;
       left: 0;
-      box-shadow: 0 0 5px #20193c91;
+      box-shadow: 0 0 0.5rem ${colors.navyBoxShadow};
     }
 
     &::before {
@@ -479,8 +479,8 @@ const Top = styled.div`
 `;
 
 const Bottom = styled.div`
+  border-top: 2px solid ${colors.azure};
   height: 4rem;
-  border-top: 2px solid #baace0;
   display: flex;
   justify-content: center;
   align-items: center;

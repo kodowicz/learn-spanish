@@ -1,22 +1,26 @@
 import React from "react";
 import styled, { css, createGlobalStyle } from "styled-components";
 import { Link } from "react-router-dom";
+import { rgbHue } from "../../constants/mutualFunctions";
 import sort from "../images/sort.svg";
 
 export const colors = {
   white: "#FFFFFF",
-  navy: "#372454",
-  blue: "#663ce2",
-  bluish: "rgba(247, 244, 255, 0.25)",
-  shadow: "rgba(66, 49, 119, 0.5)",
-  azure: "#dfd3ff", 
   black: "#303030",
-  progress: "#A080FF",
+  azure: "#E1CBFF",
+  blue: "#6200EE",
+  navy: "#33007C",
   darkGray: "#BDA7FF",
   lightGray: "#EDE7FF",
   warning: "#F65D5D",
-  navyBoxShadow: "rgba(7, 22, 124, 0.2)",
-  translucentNavy: "rgba(16, 6, 54, 0.6)"
+  progress: "#893AFA",
+  thumb: "#FFFFFF",
+  track: "#4100A0",
+  blueShadow: rgbHue("#6200EE", 0.7),
+  darkNavy: rgbHue("#340D6C", 0.7),
+  navyBoxShadow: rgbHue("#33007C", 0.1),
+  translucentNavy: rgbHue("#33007C", 0.5),
+  tapShadow: rgbHue("#33007C", 0.2)
 };
 
 export const fonts = {
@@ -67,20 +71,20 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   *::-webkit-scrollbar {
-    width: 0.4em;
+    width: 0.5rem;
   }
 
   *::-webkit-scrollbar-track {
-    background: ${colors.darkGray};
+    background: ${colors.track};
   }
 
   *::-webkit-scrollbar-thumb {
-    background: ${colors.white};
-    border-radius: 5px;
+    background: ${colors.thumb};
+    border-radius: 0.5rem;
   }
 
   * {
-    scrollbar-color: ${colors.white} ${colors.darkGray};
+    scrollbar-color: ${colors.thumb} ${colors.track};
     scrollbar-width: thin;
   }
 
@@ -96,7 +100,7 @@ export const GlobalStyle = createGlobalStyle`
 `;
 
 export const BlockElement = styled.div`
-  background: ${colors.bluish};
+  background: ${colors.translucentNavy};
   border-radius: 1.5rem;
 `;
 
@@ -122,7 +126,7 @@ export const Button = styled.button`
 
   ${ props => {
     const color = props.color || colors.white;
-    const hoverColor = props.color || colors.navy;
+    const hoverColor = props.color || colors.blue;
     const hoverBg = colors.white;
 
     return css`
@@ -153,7 +157,7 @@ const Anchor = styled(Link)`
 
   ${ props => {
     const color = props.color || colors.white;
-    const hoverColor = colors.navy;
+    const hoverColor = colors.blue;
     const hoverBg = colors.white;
 
     return css`
@@ -247,11 +251,11 @@ export const BasicTextArea = styled.textarea`
 
 /* login styles */
 export const Form = styled.form`
-  margin: 6rem 0 0 0;
+  margin: 6rem 0 1rem 0;
 `;
 
 export const Wrapper = styled.div`
-  box-shadow: 0 10px 15px -5px ${colors.shadow};
+  box-shadow: 0 10px 15px -5px ${colors.translucentNavy};
   position: relative;
   border-radius: 3rem;
   margin: 3.5rem 0;
@@ -287,7 +291,7 @@ export const Background = styled.div`
 
 export const Dialog = styled.div`
   height: ${ props => `${props.height}rem`};
-  box-shadow: 10px 10px 20px ${colors.shadow};
+  box-shadow: 1rem 1rem 1.5rem ${colors.translucentNavy};
   background: ${colors.white};
   color: ${colors.navy};
   position: absolute;

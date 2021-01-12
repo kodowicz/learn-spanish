@@ -1,4 +1,6 @@
 import styled, { css, keyframes } from "styled-components";
+import { colors } from "./GlobalStyles";
+import { rgbHue } from "../../constants/mutualFunctions";
 
 export const popIn = keyframes`
   from {
@@ -49,31 +51,31 @@ export const moveBackards = transformStart => keyframes`
 
 export const pulseShadow = keyframes`
   0% {
-    box-shadow: 0 0 0 10px rgba(94, 55, 221, 1);
+    box-shadow: 0 0 0 1rem ${rgbHue(colors.navy, 0.2)};
   }
 
   50% {
-    box-shadow: 0 0 0 50px rgba(94, 55, 221, 0.4);
+    box-shadow: 0 0 0 5rem ${rgbHue(colors.navy, 0.05)};
   }
 
   55% {
-    box-shadow: 0 0 0 50px rgba(94, 55, 221, 0);
+    box-shadow: 0 0 0 5rem ${rgbHue(colors.navy, 0)};
   }
 
   100% {
-    box-shadow: 0 0 0 50px rgba(94, 55, 221, 0);
+    box-shadow: 0 0 0 5rem ${rgbHue(colors.navy, 0)};
   }
 `;
 
 export const tapPulse = keyframes`
   0% {
-    box-shadow: 0 0 0 1rem #51359d40;
-    background: #51359d40;
+    box-shadow: 0 0 0 1rem ${colors.tapShadow};
+    background: ${colors.tapShadow};
   }
 
   100% {
-    box-shadow: 0 0 0 2rem #51359d40;
-    background: #51359d40;
+    box-shadow: 0 0 0 2rem ${colors.tapShadow};
+    background: ${colors.tapShadow};
   }
 `;
 
@@ -93,7 +95,7 @@ export const pulse = keyframes`
 
 export const shake = keyframes`
   0% {
-    transform: translateX(0px);
+    transform: translateX(0);
     opacity: 0.5;
   }
 
@@ -110,7 +112,7 @@ export const shake = keyframes`
   }
 
   100% {
-    transform: translateX(0px);
+    transform: translateX(0);
     opacity: 1
   }
 `;
@@ -173,22 +175,22 @@ export const fadeUp = keyframes`
   }
 
   to {
-    color: white
+    color: ${colors.white};
   }
 `;
 
 export const flipOut = keyframes`
   from {
-    transform: perspective(400px);
+    transform: perspective(40rem);
   }
 
   30% {
-    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+    transform: perspective(40rem) rotate3d(1, 0, 0, -20deg);
     opacity: 1;
   }
 
   to {
-    transform: perspective(400px) rotate3d(1, 0, 0, 40deg);
+    transform: perspective(40rem) rotate3d(1, 0, 0, 40deg);
     opacity: 0;
   }
 `;
@@ -196,16 +198,16 @@ export const flipOut = keyframes`
 export const flipIn = keyframes`
   from {
     opacity: 0;
-    transform: perspective(400px) rotate3d(1, 0, 0, 40deg);
+    transform: perspective(40rem) rotate3d(1, 0, 0, 40deg);
   }
 
   30% {
-    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+    transform: perspective(40rem) rotate3d(1, 0, 0, -20deg);
     opacity: 1;
   }
 
   to {
-    transform: perspective(400px);
+    transform: perspective(40rem);
     opacity: 1;
   }
 `;
@@ -278,7 +280,7 @@ export const shuffle = transform => keyframes`
   }
 
   50% {
-    transform: translate(-200px, ${transform.y}px) rotate(-15deg);
+    transform: translate(-20rem, ${transform.y}px) rotate(-15deg);
   }
 
   55% {
@@ -301,12 +303,12 @@ export const throwOut = keyframes`
   }
 
   50% {
-    transform: translateX(300px) rotate(15deg);
+    transform: translateX(30rem) rotate(15deg);
     opacity: 0.5
   }
 
   100% {
-    transform: translateX(300px) rotate(15deg);
+    transform: translateX(30rem) rotate(15deg);
     opacity: 0
   }
 `;

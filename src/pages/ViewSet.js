@@ -113,7 +113,7 @@ const Description = ({ signedUser, setDetails, percentage, width }) => {
             <ProgressBar
               percentage={percentage}
               width={width}
-              bgColor={colors.progress}
+              bgColor={colors.translucentNavy}
             />
           </Progress>
         )}

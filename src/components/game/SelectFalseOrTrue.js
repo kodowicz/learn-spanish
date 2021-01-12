@@ -111,6 +111,7 @@ const Question = styled.div`
           animation: ${flipIn} 0.5s linear;
         `};
 
+  background: ${colors.translucentNavy};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -120,7 +121,6 @@ const Question = styled.div`
   width: 100%;
   max-width: 80vw;
   margin: 0 auto;
-  background: rgba(65, 33, 160, 0.5);
   border-radius: 4rem;
   padding: 2rem;
 `;

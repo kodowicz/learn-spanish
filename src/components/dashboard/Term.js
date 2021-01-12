@@ -242,7 +242,6 @@ const Wrapper = styled.div`
   grid-template: 1fr / 1fr 80px;
 
   @media (min-width: 768px) {
-    background: ${colors.bluish};
     grid-template: 1fr / 10% 80% 10%;
     border-radius: 1.5rem;
   }
@@ -250,7 +249,7 @@ const Wrapper = styled.div`
 
 const TermWrapper = styled.div`
   transform: ${ props => `translateX(${props.translation}px)`};
-  background: ${colors.bluish};
+  background: ${colors.translucentNavy};
   border-radius: 15px;
   height: auto;
   padding: 2.2rem 0;

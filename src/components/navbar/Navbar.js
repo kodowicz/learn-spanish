@@ -111,7 +111,7 @@ const Nav = styled.nav`
 `;
 
 const BackgroundWrapper = styled.div`
-  background: ${colors.translucentNavy};
+  background: ${colors.darkNavy};
   position: absolute;
   width: 100%;
   top: 0;
