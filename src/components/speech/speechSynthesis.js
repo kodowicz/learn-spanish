@@ -1,3 +1,14 @@
+export const settings = {
+  langs: [
+    "Microsoft Elvira Online (Natural) - Spanish (Spain)",
+    "Google español de Estados Unidos",
+    "Mónica"
+  ],
+  pitch: 1,
+  rate: 1,
+  volume: 1
+};
+
 export class SpeechVoices {
   constructor(props) {
     this.voices = SpeechVoices.setVoices()

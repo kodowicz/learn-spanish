@@ -61,13 +61,13 @@ class ChooseBetweenTwo extends Component {
   }
 
   handleChosenAnswer(answer) {
-    const { item, showGameAnswer } = this.props;
+    const { item, isSkipped, showGameAnswer } = this.props;
     const correctAnswer = item.id;
 
     if (answer === correctAnswer) {
-      showGameAnswer(item, "correct");
+      showGameAnswer(item, "correct", isSkipped);
     } else {
-      showGameAnswer(item, "wrong");
+      showGameAnswer(item, "wrong", isSkipped);
     }
   }
 

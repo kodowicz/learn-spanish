@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
-import { SpeechVoices } from "../components/speech/speechSynthesis";
+import { settings, SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import GameOverOverlay from "../components/overlay/GameOverOverlay";
 import TypeMeaning from "../components/game/TypeMeaning";
@@ -15,9 +15,10 @@ const WriteSet = ({
   correctItem,
   isCancelOpen,
   isAnimated,
+  isSkipped,
   isGameOverOpen,
   cancelSesion,
-  cleanGameAnswer,
+  skipAnswer,
   showGameAnswer,
   setAnimationEnd,
   changeLocation,
@@ -27,16 +28,6 @@ const WriteSet = ({
 }) => {
   const contentRef = useRef(null);
   const [voices, setVoices] = useState([]);
-  const settings = {
-    langs: [
-      "Microsoft Elvira Online (Natural) - Spanish (Spain)",
-      "Google español de Estados Unidos",
-      "Mónica"
-    ],
-    pitch: 1,
-    rate: 1,
-    volume: 1
-  };
 
   useEffect(() => {
     changeLocation("learn");
@@ -87,9 +78,10 @@ const WriteSet = ({
           <Solution
             answer={answer}
             correctItem={correctItem}
+            isSkipped={isSkipped}
             settings={settings}
             voices={voices}
-            cleanGameAnswer={cleanGameAnswer}
+            skipAnswer={skipAnswer}
             setAnimationEnd={setAnimationEnd}
           />
         ) : (
@@ -134,6 +126,7 @@ const WriteSentence = ({ isHidden, terms, showGameAnswer }) => {
         item={item}
         showGameAnswer={showGameAnswer}
         isDesktop={isDesktop}
+        isSkipped={true}
       />
     </GameWrapper>
   );

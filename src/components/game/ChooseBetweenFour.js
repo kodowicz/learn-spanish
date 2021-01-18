@@ -61,13 +61,13 @@ class ChooseBetweenFour extends Component {
   }
 
   handleChosenAnswer(answer) {
-    const { item, showGameAnswer } = this.props;
+    const { item, isSkipped, showGameAnswer } = this.props;
     const correctAnswer = item.id;
 
     if (answer === correctAnswer) {
-      showGameAnswer(item, "correct");
+      showGameAnswer(item, "correct", isSkipped);
     } else {
-      showGameAnswer(item, "wrong");
+      showGameAnswer(item, "wrong", isSkipped);
     }
   }
 
@@ -94,7 +94,7 @@ class ChooseBetweenFour extends Component {
                 startPosition={startPosition}
               >
                 { isInSpanish
-                  ? terms[elementid].definition 
+                  ? terms[elementid].definition
                   : terms[elementid].term
                 }
               </DefinitionOption>
@@ -152,10 +152,11 @@ class DefinitionOption extends Component {
 
 const GameWrapper = styled.div`
   display: grid;
-  height: 70vh;
+  min-height: 70vh;
+  max-height: 95vh;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  grid-gap: 4rem 10vw;
+  grid-gap: 4rem 10%;
   padding: 20vh 10vw 0 10vw;
   place-items: center;
 `;

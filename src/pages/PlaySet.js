@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
-import { SpeechVoices } from "../components/speech/speechSynthesis";
+import { settings, SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import GameOverOverlay from "../components/overlay/GameOverOverlay";
 import ChooseBetweenTwo from "../components/game/ChooseBetweenTwo";
@@ -9,6 +9,7 @@ import ChooseBetweenFour from "../components/game/ChooseBetweenFour";
 import SelectFalseOrTrue from "../components/game/SelectFalseOrTrue";
 import ArrayBubbles from "../components/game/ArrayBubbles";
 import TypeMeaning from "../components/game/TypeMeaning";
+import PairWords from "../components/game/PairWords";
 import ArrayLetters from "../components/game/ArrayLetters";
 import Solution from "../components/game/Solution";
 import GameTimer from "../components/game/GameTimer";
@@ -22,28 +23,22 @@ const PlaySet = ({
   isCancelOpen,
   isCompleted,
   isAnimated,
+  isSkipped,
+  isSpeaking,
   isGameOverOpen,
   cancelSesion,
-  cleanGameAnswer,
   showGameAnswer,
+  clearGameAnswer,
+  skipAnswer,
   setAnimationEnd,
   changeLocation,
   setContentHeight,
   setCurrentSetId,
-  finishGame
+  finishGame,
+  setSpeechStatus
 }) => {
   const contentRef = useRef(null);
   const [voices, setVoices] = useState([]);
-  const settings = {
-    langs: [
-      "Microsoft Elvira Online (Natural) - Spanish (Spain)",
-      "Google español de Estados Unidos",
-      "Mónica"
-    ],
-    pitch: 1,
-    rate: 1,
-    volume: 1
-  };
 
   useEffect(() => {
     changeLocation("learn");
@@ -94,10 +89,13 @@ const PlaySet = ({
           <Solution
             answer={answer}
             correctItem={correctItem}
+            isSkipped={isSkipped}
             settings={settings}
             voices={voices}
-            cleanGameAnswer={cleanGameAnswer}
+            clearGameAnswer={clearGameAnswer}
+            skipAnswer={skipAnswer}
             setAnimationEnd={setAnimationEnd}
+            setSpeechStatus={setSpeechStatus}
           />
         ) : (
           <>
@@ -107,9 +105,12 @@ const PlaySet = ({
             <Game
               isCompleted={isCompleted}
               isHidden={isCancelOpen}
+              isSpeaking={isSpeaking}
+              settings={settings}
+              voices={voices}
               terms={terms}
-              answer={answer}
               showGameAnswer={showGameAnswer}
+              setSpeechStatus={setSpeechStatus}
             />
           </>
         )}
@@ -118,9 +119,19 @@ const PlaySet = ({
   }
 };
 
-const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
+const Game = ({
+  isCompleted,
+  isHidden,
+  isSpeaking,
+  settings,
+  voices,
+  terms,
+  showGameAnswer,
+  setSpeechStatus
+}) => {
   const [item, setItem] = useState({});
   const [game, setgame] = useState(0);
+  const isPairingGame = game === 6;
   const isDesktop = window.innerWidth >= 768;
 
   useEffect(() => {
@@ -150,13 +161,25 @@ const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
     return item;
   }
 
+  function filterTerms(terms) {
+    return [...terms].filter(el => el.ratio > 0 && el.term.length < 20);
+  };
+
   function pickGame(ratio, isTooLong) {
+    const filtredTerms = filterTerms(terms);
+    const randomPercentage = Math.random() < 0.1;
+    const pairingGame = randomPercentage && filterTerms.length >= 6;
     let game;
 
-    if (ratio <= 2) {
+    if (pairingGame) {
+      game = 6;
+
+    } else if (ratio <= 2) {
       game = Math.floor(Math.random() * 3);
+
     } else if (ratio === 5) {
       game = 5;
+
     } else {
       game = Math.floor(Math.random() * 2) + 3;
 
@@ -170,24 +193,51 @@ const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
 
   function randomGame(ratio) {
     switch (game) {
+      case 6:
+        return (
+          <PairWords
+            isSkipped={true}
+            isSpeaking={isSpeaking}
+            terms={terms}
+            settings={settings}
+            voices={voices}
+            showGameAnswer={showGameAnswer}
+            setSpeechStatus={setSpeechStatus}
+          />
+        );
+
       case 5:
         return (
           <TypeMeaning
+            isSkipped={false}
+            isDesktop={isDesktop}
             item={item}
             showGameAnswer={showGameAnswer}
-            isDesktop={isDesktop}
           />
         );
 
       case 4:
-        return <ArrayLetters item={item} showGameAnswer={showGameAnswer} />;
+        return (
+          <ArrayLetters
+            isSkipped={false}
+            item={item}
+            showGameAnswer={showGameAnswer}
+          />
+        );
 
       case 3:
-        return <ArrayBubbles item={item} showGameAnswer={showGameAnswer} />;
+        return (
+          <ArrayBubbles
+            isSkipped={false}
+            item={item}
+            showGameAnswer={showGameAnswer}
+          />
+        );
 
       case 2:
         return (
           <ChooseBetweenFour
+            isSkipped={false}
             item={item}
             terms={terms}
             showGameAnswer={showGameAnswer}
@@ -197,6 +247,7 @@ const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
       case 1:
         return (
           <SelectFalseOrTrue
+            isSkipped={false}
             item={item}
             terms={terms}
             showGameAnswer={showGameAnswer}
@@ -207,9 +258,10 @@ const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
       default:
         return (
           <ChooseBetweenTwo
+            isSkipped={false}
+            isDesktop={isDesktop}
             item={item}
             terms={terms}
-            isDesktop={isDesktop}
             showGameAnswer={showGameAnswer}
           />
         );
@@ -218,9 +270,11 @@ const Game = ({ isCompleted, isHidden, terms, showGameAnswer }) => {
 
   return (
     <GameWrapper isHidden={isHidden}>
-      <RatioWrapper>
-        <RatioDots ratio={item.ratio} />
-      </RatioWrapper>
+      { !isPairingGame &&
+        <RatioWrapper>
+          <RatioDots ratio={item.ratio} />
+        </RatioWrapper>
+      }
       {randomGame(item.ratio)}
     </GameWrapper>
   );

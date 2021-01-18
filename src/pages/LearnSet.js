@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { SpeechVoices } from "../components/speech/speechSynthesis";
+import { settings, SpeechVoices } from "../components/speech/speechSynthesis";
 import StopLearningOverlay from "../components/overlay/StopLearningOverlay";
 import { FrontCard, BackCard, Congratulations } from "../components/dashboard/Flashcard";
 import { Switcher } from "../assets/styles/GlobalStyles";
@@ -22,16 +22,6 @@ const LearnSet = ({
 }) => {
   const [voices, setVoices] = useState([]);
   const [sortedBy, setSortedBy] = useState(true);
-  const settings = {
-    langs: [
-      "Microsoft Elvira Online (Natural) - Spanish (Spain)",
-      "Google español de Estados Unidos",
-      "Mónica"
-    ],
-    pitch: 1,
-    rate: 1,
-    volume: 1
-  };
   const contentRef = useRef(null);
 
   useEffect(() => {

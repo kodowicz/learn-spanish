@@ -18,7 +18,6 @@ class TypeMeaning extends Component {
       inputValue: "",
       definition: "",
       correctAnswer: "",
-      isFocused: false,
       isPrompting: false,
       isInputWrong: false,
       hasMoreLines: false,
@@ -39,8 +38,6 @@ class TypeMeaning extends Component {
 
     this.handleTyping = this.handleTyping.bind(this);
     this.handleAnswer = this.handleAnswer.bind(this);
-    this.handleFocus = this.handleFocus.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
     this.promptingTimer = this.promptingTimer.bind(this);
   }
 
@@ -78,14 +75,14 @@ class TypeMeaning extends Component {
     }
 
     if (prevState.inputValue !== inputValue) {
-      const { item, showGameAnswer } = prevProps;
-      const isFinished = inputValue.toLowerCase() === correctAnswer.toLowerCase();
+      const { item, isSkipped, showGameAnswer } = prevProps;
+      const isFinished =
+        inputValue.toLowerCase() === correctAnswer.toLowerCase();
 
       if (counter === 3) {
-        window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
-
+        window.setTimeout(() => showGameAnswer(item, "wrong", isSkipped), 200);
       } else if (isFinished) {
-        window.setTimeout(() => showGameAnswer(item, "correct"), 500);
+        window.setTimeout(() => showGameAnswer(item, "correct", isSkipped), 500);
       }
     }
   }
@@ -108,7 +105,6 @@ class TypeMeaning extends Component {
 
       if (excludedIndexes.includes(0)) {
         this.prompting = setTimeout(this.promptingTimer, 0);
-
       } else {
         this.prompting = setTimeout(
           this.promptingTimer,
@@ -183,7 +179,6 @@ class TypeMeaning extends Component {
         if (wordLength - 1 < inputIndex) {
           wordIndex++;
           inputIndex = inputIndex - wordLength;
-
         } else {
           letterIndex = inputIndex;
           inputIndex = 0;
@@ -274,7 +269,6 @@ class TypeMeaning extends Component {
           clearTimeout(this.prompting);
           if (excludedIndexes.includes(valueIndex)) {
             this.prompting = setTimeout(this.promptingTimer, 0);
-
           } else {
             this.prompting = setTimeout(this.promptingTimer, promptingTime);
           }
@@ -319,18 +313,6 @@ class TypeMeaning extends Component {
     });
   }
 
-  handleFocus(event) {
-    this.setState({
-      isFocused: true
-    });
-  }
-
-  handleBlur(event) {
-    this.setState({
-      isFocused: false
-    });
-  }
-
   promptingTimer() {
     this.setState({
       isPrompting: true
@@ -343,7 +325,6 @@ class TypeMeaning extends Component {
       inputValue,
       definition,
       hasMoreLines,
-      isFocused,
       isPrompting,
       isWrong,
       isCorrect,
@@ -357,7 +338,7 @@ class TypeMeaning extends Component {
 
     return (
       <GameWrapper>
-        <Definition isFocused={true}>{definition}</Definition>
+        <Definition>{definition}</Definition>
 
         <InputWrapper
           isWrong={isWrong}
@@ -387,17 +368,15 @@ class TypeMeaning extends Component {
             width={inputWidth}
             ref={this.dashesRef}
           >
-            { groupedWords.map((word, wordIndex) => {
+            {groupedWords.map((word, wordIndex) => {
               const isFirstWord = wordIndex === 0;
               const activeWord = wordIndex === promptedLetter.wordIndex;
 
               return (
-                <Word
-                  ref={isFirstWord && this.firstWordRef}
-                  key={wordIndex}
-                >
-                  { word.map((letter, letterIndex) => {
-                    const activeLetter = letterIndex === promptedLetter.letterIndex;
+                <Word ref={isFirstWord && this.firstWordRef} key={wordIndex}>
+                  {word.map((letter, letterIndex) => {
+                    const activeLetter =
+                      letterIndex === promptedLetter.letterIndex;
                     const isActive = activeWord && activeLetter;
 
                     return (
@@ -436,15 +415,6 @@ const Definition = styled.p`
   text-align: center;
   margin: 7rem 0;
   opacity: 0;
-
-  @media (max-width: 686px) {
-    ${({ isFocused }) =>
-      isFocused &&
-      css`
-        font-size: 3rem;
-        margin: 12rem 0 3rem;
-      `};
-  }
 `;
 
 const InputWrapper = styled.div`
@@ -604,7 +574,7 @@ const Dash = styled.span`
           `};
 
   @media (min-width: 768px) {
-    width: ${ props => props.letter === " " && "0.6rem" }
+    width: ${ props => props.letter === " " && "0.6rem" };
   }
 `;
 

@@ -49,13 +49,14 @@ export const createPlaySet = setid => (dispatch, getState, { getFirestore }) => 
     });
 };
 
-export const showGameAnswer = (item, answer) => ({
+export const showGameAnswer = (item, answer, isSkipped) => ({
   type: types.SHOW_ANSWER,
   item,
-  answer
+  answer,
+  isSkipped
 });
 
-export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirestore }) => {
+export const clearGameAnswer = (item, isCorrect) => (dispatch, getState, { getFirestore }) => {
   const firestore = getFirestore();
   const user = getState().firebase.auth.uid;
   const set = getState().navigation.setid;
@@ -125,11 +126,16 @@ export const cleanGameAnswer = (item, isCorrect) => (dispatch, getState, { getFi
     });
 };
 
-export const cleanWriting = () => ({
-  type: types.CLEAN_WRITE
+export const skipAnswer = () => ({
+  type: types.SKIP_ANSWER
 });
 
 export const setAnimationEnd = isFinished => ({
   type: types.ANIMATION_END,
+  payload: isFinished
+});
+
+export const setSpeechStatus = isFinished => ({
+  type: types.SPEECH_STATUS,
   payload: isFinished
 });

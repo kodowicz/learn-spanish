@@ -54,15 +54,15 @@ class SelectFalseOrTrue extends Component {
 
   handleAnimationEnd(event) {
     if (event.animationName === flipOut.name) {
-      const { item, showGameAnswer } = this.props;
+      const { item, isSkipped, showGameAnswer } = this.props;
       const { answer, comparisonItem } = this.state;
       const correctAnswer = item.id === comparisonItem.id;
       const userAnswer = answer === "correct" ? true : false;
 
       if (userAnswer === correctAnswer) {
-        showGameAnswer(item, "correct");
+        showGameAnswer(item, "correct", isSkipped);
       } else {
-        showGameAnswer(item, "wrong");
+        showGameAnswer(item, "wrong", isSkipped);
       }
     }
   }

@@ -61,5 +61,6 @@ export const CREATE_PLAY_SET_ERROR = "CREATE_PLAY_SET_ERROR";
 export const SHOW_ANSWER = "SHOW_ANSWER";
 export const GAME_COMPLETED = "GAME_COMPLETED";
 export const CLEAR_ANSWER = "CLEAR_ANSWER";
-export const CLEAN_WRITE = "CLEAN_WRITE";
+export const SKIP_ANSWER = "SKIP_ANSWER";
 export const ANIMATION_END = "ANIMATION_END";
+export const SPEECH_STATUS = "SPEECH_STATUS";

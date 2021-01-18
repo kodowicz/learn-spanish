@@ -12,8 +12,10 @@ import {
 } from "../store/actions/navigationActions";
 import {
   showGameAnswer,
-  cleanGameAnswer,
-  setAnimationEnd
+  clearGameAnswer,
+  skipAnswer,
+  setAnimationEnd,
+  setSpeechStatus
 } from "../store/actions/playSetActions";
 
 import PlaySet from "../pages/PlaySet";
@@ -28,6 +30,8 @@ const PlaySetContainer = props => {
       isCancelOpen={props.isCancelOpen}
       isCompleted={props.isCompleted}
       isAnimated={props.isAnimated}
+      isSkipped={props.isSkipped}
+      isSpeaking={props.isSpeaking}
       isGameOverOpen={props.isGameOverOpen}
       changeLocation={props.changeLocation}
       changeLastLocation={props.changeLastLocation}
@@ -35,7 +39,9 @@ const PlaySetContainer = props => {
       setCurrentSetId={props.setCurrentSetId}
       cancelSesion={props.cancelSesion}
       showGameAnswer={props.showGameAnswer}
-      cleanGameAnswer={props.cleanGameAnswer}
+      clearGameAnswer={props.clearGameAnswer}
+      skipAnswer={props.skipAnswer}
+      setSpeechStatus={props.setSpeechStatus}
       changeKnowledge={props.changeKnowledge}
       setAnimationEnd={props.setAnimationEnd}
       finishGame={props.finishGame}
@@ -60,6 +66,8 @@ const mapStateToProps = (state, ownProps) => {
     answer: state.gameAnswer.answer,
     correctItem: state.gameAnswer.item,
     isAnimated: state.gameAnswer.isAnimated,
+    isSkipped: state.gameAnswer.isSkipped,
+    isSpeaking: state.gameAnswer.isSpeaking,
     location: state.navigation.location,
     lastLocation: state.navigation.lastLocation,
     isCancelOpen: state.isOverlayOpen.isCancelled,
@@ -77,9 +85,11 @@ export default compose(
       setCurrentSetId,
       cancelSesion,
       showGameAnswer,
-      cleanGameAnswer,
+      clearGameAnswer,
+      skipAnswer,
       setAnimationEnd,
-      finishGame
+      finishGame,
+      setSpeechStatus
     }
   ),
   firestoreConnect(props => {

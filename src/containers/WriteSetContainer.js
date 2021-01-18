@@ -12,7 +12,7 @@ import {
 } from "../store/actions/navigationActions";
 import {
   showGameAnswer,
-  cleanWriting,
+  skipAnswer,
   setAnimationEnd
 } from "../store/actions/playSetActions";
 
@@ -27,9 +27,10 @@ const WriteSetContainer = props => {
       correctItem={props.correctItem}
       isCancelOpen={props.isCancelOpen}
       isAnimated={props.isAnimated}
+      isSkipped={props.isSkipped}
       isGameOverOpen={props.isGameOverOpen}
       cancelSesion={props.cancelSesion}
-      cleanGameAnswer={props.cleanWriting}
+      skipAnswer={props.skipAnswer}
       showGameAnswer={props.showGameAnswer}
       setAnimationEnd={props.setAnimationEnd}
       changeLocation={props.changeLocation}
@@ -55,6 +56,7 @@ const mapStateToProps = (state, ownProps) => {
     answer: state.gameAnswer.answer,
     correctItem: state.gameAnswer.item,
     isAnimated: state.gameAnswer.isAnimated,
+    isSkipped: state.gameAnswer.isSkipped,
     isCancelOpen: state.isOverlayOpen.isCancelled,
     isGameOverOpen: state.isOverlayOpen.isGameOver
   };
@@ -70,7 +72,7 @@ export default compose(
       setCurrentSetId,
       cancelSesion,
       showGameAnswer,
-      cleanWriting,
+      skipAnswer,
       setAnimationEnd,
       finishGame
     }

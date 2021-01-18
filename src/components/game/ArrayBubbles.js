@@ -85,17 +85,17 @@ class ArrayBubbles extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { userAnswer, counter, correctAnswer } = this.state;
-    const { item, showGameAnswer } = prevProps;
+    const { item, isSkipped, showGameAnswer } = prevProps;
 
     if (prevState.counter !== counter && counter === 3) {
-      window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
+      window.setTimeout(() => showGameAnswer(item, "wrong", isSkipped), 200);
     }
 
     if (prevState.userAnswer !== userAnswer) {
       const isFinished = userAnswer === correctAnswer;
 
       if (isFinished) {
-        window.setTimeout(() => showGameAnswer(item, "correct"), 500);
+        window.setTimeout(() => showGameAnswer(item, "correct", isSkipped), 500);
       }
     }
   }
@@ -517,7 +517,6 @@ const Definition = styled.p`
 `;
 
 const BubblesWrapper = styled.div`
-  width: 90vw;
   height: 20rem;
   margin: 0 auto;
   position: relative;

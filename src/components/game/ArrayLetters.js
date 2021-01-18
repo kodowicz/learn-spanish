@@ -38,14 +38,14 @@ class ArrayLetters extends Component {
     const { userAnswer, counter, correctAnswer } = this.state;
 
     if (prevState.userAnswer !== userAnswer) {
-      const { item, showGameAnswer } = prevProps;
+      const { item, isSkipped, showGameAnswer } = prevProps;
       const isFinished = userAnswer === correctAnswer;
 
       if (counter === 3) {
-        window.setTimeout(() => showGameAnswer(item, "wrong"), 200);
+        window.setTimeout(() => showGameAnswer(item, "wrong", isSkipped), 200);
 
       } else if (isFinished) {
-        window.setTimeout(() => showGameAnswer(item, "correct"), 500);
+        window.setTimeout(() => showGameAnswer(item, "correct", isSkipped), 500);
       }
     }
   }
@@ -303,7 +303,7 @@ class ArrayLetters extends Component {
         const { item, showGameAnswer } = this.props;
 
         if (counter === 3) {
-          showGameAnswer(item, "wrong");
+          showGameAnswer(item, "wrong", false);
         }
       }
     );

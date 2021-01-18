@@ -10,10 +10,13 @@ import wrong from "../../assets/images/wrong.svg";
 const Solution = ({
   answer,
   correctItem,
+  isSkipped,
   voices,
   settings,
-  cleanGameAnswer,
-  setAnimationEnd
+  clearGameAnswer,
+  skipAnswer,
+  setAnimationEnd,
+  setSpeechStatus
 }) => {
   const [isAnswer, setIsAnswer] = useState(true);
   const [isItem, setIsItem] = useState(false);
@@ -24,9 +27,14 @@ const Solution = ({
   }
 
   function handleItem() {
-    const isCorrect = answer === "correct" ? true : false;
-    cleanGameAnswer(correctItem, isCorrect);
-    setAnimationEnd(true);
+    if (isSkipped) {
+      skipAnswer();
+
+    } else {
+      const isCorrect = answer === "correct" ? true : false;
+      clearGameAnswer(correctItem, isCorrect);
+      setAnimationEnd(true);
+    }
   }
 
   return (
@@ -42,7 +50,11 @@ const Solution = ({
           <Definition>{correctItem.definition}</Definition>
         </ItemWrapper>
       )}
-      <Speech settings={settings} voices={voices} text={correctItem.term} />
+      <Speech
+        settings={settings}
+        voices={voices}
+        text={correctItem.term}
+         />
     </>
   );
 };
@@ -68,7 +80,6 @@ const Answer = styled.img`
 
 const ItemWrapper = styled.div`
   animation: ${fadeInOut} 2s ease-out 0.2s both;
-  animation-timing-function: ease-out;
   position: absolute;
   top: 45%;
   left: 50%;

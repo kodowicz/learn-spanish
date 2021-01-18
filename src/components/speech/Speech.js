@@ -23,6 +23,7 @@ export default class Speech extends Component {
   }
 
   play() {
+    if (this.props.setSpeechStatus) this.props.setSpeechStatus(true);
     this.setSpeechSynthesis();
     this.speechSynthesis.speak();
   }
@@ -32,10 +33,10 @@ export default class Speech extends Component {
   }
 
   onend() {
-    this.stop();
+    if (this.props.setSpeechStatus) this.props.setSpeechStatus(false);
   }
 
-  onerror() {
+  onerror(error) {
     this.stop();
   }
 
