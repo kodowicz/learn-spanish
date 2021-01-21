@@ -14,13 +14,9 @@ export const createLearnSet = setid => (dispatch, getState, { getFirestore }) =>
     .then(snap => {
       if (!snap.size) {
         setRef.get().then(doc => {
-          const { amount, name } = doc.data();
-
           learnDetailsRef.set({
-            name,
-            amount,
-            knowledge: 0,
-            id: learnDetailsRef.id
+            ...doc.data(),
+            knowledge: 0
           });
         });
 

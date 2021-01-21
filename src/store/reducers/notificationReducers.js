@@ -36,6 +36,9 @@ export const notificationReducer = (state = initState, action) => {
     case types.DELETE_EDIT_SET:
       return "The set has been deleted";
 
+    case types.REMOVE_SET:
+      return "The set has been removed";
+
     case types.CREATE_SET_ERROR:
     case types.SUBMIT_EDITED_SET_ERROR:
       return "Failed saving the set";
@@ -46,6 +49,9 @@ export const notificationReducer = (state = initState, action) => {
     case types.DELETE_CREATE_SET_ERROR:
     case types.DELETE_EDIT_SET_ERROR:
       return "Couldn't delete the set. Please try again";
+
+    case types.REMOVE_SET_ERROR:
+      return "Couldn't remove the set. Please try again";
 
     case types.CREATE_BASIC_SET_ERROR:
       return "Couldn't create a set. Please try again";

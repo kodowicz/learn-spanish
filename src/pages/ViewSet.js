@@ -17,9 +17,11 @@ const ViewSet = ({
   terms,
   signedUser,
   isUserSet,
+  isLearning,
   isOverlayOpen,
   sortTerms,
   createEditSet,
+  removeSet,
   chooseMethod,
   createLearnSet,
   createPlaySet,
@@ -31,9 +33,6 @@ const ViewSet = ({
   enableEditSet,
   setCurrentSetId
 }) => {
-  const iseditable = author === signedUser;
-  const progressBarWidth = window.innerWidth < 768 ? 6 : 7;
-
   useEffect(() => {
     changeLocation("set");
     changeLastLocation("/");
@@ -50,7 +49,6 @@ const ViewSet = ({
     [isOverlayOpen]
   );
 
-  // handle if set doesn't exist
   if (terms.length === 0 && !setDetails) return <Redirect to="/404" />;
 
   if (isOverlayOpen) {
@@ -75,19 +73,20 @@ const ViewSet = ({
           signedUser={signedUser}
           setDetails={setDetails}
           percentage={percentage}
-          width={progressBarWidth}
         />
 
         <Buttons
           setid={match.params.id}
-          iseditable={iseditable}
+          isEditable={isUserSet}
+          isLearning={isLearning}
           createEditSet={createEditSet}
           chooseMethod={chooseMethod}
+          removeSet={removeSet}
         />
 
         <TermsList
           terms={terms}
-          isUserSet={isUserSet}
+          isLearning={isLearning}
           sortedBy={sortedBy}
           sortTerms={sortTerms}
         />
@@ -96,8 +95,10 @@ const ViewSet = ({
   }
 };
 
-const Description = ({ signedUser, setDetails, percentage, width }) => {
+const Description = ({ signedUser, setDetails, percentage }) => {
   const isExtended = !isNaN(percentage);
+  const width = window.innerWidth < 768 ? 6 : 7;
+
   return (
     <>
       <DetailsWrapper isExtended={isExtended}>
@@ -122,59 +123,74 @@ const Description = ({ signedUser, setDetails, percentage, width }) => {
   )
 };
 
-const Buttons = ({ setid, iseditable, chooseMethod, createEditSet }) => {
-  const handleChoice = () => {
+const Buttons = ({
+  setid,
+  isEditable,
+  isLearning,
+  chooseMethod,
+  createEditSet,
+  removeSet
+}) => {
+  const [isRemoved, setRemoved] = useState(false);
+
+  function handleChoice() {
     // open overlay then create
     chooseMethod(true);
   };
 
-  const handleEdit = () => {
+  function handleEdit() {
     createEditSet();
   };
 
+  function handleRemove() {
+    removeSet();
+    setRemoved(true);
+  };
+
+  if (isRemoved) return <Redirect to="/" />;
+
   return (
-    <ButtonsWrapper iseditable={iseditable.toString()}>
-      { iseditable && (
+    <ButtonsWrapper isEditable={isEditable.toString()}>
+      { isEditable && (
         <div onClick={handleEdit}>
-          <LinkButton isCentre={true} to={`/edit/${setid}`}>
-            edit set
-          </LinkButton>
+          <LinkButton center light to={`/edit/${setid}`}>edit set</LinkButton>
         </div>
       )}
-      <Button onClick={handleChoice}>learn set</Button>
+      { (isLearning && !isEditable) && (
+        <Button light warning onClick={handleRemove}>remove set</Button>
+      )}
+      <Button light onClick={handleChoice}>learn set</Button>
     </ButtonsWrapper>
   );
 };
 
-const TermsList = ({ terms, isUserSet, sortedBy, sortTerms }) => {
-  return (
-    <TermListWrapper>
-      <ListLable>
-        <SubTitle>terms</SubTitle>
-        <Switcher
-          sortedBy={sortedBy ? "alphabetical" : "original"}
-          handleSwitch={sortTerms}
-        />
-      </ListLable>
+const TermsList = ({ terms, isLearning, sortedBy, sortTerms }) => (
+  <TermListWrapper>
+    <ListLable>
+      <SubTitle>terms</SubTitle>
+      <Switcher
+        sortedBy={sortedBy ? "alphabetical" : "original"}
+        handleSwitch={sortTerms}
+      />
+    </ListLable>
 
-      <List>
-        { terms.map((term, index) => (
-          <ListItem key={term.id}>
-            <Counter isLessThanTen={index + 1 < 10 ? true : false}>
-              {index + 1}
-            </Counter>
-            <SetWrapper isUserSet={isUserSet}>
-              <Term id="term">{term.term}</Term>
-              { isUserSet && <RatioDots ratio={term.ratio} /> }
-              <Line />
-              <Term id="definition">{term.definition}</Term>
-            </SetWrapper>
-          </ListItem>
-        ))}
-      </List>
-    </TermListWrapper>
-  );
-};
+    <List>
+      { terms.map((term, index) => (
+        <ListItem key={term.id}>
+          <Counter isLessThanTen={index + 1 < 10 ? true : false}>
+            {index + 1}
+          </Counter>
+          <SetWrapper isLearning={isLearning}>
+            <Term id="term">{term.term}</Term>
+            { isLearning && <RatioDots ratio={term.ratio} /> }
+            <Line />
+            <Term id="definition">{term.definition}</Term>
+          </SetWrapper>
+        </ListItem>
+      ))}
+    </List>
+  </TermListWrapper>
+);
 
 const DetailsWrapper = styled.div`
   grid-template-columns: ${({ isExtended }) =>
@@ -236,8 +252,7 @@ const ButtonsWrapper = styled.div`
   max-width: 30rem;
 
   @media (min-width: 768px) {
-    justify-content: ${props =>
-      props.iseditable ? "space-between" : "flex-start"};
+    justify-content: ${ props => props.isEditable ? "space-between" : "flex-start" };
     margin: 4rem 0 6rem;
   }
 `;
@@ -296,8 +311,8 @@ const SetWrapper = styled(BlockElement)`
   padding: 1.6rem 2rem;
   height: 100%;
 
-  ${({ isUserSet }) =>
-    isUserSet
+  ${({ isLearning }) =>
+    isLearning
       ? css`
           grid-template-columns: 1fr 5rem;
           grid-template-rows: min-content min-content;
@@ -315,8 +330,8 @@ const SetWrapper = styled(BlockElement)`
     grid-template-rows: max-content;
     align-items: center;
 
-    ${({ isUserSet }) =>
-      isUserSet
+    ${({ isLearning }) =>
+      isLearning
         ? css`
             grid-template-columns: 1fr 6rem 2px 45%;
             grid-column-gap: 3.5rem;

@@ -6,7 +6,7 @@ import { chooseMethod } from "../store/actions/overlayActions";
 import { createLearnSet } from "../store/actions/learnSetActions";
 import { createPlaySet } from "../store/actions/playSetActions";
 import { removeNewKey } from "../store/actions/createSetActions";
-import { deleteSetChanges } from "../store/actions/deleteSetActions";
+import { deleteSetChanges, removeSet } from "../store/actions/deleteSetActions";
 import { sortTerms } from "../store/actions/setActions";
 import { createEditSet } from "../store/actions/editSetActions";
 import {
@@ -26,9 +26,9 @@ const ViewSetContainer = props => {
       match={props.match}
       setDetails={props.setDetails}
       signedUser={props.signedUser}
-      author={props.author}
       percentage={props.percentage}
       isUserSet={props.isUserSet}
+      isLearning={props.isLearning}
       sortedBy={props.sortedBy}
       terms={props.terms}
       lastLocation={props.lastLocation}
@@ -46,6 +46,7 @@ const ViewSetContainer = props => {
       createLearnSet={props.createLearnSet}
       createPlaySet={props.createPlaySet}
       enableEditSet={props.enableEditSet}
+      removeSet={props.removeSet}
       enableCreateSet={props.enableCreateSet}
     />
   ) : (
@@ -77,27 +78,25 @@ function orderTerms(terms, orderBy) {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const setDetails = state.firestore.data.setDetails || undefined;
-  const author = setDetails ? setDetails.authorId : null;
+  const signedUser = state.firebase.auth.uid;
   const terms = state.firestore.ordered.viewTerms;
-  const userProgress = state.firestore.data.userProgress;
-  const knowledge = userProgress?.knowledge;
-  const amount = userProgress?.amount;
-  const isUserSet = userProgress ? true : false;
   const orderedTerms = terms && orderTerms(terms, state.sortedBy);
-  const percentage = userProgress
-    ? knowledge
-      ? Math.round((knowledge * 100) / (amount * 5))
-      : 0
-    : undefined;
+  const userProgress = state.firestore.data?.userProgress;
+  const setDetails = userProgress || state.firestore.data?.setDetails;
+  const isUserSet = setDetails?.authorId === signedUser;
+  const isLearning = userProgress ? true : false;
+  const percentage = setDetails?.knowledge !== undefined ?
+    Math.round((setDetails?.knowledge * 100) / (setDetails?.amount * 5)) :
+    undefined;
 
   return {
     percentage,
-    author,
     setDetails,
     isUserSet,
+    isLearning,
+    signedUser,
     terms: orderedTerms,
-    signedUser: state.firebase.auth.uid,
+    author: setDetails?.authorId,
     lastLocation: state.navigation.lastLocation,
     sortedBy: state.setStatus.sortedBy,
     isEditSubmited: state.setStatus.isEditSubmited,
@@ -123,13 +122,14 @@ export default compose(
       createLearnSet,
       createPlaySet,
       enableCreateSet,
+      removeSet,
       enableEditSet,
       deleteSetChanges
     }
   ),
   firestoreConnect(props => {
     if (props.signedUser) {
-      if (props.isUserSet) {
+      if (props.isLearning) {
         return [
           {
             collection: "sets",

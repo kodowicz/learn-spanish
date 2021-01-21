@@ -113,3 +113,40 @@ export const deleteSetChanges = isDeleted => (dispatch, getState, { getFirestore
       }
     });
 };
+
+export const removeSet = () => (dispatch, getState, { getFirestore }) => {
+  const firestore = getFirestore();
+  const uid = getState().firebase.auth.uid;
+  const setid = getState().navigation.setid;
+
+  const userSetRef = firestore.doc(`users/${uid}/learn/${setid}`);
+  const learnSetRef = userSetRef.collection("flashcards");
+  const playSetRef = userSetRef.collection("game");
+
+  learnSetRef.get().then(snapshot => {
+    snapshot.forEach(doc => {
+      doc.ref.delete();
+    });
+  });
+
+  playSetRef.get().then(snapshot => {
+    snapshot.forEach(doc => {
+      doc.ref.delete();
+    });
+  });
+
+  userSetRef
+    .delete()
+    .then(() => {
+      dispatch({
+        type: types.REMOVE_SET,
+        payload: true
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: types.REMOVE_SET_ERROR,
+        error
+      });
+    });
+};

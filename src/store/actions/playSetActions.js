@@ -13,14 +13,10 @@ export const createPlaySet = setid => (dispatch, getState, { getFirestore }) => 
     .then(doc => {
       if (!doc.exists) {
         setRef.get().then(doc => {
-          const { amount, name } = doc.data();
-
           learnDetailsRef.set({
-            name,
-            amount,
+            ...doc.data(),
             knowledge: 0,
-            isCompleted: false,
-            id: learnDetailsRef.id
+            isCompleted: false
           });
         });
 
