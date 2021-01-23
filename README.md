@@ -11,7 +11,7 @@
 <div align="center">
   <img
     alt="demo"
-    src="https://user-images.githubusercontent.com/32198905/99290436-92bee700-283e-11eb-919c-8768032231db.gif"
+    src="https://user-images.githubusercontent.com/32198905/105613836-460b0580-5dc5-11eb-80fd-6a9ed88e7842.mp4"
   />
 </div>
 
