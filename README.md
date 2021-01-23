@@ -17,7 +17,7 @@
 
 ## 📚 Usage
 Feel free to create your own account and explore Spanish. An email can be fake, there is no email authentication.
-If you just want to see a functionality of the application log in using following basic user:
+If you just want to see a functionality of the application log in as guest or using following basic user:
 > ***email:** user@gmail.com*
 
 > ***password:** 123456*
@@ -32,7 +32,6 @@ If you just want to see a functionality of the application log in using followin
 + react-masonry-component `^6.2.1`
 + prop-types `^15.7.2`
 + styled-components `^4.4.1`
-+ react-speech `1.0.2`
 
 ## 💡 Purposes
 - [x] audio API
@@ -43,4 +42,4 @@ If you just want to see a functionality of the application log in using followin
 - [ ] security
 
 ## ❓ Questions
-For questions related to using the application, you can [raise issue here](https://github.com/kodowicz/learn-spanish/issues/new), or send me an email: [**anna.julia.kotowicz@gmail.com**](mailto:anna.julia.kotowicz@gmail.com). Also if you found any bugs or unexpected behavior let me know via issues. 
+For questions related to using the application, you can [raise issue here](https://github.com/kodowicz/learn-spanish/issues/new), or send me an email: [**anna.julia.kotowicz@gmail.com**](mailto:anna.julia.kotowicz@gmail.com). Also if you found any bugs or unexpected behavior let me know via issues.
